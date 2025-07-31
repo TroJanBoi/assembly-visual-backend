@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/conf"
+	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -58,7 +59,8 @@ func New() Service {
 	if config.AUTO_MIGRATE {
 		log.Println("Auto migrating database...")
 		err = db.AutoMigrate(
-		// Add your models here, e.g. User{}, Post{}, etc.
+			// Add your models here, e.g. &model.User{}, etc.
+			&model.User{},
 		)
 		if err != nil {
 			log.Fatalf("Error auto migrating database: %v", err)
