@@ -1,4 +1,46 @@
+definitions:
+  types.CatResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+  description: This is the API documentation for the Assembly Visual project.
+  termsOfService: http://swagger.io/terms/
+  title: Assembly Visual API documentation
+  version: "1.0"
+paths:
+  /cats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all cat information from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.CatResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all cats
+      tags:
+      - cats
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
