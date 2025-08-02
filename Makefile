@@ -1,20 +1,56 @@
-# Simple Makefile for a Go project
+# ---------------------------------------
+# Makefile for Go Project with Colors 🎨
+# ---------------------------------------
 
-# Build the application
-all: 
+# ANSI colors
+GREEN  := \033[1;32m
+BLUE   := \033[1;34m
+YELLOW := \033[1;33m
+RED    := \033[1;31m
+RESET  := \033[0m
 
-# Run the application
+.PHONY: all build run swagger swagger-install clean
+
+# ---------------------------------------
+# Default Target: Build Everything
+# ---------------------------------------
+all: build
+
+# ---------------------------------------
+# Build the Application
+# ---------------------------------------
+build:
+	@echo "$(YELLOW)🔨 Building the application...$(RESET)"
+	@go build -o main cmd/api/main.go
+	@echo "$(GREEN)✅ Build complete!$(RESET)"
+
+# ---------------------------------------
+# Run the Application
+# ---------------------------------------
 run:
+	@echo "$(YELLOW)🚀 Starting application...$(RESET)"
 	@go run cmd/api/main.go
 
-# Generate Swagger documentation
+# ---------------------------------------
+# Generate Swagger Documentation
+# ---------------------------------------
 swagger:
-	@echo "Generating Swagger documentation..."
+	@echo "$(BLUE)📄 Generating Swagger documentation...$(RESET)"
 	@swag init -g cmd/api/main.go -o cmd/api/docs
-	@echo "Swagger documentation generated."
+	@echo "$(GREEN)✅ Swagger docs generated at cmd/api/docs$(RESET)"
 
-# Install Swagger CLI tool
+# ---------------------------------------
+# Install Swagger CLI Tool
+# ---------------------------------------
 swagger-install:
-	@echo "Installing Swagger CLI tool..."
+	@echo "$(BLUE)⬇️ Installing Swagger CLI tool...$(RESET)"
 	@go install github.com/swaggo/swag/cmd/swag@latest
-	@echo "Swagger CLI tool installed successfully!"
+	@echo "$(GREEN)✅ Swagger CLI tool installed!$(RESET)"
+
+# ---------------------------------------
+# Clean Up Build Artifacts
+# ---------------------------------------
+clean:
+	@echo "$(RED)🧹 Cleaning build artifacts...$(RESET)"
+	@rm -f main
+	@echo "$(GREEN)✅ Clean complete!$(RESET)"
