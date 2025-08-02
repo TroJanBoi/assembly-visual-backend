@@ -46,12 +46,20 @@ func (s *Server) Router() (http.Handler, func()) {
 	oauthUseCase := usecases.NewOAuthUseCase(oauthRepository)
 	oauthController := controller.NewOAuthController(oauthUseCase)
 
+	userRepository := repository.NewUserRepository(s.db)
+	userUseCase := usecases.NewUserUseCase(userRepository)
+	userController := controller.NewUserController(userUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
 		catGroup := api.Group("/cats").Use(security.Middleware())
 		{
 			catController.CatRegisterRoutes(catGroup)
+		}
+		userGroup := api.Group("/users").Use(security.Middleware())
+		{
+			userController.UserRoutes(userGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
