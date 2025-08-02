@@ -19,17 +19,6 @@ type ConfigInterface interface {
 	CreateClientDatabase() (interface{}, interface{}, error)
 }
 
-var GoogleOAuthConfig = &oauth2.Config{
-	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-	RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URI"),
-	Scopes: []string{
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
-	},
-	Endpoint: google.Endpoint,
-}
-
 type Config struct {
 	POSTGRES_USER     string
 	POSTGRES_PASSWORD string
@@ -42,6 +31,22 @@ type Config struct {
 	ENV               string
 	PORT              int
 	AUTO_MIGRATE      bool
+}
+
+func GetGoogleOAuthConfig() *oauth2.Config {
+	clientID := os.Getenv("GOOGLE_CLIENT_ID")
+	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
+	redirectURL := os.Getenv("GOOGLE_REDIRECT_URI")
+	return &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: google.Endpoint,
+	}
 }
 
 func getEnvOrDefault(key, defaultValue string) string {
@@ -145,4 +150,5 @@ func NewConfig() *Config {
 		PORT:              portInt,
 		AUTO_MIGRATE:      getEnvBoolOrDefault("AUTO_MIGRATE", false),
 	}
+
 }
