@@ -20,6 +20,7 @@ func NewCatUseCase(catRepository repository.CatRepository) CatUseCase {
 		catRepository: catRepository,
 	}
 }
+
 func (c *catUseCase) GetAllCatsUsecase(ctx context.Context) ([]types.CatResponse, error) {
 	cats, err := c.catRepository.GetAllCats(ctx)
 	if err != nil {

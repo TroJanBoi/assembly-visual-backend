@@ -36,13 +36,19 @@ func (s *Server) Router() (http.Handler, func()) {
 
 	r.Use(CORSMiddleware())
 
-	docs.SwaggerInfo.BasePath = "api/v2"
+	docs.SwaggerInfo.BasePath = "/api/v2"
+
 	catRepository := repository.NewCatRepository(s.db)
 	catUseCase := usecases.NewCatUseCase(catRepository)
 	catController := controller.NewCatController(catUseCase)
 
-	api := r.Group("api/v2")
+	oauthRepository := repository.NewOAuthRepository()
+	oauthUseCase := usecases.NewOAuthUseCase(oauthRepository)
+	oauthController := controller.NewOAuthController(oauthUseCase)
+
+	api := r.Group("/api/v2")
 	{
+		oauthController.OAuthRegisterRoutes(api)
 		catGroup := api.Group("/cats").Use(security.Middleware())
 		{
 			catController.CatRegisterRoutes(catGroup)
