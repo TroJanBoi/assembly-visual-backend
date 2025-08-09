@@ -29,3 +29,7 @@ func GenerateToken(userId int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
 }
+
+func HashPassword(password string) string {
+	return password
+}
