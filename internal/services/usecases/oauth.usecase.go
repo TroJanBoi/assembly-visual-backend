@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/repository"
+	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
 )
 
 type OAuthUseCase interface {
-	HandleOAuthUseCase(ctx context.Context, code string) (string, error)
+	HandleOAuthUseCase(ctx context.Context, code string) (types.OAuthLoginResponse, error)
 }
 
 type oauthUseCase struct {
@@ -20,6 +21,6 @@ func NewOAuthUseCase(repo repository.OAuthRepository) OAuthUseCase {
 	}
 }
 
-func (o *oauthUseCase) HandleOAuthUseCase(ctx context.Context, code string) (string, error) {
+func (o *oauthUseCase) HandleOAuthUseCase(ctx context.Context, code string) (types.OAuthLoginResponse, error) {
 	return o.repo.HandleOAuth(ctx, code)
 }

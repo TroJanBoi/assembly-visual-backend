@@ -50,6 +50,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	userUseCase := usecases.NewUserUseCase(userRepository)
 	userController := controller.NewUserController(userUseCase)
 
+	classroomRepository := repository.NewClassroomRepository()
+	classroomUseCase := usecases.NewClassroomUseCase(classroomRepository)
+	classroomController := controller.NewClassroomController(classroomUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -60,6 +64,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		userGroup := api.Group("/users").Use(security.Middleware())
 		{
 			userController.UserRoutes(userGroup)
+		}
+		classroomGroup := api.Group("/classrooms").Use(security.Middleware())
+		{
+			classroomController.ClassroomRoutes(classroomGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
