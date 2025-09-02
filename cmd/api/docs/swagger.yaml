@@ -95,6 +95,43 @@ paths:
       summary: List all courses
       tags:
       - Classroom
+  /classrooms/{courseId}/assignments:
+    get:
+      consumes:
+      - application/json
+      description: Get all assignments in a specific course
+      parameters:
+      - description: Course ID
+        in: path
+        name: courseId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all assignments in a course
+      tags:
+      - Classroom
   /classrooms/{courseId}/students:
     get:
       consumes:

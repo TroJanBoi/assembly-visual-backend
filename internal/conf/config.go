@@ -46,8 +46,11 @@ func GetGoogleOAuthConfig() *oauth2.Config {
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
 
-			"https://www.googleapis.com/auth/classroom.courses.readonly",
-			"https://www.googleapis.com/auth/classroom.rosters.readonly",
+			"https://www.googleapis.com/auth/classroom.courses.readonly",             // Read-only access to course information
+			"https://www.googleapis.com/auth/classroom.rosters.readonly",             // Read-only access to course rosters
+			"https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly", // Read-only access to coursework materials
+			"https://www.googleapis.com/auth/classroom.coursework.me.readonly",       // Read-only access to coursework for me
+			"https://www.googleapis.com/auth/classroom.coursework.students.readonly", // Read-only access to coursework for students
 		},
 		Endpoint: google.Endpoint,
 	}

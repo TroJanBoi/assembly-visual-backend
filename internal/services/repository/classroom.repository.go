@@ -13,6 +13,7 @@ import (
 type ClassroomRepository interface {
 	ListCourse(ctx context.Context, accessToken string) ([]*classroom.Course, error)
 	ListStudents(ctx context.Context, accessToken string, courseId string) ([]*classroom.Student, error)
+	GetAllAssignments(ctx context.Context, accessToken string, courseId string) ([]*classroom.CourseWork, error)
 }
 
 type classroomRepository struct{}
@@ -65,4 +66,30 @@ func (c *classroomRepository) ListStudents(ctx context.Context, accessToken, cou
 	}
 
 	return allStudents, nil
+}
+
+func (c *classroomRepository) GetAllAssignments(ctx context.Context, accessToken, courseId string) ([]*classroom.CourseWork, error) {
+	service, err := c.svc(ctx, accessToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create classroom service: %w", err)
+	}
+	var GetAllAssignments []*classroom.CourseWork
+	pageToken := ""
+	for {
+		assignment := service.Courses.CourseWork.List(courseId).PageSize(100)
+		if pageToken != "" {
+			assignment = assignment.PageToken(pageToken)
+		}
+
+		response, err := assignment.Do()
+		if err != nil {
+			return nil, fmt.Errorf("failed to list assignments: %w", err)
+		}
+		GetAllAssignments = append(GetAllAssignments, response.CourseWork...)
+		if response.NextPageToken == "" {
+			break
+		}
+		pageToken = response.NextPageToken
+	}
+	return GetAllAssignments, nil
 }

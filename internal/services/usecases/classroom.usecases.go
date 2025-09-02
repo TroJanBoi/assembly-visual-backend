@@ -10,6 +10,7 @@ import (
 type ClassroomUseCase interface {
 	ListCourseUsecase(ctx context.Context, accessToken string) ([]*classroom.Course, error)
 	ListStudentsUsecase(ctx context.Context, accessToken string, courseId string) ([]*classroom.Student, error)
+	GetAllAssignmentsUsecase(ctx context.Context, accessToken string, courseId string) ([]*classroom.CourseWork, error)
 }
 
 type classroomUseCase struct {
@@ -36,4 +37,12 @@ func (c *classroomUseCase) ListStudentsUsecase(ctx context.Context, accessToken 
 		return nil, err
 	}
 	return students, nil
+}
+
+func (c *classroomUseCase) GetAllAssignmentsUsecase(ctx context.Context, accessToken string, courseId string) ([]*classroom.CourseWork, error) {
+	assignments, err := c.repo.GetAllAssignments(ctx, accessToken, courseId)
+	if err != nil {
+		return nil, err
+	}
+	return assignments, nil
 }

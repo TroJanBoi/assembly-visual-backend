@@ -84,7 +84,34 @@ func (c *ClassroomController) ListStudents(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"students": students})
 }
 
+// @Summary Get all assignments in a course
+// @Description Get all assignments in a specific course
+// @Tags Classroom
+// @Accept json
+// @Produce json
+// @Param courseId path string true "Course ID"
+// @Security BearerAuth
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router /classrooms/{courseId}/assignments [get]
+func (c *ClassroomController) GetAllAssignments(ctx *gin.Context) {
+	token := bearer(ctx)
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "missing authorization token"})
+		return
+	}
+	courseId := ctx.Param("courseId")
+	assignments, err := c.classroomUseCase.GetAllAssignmentsUsecase(ctx, token, courseId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"assignments": assignments})
+}
+
 func (c *ClassroomController) ClassroomRoutes(r gin.IRoutes) {
 	r.GET("/", c.ListCourse)
 	r.GET("/:courseId/students", c.ListStudents)
+	r.GET("/:courseId/assignments", c.GetAllAssignments)
 }
