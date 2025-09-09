@@ -26,7 +26,7 @@ type UserResponse struct {
 }
 
 type OperationResponse struct {
-	Value      []float64 `json:"value"`
-	StatusCode int       `json:"status_code"`
-	Message    string    `json:"message"`
+	Value      float64 `json:"value"`
+	StatusCode int     `json:"status_code"`
+	Message    string  `json:"message"`
 }
