@@ -8,12 +8,7 @@ import (
 type CatController struct {
 	catUseCase usecases.CatUseCase
 }
-	// _, err := c.catUseCase.GetAllCatsUsecase(ctx)
-	// if err != nil {
-	// 	ctx.JSON(500, gin.H{"error": "Failed to retrieve cats"})
-	// 	return
-	// }
-	// ctx.JSON(200, gin.H{"message": "Cats retrieved successfully"})
+
 func NewCatController(catUseCase usecases.CatUseCase) *CatController {
 	return &CatController{
 		catUseCase: catUseCase,

@@ -86,9 +86,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/users/create": {
+            },
             "post": {
                 "security": [
                     {
@@ -188,6 +186,9 @@
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "tel": {

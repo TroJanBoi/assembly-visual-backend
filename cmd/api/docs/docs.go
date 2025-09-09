@@ -94,9 +94,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/users/create": {
+            },
             "post": {
                 "security": [
                     {
@@ -196,6 +194,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "tel": {
