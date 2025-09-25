@@ -97,6 +97,112 @@ paths:
         "400":
           description: Bad Request
           schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add numbers
+      tags:
+      - operations
+  /operations/div:
+    post:
+      consumes:
+      - application/json
+      description: Divide a list of numbers and return the result
+      parameters:
+      - description: List of numbers to divide
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Divide numbers
+      tags:
+      - operations
+  /operations/mul:
+    post:
+      consumes:
+      - application/json
+      description: Multiply a list of numbers and return the result
+      parameters:
+      - description: List of numbers to multiply
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+      security:
+      - BearerAuth: []
+      summary: Multiply numbers
+      tags:
+      - operations
+  /operations/sub:
+    post:
+      consumes:
+      - application/json
+      description: Subtract a list of numbers and return the result
+      parameters:
+      - description: List of numbers to subtract
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
             additionalProperties:
               type: string
             type: object
@@ -108,7 +214,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Add numbers
+      summary: Subtract numbers
       tags:
       - operations
   /users:

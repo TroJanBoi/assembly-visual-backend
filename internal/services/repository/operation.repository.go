@@ -1,14 +1,15 @@
 package repository
 
 import (
-	"strconv"
-
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
 	"gorm.io/gorm"
 )
 
 type OperationRepository interface {
 	OperationAdd([]float64) (*types.OperationResponse, error)
+	OperationSub([]float64) (*types.OperationResponse, error)
+	OperationMul([]float64) (*types.OperationResponse, error)
+	OperationDiv([]float64) (*types.OperationResponse, error)
 }
 
 type operationRepository struct {
@@ -20,15 +21,6 @@ func NewOperationRepository(db *gorm.DB) OperationRepository {
 }
 
 func (r *operationRepository) OperationAdd(values []float64) (*types.OperationResponse, error) {
-	for i := range values {
-		if strconv.Itoa(int(values[i])) == "" {
-			return &types.OperationResponse{
-				Value:      0.0,
-				StatusCode: 400,
-				Message:    "Invalid input: all elements must be numbers",
-			}, nil
-		}
-	}
 	sum := 0.0
 	for _, v := range values {
 		sum += v
@@ -37,6 +29,52 @@ func (r *operationRepository) OperationAdd(values []float64) (*types.OperationRe
 		Value:      sum,
 		StatusCode: 200,
 		Message:    "Addition successful",
+	}
+	return result, nil
+}
+
+func (o *operationRepository) OperationSub(values []float64) (*types.OperationResponse, error) {
+	sum := values[0]
+	for _, v := range values[1:] {
+		sum -= v
+	}
+	result := &types.OperationResponse{
+		Value:      sum,
+		StatusCode: 200,
+		Message:    "Subtraction successful",
+	}
+	return result, nil
+}
+
+func (o *operationRepository) OperationMul(values []float64) (*types.OperationResponse, error) {
+	sum := values[0]
+	for _, v := range values[1:] {
+		sum *= v
+	}
+	result := &types.OperationResponse{
+		Value:      sum,
+		StatusCode: 200,
+		Message:    "Multiplication successful",
+	}
+	return result, nil
+}
+
+func (o *operationRepository) OperationDiv(values []float64) (*types.OperationResponse, error) {
+	sum := values[0]
+	for _, v := range values[1:] {
+		if v == 0 {
+			return &types.OperationResponse{
+				Value:      0,
+				StatusCode: 400,
+				Message:    "Division by zero is not allowed",
+			}, nil
+		}
+		sum /= v
+	}
+	result := &types.OperationResponse{
+		Value:      sum,
+		StatusCode: 200,
+		Message:    "Division successful",
 	}
 	return result, nil
 }
