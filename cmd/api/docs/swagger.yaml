@@ -137,9 +137,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/types.OperationResponse'
       security:
       - BearerAuth: []
       summary: Divide numbers
@@ -242,6 +240,7 @@ paths:
       summary: Get all users
       tags:
       - users
+  /users/signup:
     post:
       consumes:
       - application/json

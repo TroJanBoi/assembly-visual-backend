@@ -161,10 +161,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/types.OperationResponse"
                         }
                     }
                 }
@@ -322,7 +319,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/users/signup": {
             "post": {
                 "security": [
                     {

@@ -59,7 +59,6 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 			Username: user.Username,
 			Password: user.Password, // Note: Password should not be returned in a real application
 			Name:     user.Name,
-			Avatar:   user.Avatar,
 			Tel:      user.Tel,
 		})
 	}
