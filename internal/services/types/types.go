@@ -24,3 +24,9 @@ type UserResponse struct {
 	Avatar   string `json:"avatar"`
 	Tel      string `json:"tel"`
 }
+
+type OperationResponse struct {
+	Value      float64 `json:"value"`
+	StatusCode int     `json:"status_code"`
+	Message    string  `json:"message"`
+}

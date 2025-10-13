@@ -9,12 +9,12 @@ YELLOW := \033[1;33m
 RED    := \033[1;31m
 RESET  := \033[0m
 
-.PHONY: all build run swagger swagger-install clean
+.PHONY: all build run swagger swagger-install clean test
 
 # ---------------------------------------
 # Default Target: Build Everything
 # ---------------------------------------
-all: build
+all: test build
 
 # ---------------------------------------
 # Build the Application
@@ -30,6 +30,15 @@ build:
 run:
 	@echo "$(YELLOW)🚀 Starting application...$(RESET)"
 	@go run cmd/api/main.go
+
+# ---------------------------------------
+# Test the Application
+# ---------------------------------------
+test:
+	@echo "$(YELLOW)🧪 Running tests...$(RESET)"
+	@go clean -testcache
+	@go test ./test/... -v
+	@echo "$(GREEN)✅ Tests complete!$(RESET)"
 
 # ---------------------------------------
 # Generate Swagger Documentation
@@ -54,3 +63,4 @@ clean:
 	@echo "$(RED)🧹 Cleaning build artifacts...$(RESET)"
 	@rm -f main
 	@echo "$(GREEN)✅ Clean complete!$(RESET)"
+

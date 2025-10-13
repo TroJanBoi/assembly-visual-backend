@@ -15,6 +15,15 @@ definitions:
     required:
     - email
     type: object
+  types.OperationResponse:
+    properties:
+      message:
+        type: string
+      status_code:
+        type: integer
+      value:
+        type: number
+    type: object
   types.UserResponse:
     properties:
       avatar:
@@ -24,6 +33,8 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+      password:
         type: string
       tel:
         type: string
@@ -62,6 +73,150 @@ paths:
       summary: Get all cats
       tags:
       - cats
+  /operations/add:
+    post:
+      consumes:
+      - application/json
+      description: Add a list of numbers and return the result
+      parameters:
+      - description: List of numbers to add
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add numbers
+      tags:
+      - operations
+  /operations/div:
+    post:
+      consumes:
+      - application/json
+      description: Divide a list of numbers and return the result
+      parameters:
+      - description: List of numbers to divide
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Divide numbers
+      tags:
+      - operations
+  /operations/mul:
+    post:
+      consumes:
+      - application/json
+      description: Multiply a list of numbers and return the result
+      parameters:
+      - description: List of numbers to multiply
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+      security:
+      - BearerAuth: []
+      summary: Multiply numbers
+      tags:
+      - operations
+  /operations/sub:
+    post:
+      consumes:
+      - application/json
+      description: Subtract a list of numbers and return the result
+      parameters:
+      - description: List of numbers to subtract
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: number
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.OperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Subtract numbers
+      tags:
+      - operations
   /users:
     get:
       consumes:
@@ -87,7 +242,6 @@ paths:
       summary: Get all users
       tags:
       - users
-  /users/create:
     post:
       consumes:
       - application/json
