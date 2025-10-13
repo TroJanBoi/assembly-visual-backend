@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Assembly DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "assembly-visual",
+      "Username": "postgres",
+      "SSLMode": "disable",
+      "ConnectNow": true
+    }
+  }
+}

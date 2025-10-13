@@ -153,10 +153,7 @@
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/types.OperationResponse"
                         }
                     }
                 }
@@ -314,7 +311,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/users/signup": {
             "post": {
                 "security": [
                     {

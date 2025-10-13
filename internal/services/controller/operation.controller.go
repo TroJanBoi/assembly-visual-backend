@@ -147,7 +147,7 @@ func (o *OperationController) OperationMulController(ctx *gin.Context) {
 // @Param body body []float64 true "List of numbers to divide"
 // @Success      200   {object}  types.OperationResponse
 // @Failure      400   {object}  types.OperationResponse
-// @Failure      500   {object}  types.OperationResponse8
+// @Failure      500   {object}  types.OperationResponse
 // @Security     BearerAuth
 // @Router       /operations/div [post]
 func (o *OperationController) OperationDivController(ctx *gin.Context) {
