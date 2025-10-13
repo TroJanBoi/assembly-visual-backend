@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 
+	"path/filepath"
+
 	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -122,11 +124,26 @@ func (c *Config) CreateClientDatabase() (*gorm.DB, *sql.DB, error) {
 }
 
 func NewConfig() *Config {
-	dotenverr := godotenv.Load()
-	if dotenverr != nil {
-		log.Printf("Warning: .env file not found, using environment variables instead: %v", dotenverr)
-	} else {
-		log.Println("Loaded environment variables from .env file")
+	// dotenverr := godotenv.Load()
+	// if dotenverr != nil {
+	// 	log.Printf("Warning: .env file not found, using environment variables instead: %v", dotenverr)
+	// } else {
+	// 	log.Println("Loaded environment variables from .env file")
+	// }
+	paths := []string{
+		".env",
+		filepath.Join("..", "..", ".env"),
+	}
+	loaded := false
+	for _, p := range paths {
+		if err := godotenv.Load(p); err == nil {
+			log.Printf("Loaded environment variables from %s", p)
+			loaded = true
+			break
+		}
+	}
+	if !loaded {
+		log.Printf("Warning: .env file not found in %v, using OS environment", paths)
 	}
 
 	portStr := getEnvOrDefault("PORT", "9090")
@@ -141,7 +158,7 @@ func NewConfig() *Config {
 		POSTGRES_USER:     getEnvOrThrow("POSTGRES_USER"),
 		POSTGRES_PASSWORD: getEnvOrThrow("POSTGRES_PASSWORD"),
 		POSTGRES_DB:       getEnvOrThrow("POSTGRES_DB"),
-		POSTGRES_HOST:     getEnvOrDefault("POSTGRES_HOST", "localhost"),
+		POSTGRES_HOST:     getEnvOrDefault("POSTGRES_HOST", "postgres"),
 		POSTGRES_PORT:     getEnvOrDefault("POSTGRES_PORT", "5432"),
 		POSTGRES_SSL:      getEnvOrDefault("POSTGRES_SSL", "disable"),
 		POSTGRES_TIMEZONE: getEnvOrDefault("POSTGRES_TIMEZONE", "Asia/Bangkok"),

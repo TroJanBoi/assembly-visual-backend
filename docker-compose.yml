@@ -1,0 +1,45 @@
+# version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: assembly-postgres
+    restart: always
+    env_file: .env
+    environment:
+      TZ: ${POSTGRES_TIMEZONE}
+      PGTZ: ${POSTGRES_TIMEZONE}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d   # (ถ้ามีไฟล์ init.sql)
+    networks:
+      - assembly-net
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: assembly-pgadmin
+    restart: always
+    env_file: .env
+    environment:
+      PGADMIN_LISTEN_PORT: ${PGADMIN_PORT}
+      # ตัวเลือกด้านล่างไม่จำเป็น แต่ช่วยลด prompt master password
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "${PGADMIN_PORT}:${PGADMIN_PORT}"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro  # สำคัญ!
+    networks:
+      - assembly-net
+
+volumes:
+  pgdata:
+  pgadmin-data:
+
+networks:
+  assembly-net:
+    driver: bridge
