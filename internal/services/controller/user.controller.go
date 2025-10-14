@@ -26,7 +26,7 @@ func NewUserController(userUseCase usecases.UserUseCase) *UserController {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/signup [post]
+// @Router       /users/sign-up [post]
 func (u *UserController) CreateUserController(ctx *gin.Context) {
 	var request types.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -38,6 +38,54 @@ func (u *UserController) CreateUserController(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(201, gin.H{"message": "User created successfully"})
+}
+
+// @Summary      Update user
+// @Description  Update an existing user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param body body types.UpdateUserRequest true "Updated user info"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /users [put]
+func (u *UserController) UpdateUserController(ctx *gin.Context) {
+	var request types.UpdateUserRequest
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid request data"})
+		return
+	}
+	if err := u.userUseCase.UpdateUserUsecase(ctx, &request); err != nil {
+		ctx.JSON(500, gin.H{"error": "Failed to update user"})
+		return
+	}
+	ctx.JSON(200, gin.H{"message": "User updated successfully"})
+}
+
+// @Summary      Delete user
+// @Description  Delete an existing user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param body body types.DeleteUserRequest true "User email to delete"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /users [delete]
+func (u *UserController) DeleteUserController(ctx *gin.Context) {
+	var request types.DeleteUserRequest
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid request data"})
+		return
+	}
+	if err := u.userUseCase.DeleteUserUsecase(ctx, &request); err != nil {
+		ctx.JSON(500, gin.H{"error": "Failed to delete user"})
+		return
+	}
+	ctx.JSON(200, gin.H{"message": "User deleted successfully"})
 }
 
 // @Summary      Get all users
@@ -60,5 +108,7 @@ func (u *UserController) GetAllUsersController(ctx *gin.Context) {
 
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
-	r.POST("/signup", u.CreateUserController)
+	r.PUT("/", u.UpdateUserController)
+	r.DELETE("/", u.DeleteUserController)
+	r.POST("/sign-up", u.CreateUserController)
 }
