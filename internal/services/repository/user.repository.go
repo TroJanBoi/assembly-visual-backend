@@ -13,7 +13,7 @@ import (
 
 type UserRepository interface {
 	GetAllUsers(ctx context.Context) (*[]types.UserResponse, error)
-	CreateUser(ctx context.Context, email, password string) error
+	CreateUser(ctx context.Context, users *types.CreateUserRequest) error
 }
 
 type userRepository struct {
@@ -24,18 +24,28 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) CreateUser(ctx context.Context, email, password string) error {
+func (r *userRepository) CreateUser(ctx context.Context, users *types.CreateUserRequest) error {
 	var user model.User
 
-	err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error
+	err := r.db.WithContext(ctx).Where("email = ?", users.Email).First(&user).Error
 	if err == nil {
-		return fmt.Errorf("user with email %s already exists", email)
+		return fmt.Errorf("user with email %s already exists", users.Email)
+	}
+
+	if users.Name == "" {
+		users.Name = ""
+	}
+
+	if users.Tel == "" {
+		users.Tel = ""
 	}
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		newUser := model.User{
-			Email:    email,
-			Password: security.HashPassword(password),
+			Email:    users.Email,
+			Password: security.HashPassword(users.Password),
+			Name:     users.Name,
+			Tel:      users.Tel,
 		}
 		if err := r.db.WithContext(ctx).Create(&newUser).Error; err != nil {
 			return fmt.Errorf("failed to create user: %w", err)
@@ -56,7 +66,6 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 		userResp = append(userResp, types.UserResponse{
 			ID:       int(user.ID),
 			Email:    user.Email,
-			Username: user.Username,
 			Password: user.Password, // Note: Password should not be returned in a real application
 			Name:     user.Name,
 			Tel:      user.Tel,

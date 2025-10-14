@@ -10,7 +10,11 @@ definitions:
     properties:
       email:
         type: string
+      name:
+        type: string
       password:
+        type: string
+      tel:
         type: string
     required:
     - email
@@ -26,8 +30,6 @@ definitions:
     type: object
   types.UserResponse:
     properties:
-      avatar:
-        type: string
       email:
         type: string
       id:
@@ -37,8 +39,6 @@ definitions:
       password:
         type: string
       tel:
-        type: string
-      username:
         type: string
     type: object
 info:

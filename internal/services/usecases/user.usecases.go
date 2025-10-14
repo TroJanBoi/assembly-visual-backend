@@ -8,7 +8,7 @@ import (
 )
 
 type UserUseCase interface {
-	CreateUserUsecase(ctx context.Context, email, password string) error
+	CreateUserUsecase(ctx context.Context, user *types.CreateUserRequest) error
 	GetAllUsersUsecase(ctx context.Context) (*[]types.UserResponse, error)
 }
 
@@ -22,8 +22,8 @@ func NewUserUseCase(userRepository repository.UserRepository) UserUseCase {
 	}
 }
 
-func (u *userUseCase) CreateUserUsecase(ctx context.Context, email, password string) error {
-	if err := u.userRepository.CreateUser(ctx, email, password); err != nil {
+func (u *userUseCase) CreateUserUsecase(ctx context.Context, user *types.CreateUserRequest) error {
+	if err := u.userRepository.CreateUser(ctx, user); err != nil {
 		return err
 	}
 	return nil

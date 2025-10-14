@@ -13,15 +13,15 @@ type OAuthRequest struct {
 type CreateUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
+	Name     string `json:"name"`
+	Tel      string `json:"tel"`
 }
 
 type UserResponse struct {
 	ID       int    `json:"id"`
 	Email    string `json:"email"`
-	Username string `json:"username"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
-	Avatar   string `json:"avatar"`
 	Tel      string `json:"tel"`
 }
 

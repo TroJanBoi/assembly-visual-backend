@@ -395,7 +395,13 @@
                 "email": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "tel": {
                     "type": "string"
                 }
             }
@@ -417,9 +423,6 @@
         "types.UserResponse": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
@@ -433,9 +436,6 @@
                     "type": "string"
                 },
                 "tel": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }
