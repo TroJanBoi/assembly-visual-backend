@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/usecases"
 	"github.com/gin-gonic/gin"
@@ -45,19 +47,25 @@ func (u *UserController) CreateUserController(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
+// @Param id path int true "User ID"
 // @Param body body types.UpdateUserRequest true "Updated user info"
 // @Success      200   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users [put]
+// @Router       /users/{id} [put]
 func (u *UserController) UpdateUserController(ctx *gin.Context) {
+	userID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID"})
+		return
+	}
 	var request types.UpdateUserRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(400, gin.H{"error": "Invalid request data"})
 		return
 	}
-	if err := u.userUseCase.UpdateUserUsecase(ctx, &request); err != nil {
+	if err := u.userUseCase.UpdateUsersUsecase(ctx, userID, &request); err != nil {
 		ctx.JSON(500, gin.H{"error": "Failed to update user"})
 		return
 	}
@@ -69,19 +77,19 @@ func (u *UserController) UpdateUserController(ctx *gin.Context) {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param body body types.DeleteUserRequest true "User email to delete"
+// @Param id path int true "User ID"
 // @Success      200   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users [delete]
+// @Router       /users/{id} [delete]
 func (u *UserController) DeleteUserController(ctx *gin.Context) {
-	var request types.DeleteUserRequest
-	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(400, gin.H{"error": "Invalid request data"})
+	var userID, err = strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID"})
 		return
 	}
-	if err := u.userUseCase.DeleteUserUsecase(ctx, &request); err != nil {
+	if err := u.userUseCase.DeleteUserUsecase(ctx, userID); err != nil {
 		ctx.JSON(500, gin.H{"error": "Failed to delete user"})
 		return
 	}
@@ -108,7 +116,7 @@ func (u *UserController) GetAllUsersController(ctx *gin.Context) {
 
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
-	r.PUT("/", u.UpdateUserController)
-	r.DELETE("/", u.DeleteUserController)
+	r.PUT("/:id", u.UpdateUserController)
+	r.DELETE("/:id", u.DeleteUserController)
 	r.POST("/", u.CreateUserController)
 }

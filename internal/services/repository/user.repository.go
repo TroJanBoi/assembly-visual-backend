@@ -14,8 +14,8 @@ import (
 type UserRepository interface {
 	GetAllUsers(ctx context.Context) (*[]types.UserResponse, error)
 	CreateUser(ctx context.Context, users *types.CreateUserRequest) error
-	UpdateUser(ctx context.Context, users *types.UpdateUserRequest) error
-	DeleteUser(ctx context.Context, user *types.DeleteUserRequest) error
+	UpdateUser(ctx context.Context, userID int, users *types.UpdateUserRequest) error
+	DeleteUser(ctx context.Context, userID int) error
 }
 
 type userRepository struct {
@@ -26,12 +26,11 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) UpdateUser(ctx context.Context, users *types.UpdateUserRequest) error {
+func (r *userRepository) UpdateUser(ctx context.Context, userID int, users *types.UpdateUserRequest) error {
 	var user model.User
-
-	err := r.db.WithContext(ctx).Where("email = ?", users.Email).First(&user).Error
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error
 	if err != nil {
-		return fmt.Errorf("user with email %s does not exist", users.Email)
+		return fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
 	updatedData := make(map[string]interface{})
@@ -45,10 +44,8 @@ func (r *userRepository) UpdateUser(ctx context.Context, users *types.UpdateUser
 		updatedData["tel"] = users.Tel
 	}
 
-	if len(updatedData) > 0 {
-		if err := r.db.WithContext(ctx).Model(&user).Updates(updatedData).Error; err != nil {
-			return fmt.Errorf("failed to update user: %w", err)
-		}
+	if err := r.db.WithContext(ctx).Model(&user).Updates(updatedData).Error; err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
 	}
 	return nil
 }
@@ -84,12 +81,12 @@ func (r *userRepository) CreateUser(ctx context.Context, users *types.CreateUser
 	return fmt.Errorf("failed to create user: %w", err)
 }
 
-func (r *userRepository) DeleteUser(ctx context.Context, user *types.DeleteUserRequest) error {
+func (r *userRepository) DeleteUser(ctx context.Context, userID int) error {
 	var existingUser model.User
-	err := r.db.WithContext(ctx).Where("email = ?", user.Email).First(&existingUser).Error
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&existingUser).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with email %s does not exist", user.Email)
+			return fmt.Errorf("user with ID %d does not exist", userID)
 		}
 		return fmt.Errorf("failed to find user: %w", err)
 	}
@@ -118,3 +115,4 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 	}
 	return &userResp, nil
 }
+

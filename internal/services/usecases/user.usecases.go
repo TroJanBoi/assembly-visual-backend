@@ -10,8 +10,8 @@ import (
 type UserUseCase interface {
 	CreateUserUsecase(ctx context.Context, user *types.CreateUserRequest) error
 	GetAllUsersUsecase(ctx context.Context) (*[]types.UserResponse, error)
-	UpdateUserUsecase(ctx context.Context, user *types.UpdateUserRequest) error
-	DeleteUserUsecase(ctx context.Context, user *types.DeleteUserRequest) error
+	UpdateUsersUsecase(ctx context.Context, userID int, user *types.UpdateUserRequest) error
+	DeleteUserUsecase(ctx context.Context, userID int) error
 }
 
 type userUseCase struct {
@@ -39,15 +39,15 @@ func (u *userUseCase) GetAllUsersUsecase(ctx context.Context) (*[]types.UserResp
 	return users, nil
 }
 
-func (u *userUseCase) UpdateUserUsecase(ctx context.Context, user *types.UpdateUserRequest) error {
-	if err := u.userRepository.UpdateUser(ctx, user); err != nil {
+func (u *userUseCase) UpdateUsersUsecase(ctx context.Context, userID int, user *types.UpdateUserRequest) error {
+	if err := u.userRepository.UpdateUser(ctx, userID, user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *userUseCase) DeleteUserUsecase(ctx context.Context, user *types.DeleteUserRequest) error {
-	if err := u.userRepository.DeleteUser(ctx, user); err != nil {
+func (u *userUseCase) DeleteUserUsecase(ctx context.Context, userID int) error {
+	if err := u.userRepository.DeleteUser(ctx, userID); err != nil {
 		return err
 	}
 	return nil
