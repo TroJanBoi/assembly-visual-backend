@@ -44,6 +44,9 @@ func GetGoogleOAuthConfig() *oauth2.Config {
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
 		Scopes: []string{
+			"openid",
+			"email",
+			"profile",
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
 		},
