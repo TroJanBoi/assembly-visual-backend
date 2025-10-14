@@ -13,7 +13,6 @@ type UserUseCase interface {
 	UpdateUsersUsecase(ctx context.Context, userID int, user *types.UpdateUserRequest) error
 	DeleteUserUsecase(ctx context.Context, userID int) error
 }
-
 type userUseCase struct {
 	userRepository repository.UserRepository
 }

@@ -119,4 +119,5 @@ func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.PUT("/:id", u.UpdateUserController)
 	r.DELETE("/:id", u.DeleteUserController)
 	r.POST("/", u.CreateUserController)
+
 }

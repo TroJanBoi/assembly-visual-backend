@@ -40,8 +40,8 @@ func startScheduler(logger *zap.Logger) {
 	c := cron.New(cron.WithLocation(time.FixedZone("Asia/Bangkok", 7*3600)))
 	_, err := c.AddFunc("* * * * *", func() {
 		logger.Info("Scheduler running...")
-		// Add your scheduled tasks here
-		scheduler.CleanupSoftDeletedUsers(&model.User{}, 1)
+
+		scheduler.CleanupSoftDeletedUsers(&model.User{}, 3) // Clean up users soft-deleted more than 3 days ago
 	})
 
 	if err != nil {

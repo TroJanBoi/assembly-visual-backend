@@ -58,3 +58,14 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token string `json:"token"`
 }
+
+type EditProfileRequest struct {
+	Username     string `json:"username"`
+	Name         string `json:"name"`
+	Tel          string `json:"tel"`
+	Picture_path string `json:"picture_path"`
+}
+
+type ChangePasswordRequest struct {
+	NewPassword string `json:"new_password" binding:"required"`
+}

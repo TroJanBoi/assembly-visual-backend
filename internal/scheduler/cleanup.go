@@ -9,8 +9,7 @@ import (
 
 func CleanupSoftDeletedUsers(model any, days int) {
 	db := database.New().GetClient()
-	// threshold := time.Now().AddDate(0, 0, -days)
-	threshold := time.Now().Add(-1 * time.Minute)
+	threshold := time.Now().AddDate(0, 0, -days)
 
 	var count int64
 	if err := db.Unscoped().Model(model).Where("deleted_at IS NOT NULL AND deleted_at < ?", threshold).Count(&count).Error; err != nil {

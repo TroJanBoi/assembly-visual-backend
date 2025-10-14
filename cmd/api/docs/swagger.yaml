@@ -6,6 +6,13 @@ definitions:
       name:
         type: string
     type: object
+  types.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+    required:
+    - new_password
+    type: object
   types.CreateUserRequest:
     properties:
       email:
@@ -18,6 +25,17 @@ definitions:
         type: string
     required:
     - email
+    type: object
+  types.EditProfileRequest:
+    properties:
+      name:
+        type: string
+      picture_path:
+        type: string
+      tel:
+        type: string
+      username:
+        type: string
     type: object
   types.LoginRequest:
     properties:
@@ -326,6 +344,128 @@ paths:
       summary: Subtract numbers
       tags:
       - operations
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the profile of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Edit the profile of the authenticated user
+      parameters:
+      - description: Profile info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.EditProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Edit user profile
+      tags:
+      - profile
+  /profile/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change the password of the authenticated user
+      parameters:
+      - description: New password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - profile
   /users:
     get:
       consumes:

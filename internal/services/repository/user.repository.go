@@ -108,11 +108,10 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 		userResp = append(userResp, types.UserResponse{
 			ID:       int(user.ID),
 			Email:    user.Email,
-			Password: user.Password, // Note: Password should not be returned in a real application
+			Password: user.Password,
 			Name:     user.Name,
 			Tel:      user.Tel,
 		})
 	}
 	return &userResp, nil
 }
-
