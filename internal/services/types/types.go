@@ -27,7 +27,6 @@ type UserResponse struct {
 }
 
 type UpdateUserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
 	Tel      string `json:"tel"`
