@@ -33,7 +33,7 @@ func (u *UserController) CreateUserController(ctx *gin.Context) {
 		ctx.JSON(400, gin.H{"error": "Invalid request data"})
 		return
 	}
-	if err := u.userUseCase.CreateUserUsecase(ctx, request.Email, request.Password); err != nil {
+	if err := u.userUseCase.CreateUserUsecase(ctx, &request); err != nil {
 		ctx.JSON(500, gin.H{"error": "Failed to create user"})
 		return
 	}

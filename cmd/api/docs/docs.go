@@ -403,7 +403,13 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "tel": {
                     "type": "string"
                 }
             }
@@ -425,9 +431,6 @@ const docTemplate = `{
         "types.UserResponse": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
@@ -441,9 +444,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tel": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }
