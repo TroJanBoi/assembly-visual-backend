@@ -1,7 +1,9 @@
 package security
 
 import (
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +14,22 @@ var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Security middleware logic goes here
-		// For example, you can set security headers or check authentication
+		auth := c.GetHeader("Authorization")
+		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
+			c.Abort()
+			return
+		}
 
-		// Call the next handler in the chain
+		tokenStr := strings.TrimPrefix(auth, "Bearer ")
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+		})
+		if err != nil || !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }
