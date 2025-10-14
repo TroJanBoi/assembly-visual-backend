@@ -54,6 +54,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	operationUsecase := usecases.NewOperationUsecase(operationRepository)
 	operationController := controller.NewOperationController(operationUsecase)
 
+	authRepository := repository.NewAuthRepository(s.db)
+	authUseCase := usecases.NewAuthUseCase(authRepository)
+	authController := controller.NewAuthController(authUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -68,6 +72,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		operationGroup := api.Group("/operations").Use(security.Middleware())
 		{
 			operationController.OperationRegisterRoutes(operationGroup)
+		}
+		authGroup := api.Group("/auth")
+		{
+			authController.AuthRoutes(authGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {

@@ -26,7 +26,7 @@ func NewUserController(userUseCase usecases.UserUseCase) *UserController {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/sign-up [post]
+// @Router       /users [post]
 func (u *UserController) CreateUserController(ctx *gin.Context) {
 	var request types.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -110,5 +110,5 @@ func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
 	r.PUT("/", u.UpdateUserController)
 	r.DELETE("/", u.DeleteUserController)
-	r.POST("/sign-up", u.CreateUserController)
+	r.POST("/", u.CreateUserController)
 }

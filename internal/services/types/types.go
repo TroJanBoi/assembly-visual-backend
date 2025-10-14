@@ -42,3 +42,19 @@ type OperationResponse struct {
 type DeleteUserRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
+
+type SignInRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+	Name     string `json:"name"`
+	Tel      string `json:"tel"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
