@@ -61,6 +61,18 @@ func New() Service {
 		err = db.AutoMigrate(
 			// Add your models here, e.g. &model.User{}, etc.
 			&model.User{},
+			&model.Assignment{},
+			&model.BookMark{},
+			&model.Class{},
+			&model.Executions{},
+			&model.GoogleAccount{},
+			&model.GoogleCourseSyncLog{},
+			&model.Invitation{},
+			&model.Playground{},
+			&model.RecentClasses{},
+			&model.Submissions{},
+			&model.TestSuites{},
+			&model.TestCase{},
 		)
 		if err != nil {
 			log.Fatalf("Error auto migrating database: %v", err)

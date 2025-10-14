@@ -1,0 +1,17 @@
+package model
+
+import "gorm.io/gorm"
+
+type Invitation struct {
+	gorm.Model
+	ClassID            uint   `gorm:"not null"`
+	UserID             uint   `gorm:"not null"`
+	InvitationEmail    string `gorm:"not null"`
+	Role               string `gorm:"not null"` // e.g., "student", "instructor"
+	GoogleInvitationID string `gorm:"null;uniqueIndex"`
+	Status             string `gorm:"not null"` // e.g., "pending", "accepted", "declined"
+}
+
+func (Invitation) TableName() string {
+	return "invitation"
+}
