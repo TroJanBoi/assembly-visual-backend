@@ -10,6 +10,8 @@ import (
 type UserUseCase interface {
 	CreateUserUsecase(ctx context.Context, user *types.CreateUserRequest) error
 	GetAllUsersUsecase(ctx context.Context) (*[]types.UserResponse, error)
+	UpdateUserUsecase(ctx context.Context, user *types.UpdateUserRequest) error
+	DeleteUserUsecase(ctx context.Context, user *types.DeleteUserRequest) error
 }
 
 type userUseCase struct {
@@ -35,4 +37,18 @@ func (u *userUseCase) GetAllUsersUsecase(ctx context.Context) (*[]types.UserResp
 		return nil, err
 	}
 	return users, nil
+}
+
+func (u *userUseCase) UpdateUserUsecase(ctx context.Context, user *types.UpdateUserRequest) error {
+	if err := u.userRepository.UpdateUser(ctx, user); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *userUseCase) DeleteUserUsecase(ctx context.Context, user *types.DeleteUserRequest) error {
+	if err := u.userRepository.DeleteUser(ctx, user); err != nil {
+		return err
+	}
+	return nil
 }

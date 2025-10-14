@@ -19,6 +19,13 @@ definitions:
     required:
     - email
     type: object
+  types.DeleteUserRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   types.OperationResponse:
     properties:
       message:
@@ -27,6 +34,19 @@ definitions:
         type: integer
       value:
         type: number
+    type: object
+  types.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      tel:
+        type: string
+    required:
+    - email
     type: object
   types.UserResponse:
     properties:
@@ -216,6 +236,43 @@ paths:
       tags:
       - operations
   /users:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing user
+      parameters:
+      - description: User email to delete
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.DeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
     get:
       consumes:
       - application/json
@@ -240,7 +297,44 @@ paths:
       summary: Get all users
       tags:
       - users
-  /users/signup:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing user
+      parameters:
+      - description: Updated user info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /users/sign-up:
     post:
       consumes:
       - application/json
