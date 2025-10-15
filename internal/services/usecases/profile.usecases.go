@@ -11,6 +11,7 @@ type ProfileUseCase interface {
 	GetProfileUsecases(ctx context.Context, userID int) (*types.UserResponse, error)
 	EditProfileUsecases(ctx context.Context, userID int, user *types.EditProfileRequest) error
 	ChangePasswordUsecases(ctx context.Context, userID int, newPassword string) error
+	DeleteProfileUsecases(ctx context.Context, userID int) error
 }
 
 type profileUseCase struct {
@@ -40,6 +41,13 @@ func (p *profileUseCase) EditProfileUsecases(ctx context.Context, userID int, us
 
 func (p *profileUseCase) ChangePasswordUsecases(ctx context.Context, userID int, newPassword string) error {
 	if err := p.profileRepository.ChangePassword(ctx, userID, newPassword); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *profileUseCase) DeleteProfileUsecases(ctx context.Context, userID int) error {
+	if err := p.profileRepository.DeleteProfile(ctx, userID); err != nil {
 		return err
 	}
 	return nil

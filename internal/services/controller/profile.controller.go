@@ -120,8 +120,39 @@ func (p *ProfileController) ChangePasswordController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
 }
 
+// @Summary      Delete user profile
+// @Description  Delete the profile of the authenticated user
+// @Tags         profile
+// @Accept       json
+// @Produce      json
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      401   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /profile/delete [delete]
+func (p *ProfileController) DeleteProfileController(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	if err := p.ProfileUseCase.DeleteProfileUsecases(ctx, userID); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Profile deleted successfully"})
+}
+
 func (p *ProfileController) ProfileRoutes(r gin.IRoutes) {
 	r.GET("/", p.GetProfileController)
 	r.PUT("/", p.EditProfileController)
 	r.PUT("/change-password", p.ChangePasswordController)
+	r.DELETE("/delete", p.DeleteProfileController)
 }

@@ -14,6 +14,7 @@ type ProfileRepository interface {
 	GetProfile(ctx context.Context, userID int) (*types.UserResponse, error)
 	EditProfile(ctx context.Context, userID int, user *types.EditProfileRequest) error
 	ChangePassword(ctx context.Context, userID int, newPassword string) error
+	DeleteProfile(ctx context.Context, userID int) error
 }
 
 type profileRepository struct {
@@ -90,6 +91,19 @@ func (r *profileRepository) ChangePassword(ctx context.Context, userID int, newP
 
 	if err := r.db.WithContext(ctx).Model(&user).Updates(updatedData).Error; err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
+	}
+	return nil
+}
+
+func (r *profileRepository) DeleteProfile(ctx context.Context, userID int) error {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return fmt.Errorf("user with ID %d does not exist", userID)
+	}
+
+	if err := r.db.WithContext(ctx).Delete(&user).Error; err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
 	}
 	return nil
 }
