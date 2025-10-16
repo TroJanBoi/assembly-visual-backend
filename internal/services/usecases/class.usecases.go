@@ -11,9 +11,9 @@ type ClassUseCase interface {
 	// Define methods related to Class use cases here
 	GetAllClasses(ctx context.Context) (*[]types.ClassResponse, error)
 	GetClassByIDUseCases(ctx context.Context, classID int) (*types.ClassResponse, error)
-	CreateClassUseCases(ctx context.Context, owner uint, class *types.CreateClassRequest) error
-	UpdateClassUseCases(ctx context.Context, owner uint, classID int, class *types.UpdateClassRequest) error
-	DeleteClassUseCases(ctx context.Context, owner uint, classID int) error
+	CreateClassUseCases(ctx context.Context, owner int, class *types.CreateClassRequest) error
+	UpdateClassUseCases(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error
+	DeleteClassUseCases(ctx context.Context, owner int, classID int) error
 }
 
 type classUseCase struct {
@@ -40,7 +40,7 @@ func (uc *classUseCase) GetClassByIDUseCases(ctx context.Context, classID int) (
 	return resp, nil
 }
 
-func (uc *classUseCase) CreateClassUseCases(ctx context.Context, owner uint, class *types.CreateClassRequest) error {
+func (uc *classUseCase) CreateClassUseCases(ctx context.Context, owner int, class *types.CreateClassRequest) error {
 	err := uc.classRepo.CreateClass(ctx, owner, class)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (uc *classUseCase) CreateClassUseCases(ctx context.Context, owner uint, cla
 	return nil
 }
 
-func (uc *classUseCase) UpdateClassUseCases(ctx context.Context, owner uint, classID int, class *types.UpdateClassRequest) error {
+func (uc *classUseCase) UpdateClassUseCases(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error {
 	err := uc.classRepo.UpdateClass(ctx, owner, classID, class)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (uc *classUseCase) UpdateClassUseCases(ctx context.Context, owner uint, cla
 	return nil
 }
 
-func (uc *classUseCase) DeleteClassUseCases(ctx context.Context, owner uint, classID int) error {
+func (uc *classUseCase) DeleteClassUseCases(ctx context.Context, owner int, classID int) error {
 	err := uc.classRepo.DeleteClass(ctx, owner, classID)
 	if err != nil {
 		return err

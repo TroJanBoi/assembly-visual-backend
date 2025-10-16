@@ -64,6 +64,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 				Email:    userInfo.Email,
 				Password: userInfo.Password,
 				Name:     userInfo.Name,
+				Picture_path: userInfo.Picture,
 			}
 			if err := db.Create(&user).Error; err != nil {
 				return "", fmt.Errorf("failed to create user: %w", err)
@@ -81,7 +82,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 				GoogleUserID: userInfo.ID,
 				AccessToken:  token.AccessToken,
 				RefreshToken: token.RefreshToken,
-				UserID:       user.ID,
+				UserID:       int(user.ID),
 				Expired:      token.Expiry,
 			}
 			if err := db.Create(&googleAcc).Error; err != nil {

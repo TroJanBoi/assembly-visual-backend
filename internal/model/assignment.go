@@ -8,7 +8,7 @@ import (
 
 type Assignment struct {
 	gorm.Model
-	ClassID     uint                   `gorm:"not null"`
+	ClassID     int                   `gorm:"not null"`
 	Title       string                 `gorm:"not null"`
 	Description string                 `gorm:"null"`
 	DueDate     time.Time              `gorm:"null"`

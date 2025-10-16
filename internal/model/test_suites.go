@@ -3,8 +3,8 @@ package model
 import "time"
 
 type TestSuites struct {
-	ID           uint      `gorm:"primaryKey"`
-	AssignmentID uint      `gorm:"not null"`
+	ID           int       `gorm:"primaryKey"`
+	AssignmentID int       `gorm:"not null"`
 	Name         string    `gorm:"not null"`
 	CreateAt     time.Time `gorm:"autoCreateTime"`
 }

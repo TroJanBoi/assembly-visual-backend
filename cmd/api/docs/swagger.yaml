@@ -1,4 +1,58 @@
 definitions:
+  types.AssignmentCondition:
+    properties:
+      arithmetic:
+        additionalProperties:
+          type: integer
+        description: ADD, SUB, INC, DEC, MUL, DIV
+        type: object
+      comparison_and_conditional:
+        additionalProperties:
+          type: integer
+        description: CMP, JMP, JC, JNZ, JZ, JNC
+        type: object
+      data_movement:
+        additionalProperties:
+          type: integer
+        description: LOAD, STORE, MOV
+        type: object
+      system:
+        additionalProperties:
+          type: integer
+        description: LABEL, NOP, HLT
+        type: object
+    type: object
+  types.AssignmentResponse:
+    properties:
+      class_id:
+        type: integer
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
+      description:
+        type: string
+      due_date:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
+      id:
+        type: integer
+      max_attempt:
+        type: integer
+      settings:
+        $ref: '#/definitions/types.AssignmentSettings'
+      title:
+        type: string
+    type: object
+  types.AssignmentSettings:
+    properties:
+      fe_behavior:
+        $ref: '#/definitions/types.FEBehavior'
+      grade_policy:
+        $ref: '#/definitions/types.GradePolicy'
+      test_case_policy:
+        $ref: '#/definitions/types.TestCasePolicy'
+    type: object
   types.CatResponse:
     properties:
       id:
@@ -75,6 +129,20 @@ definitions:
       username:
         type: string
     type: object
+  types.FEBehavior:
+    properties:
+      allow_resubmit_after_due:
+        type: boolean
+      lock_after_submit:
+        type: boolean
+    type: object
+  types.GradePolicy:
+    properties:
+      mode:
+        type: string
+      weight:
+        $ref: '#/definitions/types.WeightPolicy'
+    type: object
   types.LoginRequest:
     properties:
       email:
@@ -107,6 +175,11 @@ definitions:
     required:
     - email
     - password
+    type: object
+  types.TestCasePolicy:
+    properties:
+      visible_to_student:
+        type: boolean
     type: object
   types.UpdateClassRequest:
     properties:
@@ -143,6 +216,13 @@ definitions:
         type: string
       tel:
         type: string
+    type: object
+  types.WeightPolicy:
+    properties:
+      number_of_node_used:
+        type: number
+      test_case:
+        type: number
     type: object
 info:
   contact: {}
@@ -320,7 +400,7 @@ paths:
       - BearerAuth: []
       tags:
       - classes
-  /classes/{id}:
+  /classes/{class_id}:
     delete:
       consumes:
       - application/json
@@ -328,7 +408,7 @@ paths:
       parameters:
       - description: Class ID
         in: path
-        name: id
+        name: class_id
         required: true
         type: integer
       produces:
@@ -369,7 +449,7 @@ paths:
       parameters:
       - description: Class ID
         in: path
-        name: id
+        name: class_id
         required: true
         type: integer
       produces:
@@ -402,7 +482,7 @@ paths:
       parameters:
       - description: Class ID
         in: path
-        name: id
+        name: class_id
         required: true
         type: integer
       - description: Updated class info
@@ -442,6 +522,42 @@ paths:
       - BearerAuth: []
       tags:
       - classes
+  /classes/{class_id}/assignments:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve assignments by class ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.AssignmentResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
   /operations/add:
     post:
       consumes:

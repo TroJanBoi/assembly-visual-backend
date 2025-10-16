@@ -9,8 +9,8 @@ import (
 type Executions struct {
 	gorm.Model
 	ExecutionsUUID string                 `gorm:"not null;uniqueIndex"`
-	AssignmentID   uint                   `gorm:"not null"`
-	PlaygroundID   uint                   `gorm:"not null"`
+	AssignmentID   int                    `gorm:"not null"`
+	PlaygroundID   int                    `gorm:"not null"`
 	StartAt        time.Time              `gorm:"null"`
 	FinishAt       time.Time              `gorm:"null"`
 	DurationMs     int64                  `gorm:"default:0"` // Duration in milliseconds

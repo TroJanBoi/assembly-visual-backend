@@ -56,6 +56,21 @@ func New() Service {
 		log.Fatalf("Error connecting to database: %v", err)
 		return nil
 	}
+	// db.Migrator().DropTable(
+	// 	&model.User{},
+	// 	&model.Assignment{},
+	// 	&model.BookMark{},
+	// 	&model.Class{},
+	// 	&model.Executions{},
+	// 	&model.GoogleAccount{},
+	// 	&model.GoogleCourseSyncLog{},
+	// 	&model.Invitation{},
+	// 	&model.Playground{},
+	// 	&model.RecentClasses{},
+	// 	&model.Submissions{},
+	// 	&model.TestSuites{},
+	// 	&model.TestCase{},
+	// )
 	if config.AUTO_MIGRATE {
 		log.Println("Auto migrating database...")
 		err = db.AutoMigrate(
