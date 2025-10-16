@@ -69,3 +69,31 @@ type EditProfileRequest struct {
 type ChangePasswordRequest struct {
 	NewPassword string `json:"new_password" binding:"required"`
 }
+
+type ClassResponse struct {
+	ID               int    `json:"id"`
+	Topic            string `json:"topic"`
+	Description      string `json:"description"`
+	GoogleCourseID   string `json:"google_course_id"`
+	GoogleCourseLink string `json:"google_course_link"`
+	GoogleSyncedAt   string `json:"google_synced_at"`
+	FavScore         int64  `json:"fav_score"`
+	Owner            uint   `json:"owner"`
+	Status           int    `json:"status"`
+}
+
+type CreateClassRequest struct {
+	Topic            string `json:"topic" binding:"required"`
+	Description      string `json:"description" binding:"required"`
+	GoogleCourseID   string `json:"google_course_id"`
+	GoogleCourseLink string `json:"google_course_link"`
+	Status           int    `json:"status"` // public or private
+}
+
+type UpdateClassRequest struct {
+	Topic            string `json:"topic"`
+	Description      string `json:"description"`
+	GoogleCourseID   string `json:"google_course_id"`
+	GoogleCourseLink string `json:"google_course_link"`
+	Status           int    `json:"status"` // public or private
+}

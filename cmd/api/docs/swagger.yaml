@@ -13,6 +13,44 @@ definitions:
     required:
     - new_password
     type: object
+  types.ClassResponse:
+    properties:
+      description:
+        type: string
+      fav_score:
+        type: integer
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      google_synced_at:
+        type: string
+      id:
+        type: integer
+      owner:
+        type: integer
+      status:
+        type: integer
+      topic:
+        type: string
+    type: object
+  types.CreateClassRequest:
+    properties:
+      description:
+        type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      status:
+        description: public or private
+        type: integer
+      topic:
+        type: string
+    required:
+    - description
+    - topic
+    type: object
   types.CreateUserRequest:
     properties:
       email:
@@ -69,6 +107,20 @@ definitions:
     required:
     - email
     - password
+    type: object
+  types.UpdateClassRequest:
+    properties:
+      description:
+        type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      status:
+        description: public or private
+        type: integer
+      topic:
+        type: string
     type: object
   types.UpdateUserRequest:
     properties:
@@ -202,6 +254,194 @@ paths:
       summary: Get all cats
       tags:
       - cats
+  /classes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all classes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
+    post:
+      consumes:
+      - application/json
+      description: Create a new class
+      parameters:
+      - description: Class info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
+  /classes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a class
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a class by ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.ClassResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
+    put:
+      consumes:
+      - application/json
+      description: Update an existing class
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated class info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
   /operations/add:
     post:
       consumes:

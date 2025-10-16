@@ -62,6 +62,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	profileUseCase := usecases.NewProfileUseCase(profileReposrtory)
 	profileController := controller.NewProfileController(profileUseCase)
 
+	classRepository := repository.NewClassRepository(s.db)
+	classUseCase := usecases.NewClassUseCase(classRepository)
+	classController := controller.NewClassController(classUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -84,6 +88,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		profileGroup := api.Group("/profile").Use(security.Middleware())
 		{
 			profileController.ProfileRoutes(profileGroup)
+		}
+		classGroup := api.Group("/classes").Use(security.Middleware())
+		{
+			classController.ClassRoutes(classGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
