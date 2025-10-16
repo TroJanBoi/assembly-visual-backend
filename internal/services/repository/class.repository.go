@@ -12,9 +12,9 @@ import (
 type ClassRepository interface {
 	GetAllClasses(ctx context.Context) (*[]types.ClassResponse, error)
 	GetClassByID(ctx context.Context, classID int) (*types.ClassResponse, error)
-	CreateClass(ctx context.Context, owner uint, class *types.CreateClassRequest) error
-	UpdateClass(ctx context.Context, owner uint, classID int, class *types.UpdateClassRequest) error
-	DeleteClass(ctx context.Context, owner uint, classID int) error
+	CreateClass(ctx context.Context, owner int, class *types.CreateClassRequest) error
+	UpdateClass(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error
+	DeleteClass(ctx context.Context, owner int, classID int) error
 }
 
 type classRepository struct {
@@ -41,7 +41,7 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
 			FavScore:         class.FavScore,
-			Owner:            uint(class.Owner),
+			Owner:            int(class.Owner),
 			Status:           class.Status,
 		})
 	}
@@ -49,7 +49,7 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 	return &classResponses, nil
 }
 
-func (r *classRepository) CreateClass(ctx context.Context, owner uint, class *types.CreateClassRequest) error {
+func (r *classRepository) CreateClass(ctx context.Context, owner int, class *types.CreateClassRequest) error {
 	var users model.User
 	if err := r.db.WithContext(ctx).Where("id = ?", owner).First(&users).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -74,7 +74,7 @@ func (r *classRepository) CreateClass(ctx context.Context, owner uint, class *ty
 	return nil
 }
 
-func (r *classRepository) UpdateClass(ctx context.Context, owner uint, classID int, class *types.UpdateClassRequest) error {
+func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error {
 	var existingClass model.Class
 	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
@@ -107,7 +107,7 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner uint, classID i
 	return nil
 }
 
-func (r *classRepository) DeleteClass(ctx context.Context, owner uint, classID int) error {
+func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID int) error {
 	var existingClass model.Class
 	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
@@ -141,7 +141,7 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		GoogleCourseLink: class.GoogleCourseLink,
 		GoogleSyncedAt:   class.GoogleSyncedAt,
 		FavScore:         class.FavScore,
-		Owner:            uint(class.Owner),
+		Owner:            int(class.Owner),
 		Status:           class.Status,
 	}
 

@@ -66,6 +66,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	classUseCase := usecases.NewClassUseCase(classRepository)
 	classController := controller.NewClassController(classUseCase)
 
+	assignmentRepositoryInClass := repository.NewAssignmentRepository(s.db)
+	assignmentUseCaseInClass := usecases.NewAssignmentUseCase(assignmentRepositoryInClass)
+	assignmentControllerInClass := controller.NewAssignmentController(assignmentUseCaseInClass)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -89,10 +93,15 @@ func (s *Server) Router() (http.Handler, func()) {
 		{
 			profileController.ProfileRoutes(profileGroup)
 		}
-		classGroup := api.Group("/classes").Use(security.Middleware())
+		classGroup := api.Group("/classes").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			classController.ClassRoutes(classGroup)
+			assignmentGroup := classGroup.Group("/:class_id/assignments").Use(security.Middleware()).(*gin.RouterGroup)
+			{
+				assignmentControllerInClass.AssignmentRoutes(assignmentGroup)
+			}
 		}
+
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

@@ -3,9 +3,9 @@ package model
 import "time"
 
 type RecentClasses struct {
-	ID           uint      `gorm:"primaryKey"`
-	UserID       uint      `gorm:"not null"`
-	ClassID      uint      `gorm:"not null"`
+	ID           int       `gorm:"primaryKey"`
+	UserID       int       `gorm:"not null"`
+	ClassID      int       `gorm:"not null"`
 	LastViewedAt time.Time `gorm:"autoUpdateTime"`
 }
 

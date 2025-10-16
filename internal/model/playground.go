@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Playground struct {
 	gorm.Model
-	AssignmentID uint                   `gorm:"not null"`
-	UserID       uint                   `gorm:"not null"`
-	AttemptNO    uint                   `gorm:"not null"`
+	AssignmentID int                    `gorm:"not null"`
+	UserID       int                    `gorm:"not null"`
+	AttemptNO    int                    `gorm:"not null"`
 	Item         map[string]interface{} `gorm:"type:jsonb"`
 	Status       string                 `gorm:"not null"` // e.g., "in_progress", "completed", "failed"
 }

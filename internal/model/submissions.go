@@ -4,11 +4,11 @@ import "gorm.io/gorm"
 
 type Submissions struct {
 	gorm.Model
-	PlaygroundID        uint                   `gorm:"not null"`
-	UserID              uint                   `gorm:"not null"`
-	AssignmentID        uint                   `gorm:"not null"`
-	SubmissionAttemptNo uint                   `gorm:"not null"`
-	ExecutionID         uint                   `gorm:"not null"`
+	PlaygroundID        int                    `gorm:"not null"`
+	UserID              int                    `gorm:"not null"`
+	AssignmentID        int                    `gorm:"not null"`
+	SubmissionAttemptNo int                    `gorm:"not null"`
+	ExecutionID         int                    `gorm:"not null"`
 	Status              string                 `gorm:"not null"`
 	ResultSummary       map[string]interface{} `gorm:"type:jsonb"`
 	Grade               int                    `gorm:"default:0"`

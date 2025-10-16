@@ -280,7 +280,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{id}": {
+        "/classes/{class_id}": {
             "get": {
                 "security": [
                     {
@@ -301,7 +301,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Class ID",
-                        "name": "id",
+                        "name": "class_id",
                         "in": "path",
                         "required": true
                     }
@@ -353,7 +353,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Class ID",
-                        "name": "id",
+                        "name": "class_id",
                         "in": "path",
                         "required": true
                     },
@@ -426,7 +426,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Class ID",
-                        "name": "id",
+                        "name": "class_id",
                         "in": "path",
                         "required": true
                     }
@@ -452,6 +452,63 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/classes/{class_id}/assignments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve assignments by class ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "assignments"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Class ID",
+                        "name": "class_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.AssignmentResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -1168,6 +1225,86 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "types.AssignmentCondition": {
+            "type": "object",
+            "properties": {
+                "arithmetic": {
+                    "description": "ADD, SUB, INC, DEC, MUL, DIV",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "comparison_and_conditional": {
+                    "description": "CMP, JMP, JC, JNZ, JZ, JNC",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "data_movement": {
+                    "description": "LOAD, STORE, MOV",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "system": {
+                    "description": "LABEL, NOP, HLT",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "types.AssignmentResponse": {
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "type": "integer"
+                },
+                "condition": {
+                    "$ref": "#/definitions/types.AssignmentCondition"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "grade": {
+                    "description": "total grade of the assignment",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "max_attempt": {
+                    "type": "integer"
+                },
+                "settings": {
+                    "$ref": "#/definitions/types.AssignmentSettings"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.AssignmentSettings": {
+            "type": "object",
+            "properties": {
+                "fe_behavior": {
+                    "$ref": "#/definitions/types.FEBehavior"
+                },
+                "grade_policy": {
+                    "$ref": "#/definitions/types.GradePolicy"
+                },
+                "test_case_policy": {
+                    "$ref": "#/definitions/types.TestCasePolicy"
+                }
+            }
+        },
         "types.CatResponse": {
             "type": "object",
             "properties": {
@@ -1284,6 +1421,28 @@ const docTemplate = `{
                 }
             }
         },
+        "types.FEBehavior": {
+            "type": "object",
+            "properties": {
+                "allow_resubmit_after_due": {
+                    "type": "boolean"
+                },
+                "lock_after_submit": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "types.GradePolicy": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "type": "string"
+                },
+                "weight": {
+                    "$ref": "#/definitions/types.WeightPolicy"
+                }
+            }
+        },
         "types.LoginRequest": {
             "type": "object",
             "required": [
@@ -1331,6 +1490,14 @@ const docTemplate = `{
                 },
                 "tel": {
                     "type": "string"
+                }
+            }
+        },
+        "types.TestCasePolicy": {
+            "type": "object",
+            "properties": {
+                "visible_to_student": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1386,6 +1553,17 @@ const docTemplate = `{
                 },
                 "tel": {
                     "type": "string"
+                }
+            }
+        },
+        "types.WeightPolicy": {
+            "type": "object",
+            "properties": {
+                "number_of_node_used": {
+                    "type": "number"
+                },
+                "test_case": {
+                    "type": "number"
                 }
             }
         }

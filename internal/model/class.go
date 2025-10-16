@@ -6,11 +6,11 @@ type Class struct {
 	gorm.Model
 	Topic            string `gorm:"not null"`
 	Description      string `gorm:"not null"`
-	GoogleCourseID   string `gorm:"null;uniqueIndex"`
-	GoogleCourseLink string `gorm:"null;uniqueIndex"`
-	GoogleSyncedAt   string `gorm:"null"`
+	GoogleCourseID   string `gorm:"null;"`
+	GoogleCourseLink string `gorm:"null;"`
+	GoogleSyncedAt   string `gorm:"null;"`
 	FavScore         int64  `gorm:"default:0"`
-	Owner            uint   `gorm:"not null"`
+	Owner            int    `gorm:"not null"`
 	Status           int    `gorm:"default:1"`
 }
 

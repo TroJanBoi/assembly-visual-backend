@@ -5,7 +5,7 @@ import (
 )
 
 type GoogleAccount struct {
-	UserID       uint      `gorm:"primaryKey"`
+	UserID       int       `gorm:"primaryKey"`
 	GoogleUserID string    `gorm:"uniqueIndex;not null"`
 	Email        string    `gorm:"not null"`
 	AccessToken  string    `gorm:"not null"`
