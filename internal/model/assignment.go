@@ -14,8 +14,8 @@ type Assignment struct {
 	DueDate     time.Time              `gorm:"null"`
 	MaxAttempt  int                    `gorm:"default:1"`
 	AllowLate   bool                   `gorm:"default:false"`
-	Setting     map[string]interface{} `gorm:"type:jsonb;not null"`
-	Condition   map[string]interface{} `gorm:"type:jsonb;not null"`
+	Setting     map[string]interface{} `gorm:"type:jsonb;null"`
+	Condition   map[string]interface{} `gorm:"type:jsonb;null"`
 	Grade       int                    `gorm:"default:0"`
 }
 

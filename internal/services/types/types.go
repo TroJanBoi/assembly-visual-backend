@@ -119,10 +119,8 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	ClassID     int    `json:"class_id" binding:"required"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description" binding:"required"`
-	DueDate     string `json:"due_date" binding:"required"`
 	MaxAttempt  int    `json:"max_attempt"`
 	Grade       int    `json:"grade"` // total grade of the assignment
 }
@@ -150,4 +148,11 @@ type AssignmentSettings struct {
 	GradePolicy    GradePolicy    `json:"grade_policy"`
 	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
 	FEBehavior     FEBehavior     `json:"fe_behavior"`
+}
+
+type EditAssignmentRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	MaxAttempt  int    `json:"max_attempt"`
+	Grade       int    `json:"grade"` // total grade of the assignment
 }
