@@ -88,6 +88,21 @@ definitions:
       topic:
         type: string
     type: object
+  types.CreateAssignmentRequest:
+    properties:
+      description:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
+      max_attempt:
+        type: integer
+      title:
+        type: string
+    required:
+    - description
+    - title
+    type: object
   types.CreateClassRequest:
     properties:
       description:
@@ -117,6 +132,18 @@ definitions:
         type: string
     required:
     - email
+    type: object
+  types.EditAssignmentRequest:
+    properties:
+      description:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
+      max_attempt:
+        type: integer
+      title:
+        type: string
     type: object
   types.EditProfileRequest:
     properties:
@@ -542,6 +569,172 @@ paths:
             items:
               $ref: '#/definitions/types.AssignmentResponse'
             type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+    post:
+      consumes:
+      - application/json
+      description: Create a new assignment
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment Data
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+  /classes/{class_id}/assignments/{assignment_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.AssignmentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+    put:
+      consumes:
+      - application/json
+      description: Edit an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Assignment Data
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/types.EditAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "400":
           description: Bad Request
           schema:
