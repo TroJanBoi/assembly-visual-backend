@@ -88,6 +88,7 @@ func New() Service {
 			&model.Submissions{},
 			&model.TestSuites{},
 			&model.TestCase{},
+			&model.Member{},
 		)
 		if err != nil {
 			log.Fatalf("Error auto migrating database: %v", err)

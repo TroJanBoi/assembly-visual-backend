@@ -14,6 +14,8 @@ type ClassUseCase interface {
 	CreateClassUseCases(ctx context.Context, owner int, class *types.CreateClassRequest) error
 	UpdateClassUseCases(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error
 	DeleteClassUseCases(ctx context.Context, owner int, classID int) error
+	JoinClassUseCases(ctx context.Context, userID, classID int) error
+	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 }
 
 type classUseCase struct {
@@ -62,4 +64,20 @@ func (uc *classUseCase) DeleteClassUseCases(ctx context.Context, owner int, clas
 		return err
 	}
 	return nil
+}
+
+func (uc *classUseCase) JoinClassUseCases(ctx context.Context, userID, classID int) error {
+	err := uc.classRepo.JoinClass(ctx, userID, classID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *classUseCase) GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error) {
+	resp, err := uc.classRepo.GetAllMembersByClassID(ctx, classID)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

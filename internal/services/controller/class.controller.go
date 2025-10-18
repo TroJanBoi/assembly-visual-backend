@@ -178,10 +178,76 @@ func (c *ClassController) ClassDeleteClass(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Class deleted successfully"})
 }
 
+// @Description  Join a class
+// @Tags         classes
+// @Accept       json
+// @Produce      json
+// @Param        class_id   path      int  true  "Class ID"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      401   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /classes/{class_id}/join [post]
+func (c *ClassController) JoinClass(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	classIDStr := ctx.Param("class_id")
+	classID, err := strconv.Atoi(classIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class ID"})
+		return
+	}
+
+	err = c.classUseCase.JoinClassUseCases(ctx, userID, classID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Joined class successfully"})
+}
+
+// @Description  Get all members of a class by class ID
+// @Tags         classes
+// @Accept       json
+// @Produce      json
+// @Param        class_id   path      int  true  "Class ID"
+// @Success      200   {array}   types.MemberResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /classes/{class_id}/members [get]
+func (c *ClassController) GetAllMembersByClassID(ctx *gin.Context) {
+	classIDStr := ctx.Param("class_id")
+	classID, err := strconv.Atoi(classIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class ID"})
+		return
+	}
+
+	members, err := c.classUseCase.GetAllMembersByClassID(ctx, classID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, members)
+}
+
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.GET("/", c.ClassGetAllClasses)
 	r.GET("/:class_id", c.ClassGetClassByID)
 	r.POST("/", c.ClassCreateClass)
 	r.PUT("/:class_id", c.ClassUpdateClass)
 	r.DELETE("/:class_id", c.ClassDeleteClass)
+	r.POST("/:class_id/join", c.JoinClass)
+	r.GET("/:class_id/members", c.GetAllMembersByClassID)
 }

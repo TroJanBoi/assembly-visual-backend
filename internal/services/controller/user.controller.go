@@ -114,10 +114,38 @@ func (u *UserController) GetAllUsersController(ctx *gin.Context) {
 	ctx.JSON(200, users)
 }
 
+// @Summary      Get my classes
+// @Description  Retrieve classes of the authenticated user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200   {array}   types.ClassMeResponse
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /users/me/classes [get]
+func (u *UserController) GetMeClassesController(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+	classes, err := u.userUseCase.GetMeClassUsecase(ctx, userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": "Failed to retrieve classes"})
+		return
+	}
+	ctx.JSON(200, classes)
+}
+
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
 	r.PUT("/:id", u.UpdateUserController)
 	r.DELETE("/:id", u.DeleteUserController)
 	r.POST("/", u.CreateUserController)
-
+	r.GET("/me/classes", u.GetMeClassesController)
 }

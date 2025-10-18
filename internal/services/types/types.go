@@ -156,3 +156,17 @@ type EditAssignmentRequest struct {
 	MaxAttempt  int    `json:"max_attempt"`
 	Grade       int    `json:"grade"` // total grade of the assignment
 }
+
+type MemberResponse struct {
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	Picture_path string `json:"picture_path"`
+}
+
+type ClassMeResponse struct {
+	ID          int    `json:"id"`
+	Topic       string `json:"topic"`
+	Description string `json:"description"`
+	FavScore    int64  `json:"fav_score"`
+}

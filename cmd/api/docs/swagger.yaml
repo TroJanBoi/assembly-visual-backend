@@ -67,6 +67,17 @@ definitions:
     required:
     - new_password
     type: object
+  types.ClassMeResponse:
+    properties:
+      description:
+        type: string
+      fav_score:
+        type: integer
+      id:
+        type: integer
+      topic:
+        type: string
+    type: object
   types.ClassResponse:
     properties:
       description:
@@ -179,6 +190,17 @@ definitions:
     required:
     - email
     - password
+    type: object
+  types.MemberResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      picture_path:
+        type: string
     type: object
   types.OperationResponse:
     properties:
@@ -751,9 +773,93 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
+  /classes/{class_id}/join:
+    post:
+      consumes:
+      - application/json
+      description: Join a class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
+  /classes/{class_id}/members:
+    get:
+      consumes:
+      - application/json
+      description: Get all members of a class by class ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.MemberResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
   /oauth/google/login:
     get:
       description: Initiate Google OAuth2 login
+      parameters:
+      - description: State parameter for CSRF protection
+        in: query
+        name: state
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -1213,6 +1319,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Update user
+      tags:
+      - users
+  /users/me/classes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve classes of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my classes
       tags:
       - users
 securityDefinitions:

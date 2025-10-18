@@ -16,6 +16,7 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, users *types.CreateUserRequest) error
 	UpdateUser(ctx context.Context, userID int, users *types.UpdateUserRequest) error
 	DeleteUser(ctx context.Context, userID int) error
+	GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 }
 
 type userRepository struct {
@@ -114,4 +115,32 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 		})
 	}
 	return &userResp, nil
+}
+
+func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error) {
+	var member []model.Member
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&member).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve member records: %w", err)
+	}
+
+	var classIDs []int
+	for _, m := range member {
+		classIDs = append(classIDs, int(m.ClassID))
+	}
+
+	var classes []model.Class
+	if err := r.db.WithContext(ctx).Where("id IN ?", classIDs).Find(&classes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
+	}
+
+	var classResp []types.ClassMeResponse
+	for _, class := range classes {
+		classResp = append(classResp, types.ClassMeResponse{
+			ID:          int(class.ID),
+			Topic:       class.Topic,
+			Description: class.Description,
+			FavScore:    class.FavScore,
+		})
+	}
+	return &classResp, nil
 }
