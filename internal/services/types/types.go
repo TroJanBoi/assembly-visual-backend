@@ -20,11 +20,12 @@ type CreateUserRequest struct {
 }
 
 type UserResponse struct {
-	ID       int    `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
-	Tel      string `json:"tel"`
+	ID           int    `json:"id"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	Name         string `json:"name"`
+	Tel          string `json:"tel"`
+	Picture_path string `json:"picture_path"`
 }
 
 type UpdateUserRequest struct {
@@ -179,4 +180,8 @@ type InvitationResponse struct {
 	InvitationEmail  string `json:"invitation_email"`
 	GoogleInviteCode string `json:"google_invite_code"`
 	Status           string `json:"status"`
+}
+
+type UploadAvatarRequest struct {
+	AvatarURL string `json:"avatar_url" binding:"required,url"`
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -15,6 +17,9 @@ type ProfileRepository interface {
 	EditProfile(ctx context.Context, userID int, user *types.EditProfileRequest) error
 	ChangePassword(ctx context.Context, userID int, newPassword string) error
 	DeleteProfile(ctx context.Context, userID int) error
+	UploadAvatar(ctx context.Context, userID int, avatarURL string) error
+	GetAvatar(ctx context.Context, userID int) (string, error)
+	ChangeAvatar(ctx context.Context, userID int, avatarURL string) error
 }
 
 type profileRepository struct {
@@ -36,11 +41,12 @@ func (r *profileRepository) GetProfile(ctx context.Context, userID int) (*types.
 	}
 
 	userResp := &types.UserResponse{
-		ID:       int(user.ID),
-		Email:    user.Email,
-		Password: user.Password,
-		Name:     user.Name,
-		Tel:      user.Tel,
+		ID:           int(user.ID),
+		Email:        user.Email,
+		Password:     user.Password,
+		Name:         user.Name,
+		Tel:          user.Tel,
+		Picture_path: user.Picture_path,
 	}
 	return userResp, nil
 }
@@ -102,8 +108,63 @@ func (r *profileRepository) DeleteProfile(ctx context.Context, userID int) error
 		return fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
+	if user.Picture_path != "" {
+		fileName := filepath.Base(user.Picture_path)
+		filePath := filepath.Join("uploads/users", fileName)
+
+		if err := os.Remove(filePath); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to delete avatar file: %w", err)
+		}
+	}
+
 	if err := r.db.WithContext(ctx).Delete(&user).Error; err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
+	}
+	return nil
+}
+
+func (r *profileRepository) UploadAvatar(ctx context.Context, userID int, avatarURL string) error {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return fmt.Errorf("user with ID %d does not exist", userID)
+	}
+
+	if err := r.db.WithContext(ctx).Model(&user).Update("picture_path", avatarURL).Error; err != nil {
+		return fmt.Errorf("failed to upload avatar: %w", err)
+	}
+	return nil
+}
+
+func (r *profileRepository) GetAvatar(ctx context.Context, userID int) (string, error) {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return "", fmt.Errorf("user with ID %d does not exist", userID)
+	}
+
+	return user.Picture_path, nil
+}
+
+func (r *profileRepository) ChangeAvatar(ctx context.Context, userID int, avatarURL string) error {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return fmt.Errorf("user with ID %d does not exist", userID)
+	}
+
+	old_path := user.Picture_path
+	if old_path != "" {
+		fileName := filepath.Base(old_path)
+		filePath := filepath.Join("uploads/users", fileName)
+
+		if err := os.Remove(filePath); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to delete old avatar file: %w", err)
+		}
+	}
+
+	if err := r.db.WithContext(ctx).Model(&user).Update("picture_path", avatarURL).Error; err != nil {
+		return fmt.Errorf("failed to change avatar: %w", err)
 	}
 	return nil
 }

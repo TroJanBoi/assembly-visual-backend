@@ -12,6 +12,9 @@ type ProfileUseCase interface {
 	EditProfileUsecases(ctx context.Context, userID int, user *types.EditProfileRequest) error
 	ChangePasswordUsecases(ctx context.Context, userID int, newPassword string) error
 	DeleteProfileUsecases(ctx context.Context, userID int) error
+	UploadAvatarUsecase(ctx context.Context, userID int, avatarURL string) error
+	GetAvatarUsecase(ctx context.Context, userID int) (string, error)
+	ChangeAvatarUsecase(ctx context.Context, userID int, avatarURL string) error
 }
 
 type profileUseCase struct {
@@ -48,6 +51,28 @@ func (p *profileUseCase) ChangePasswordUsecases(ctx context.Context, userID int,
 
 func (p *profileUseCase) DeleteProfileUsecases(ctx context.Context, userID int) error {
 	if err := p.profileRepository.DeleteProfile(ctx, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *profileUseCase) UploadAvatarUsecase(ctx context.Context, userID int, avatarURL string) error {
+	if err := u.profileRepository.UploadAvatar(ctx, userID, avatarURL); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *profileUseCase) GetAvatarUsecase(ctx context.Context, userID int) (string, error) {
+	avatarURL, err := u.profileRepository.GetAvatar(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+	return avatarURL, nil
+}
+
+func (u *profileUseCase) ChangeAvatarUsecase(ctx context.Context, userID int, avatarURL string) error {
+	if err := u.profileRepository.ChangeAvatar(ctx, userID, avatarURL); err != nil {
 		return err
 	}
 	return nil
