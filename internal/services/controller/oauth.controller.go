@@ -50,7 +50,7 @@ func (c *OAuthController) HandleGoogleOAuth(ctx *gin.Context) {
 		return
 	}
 
-	redirectURL := fmt.Sprintf("http://localhost:3000/auth/success?token=%s", token)
+	redirectURL := fmt.Sprintf("http://localhost:3000/success?token=%s", token)
 	ctx.Redirect(http.StatusFound, redirectURL)
 }
 
