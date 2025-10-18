@@ -31,9 +31,7 @@ func NewOAuthController(oauthUsecase usecases.OAuthUseCase) *OAuthController {
 // @Router       /oauth/google/login [get]
 func (c *OAuthController) GoogleLogin(ctx *gin.Context) {
 	state := "assembly-visual-state"
-
 	url := conf.GetGoogleOAuthConfig().AuthCodeURL(state, oauth2.AccessTypeOffline)
-
 	ctx.Redirect(http.StatusFound, url)
 }
 
