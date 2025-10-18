@@ -751,6 +751,28 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
+  /oauth/google/login:
+    get:
+      description: Initiate Google OAuth2 login
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - oauth
   /operations/add:
     post:
       consumes:

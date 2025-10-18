@@ -3,8 +3,10 @@ package controller
 import (
 	"net/http"
 
+	"github.com/TroJanBoi/assembly-visual-backend/internal/conf"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/usecases"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
 )
 
 type OAuthController struct {
@@ -15,6 +17,23 @@ func NewOAuthController(oauthUsecase usecases.OAuthUseCase) *OAuthController {
 	return &OAuthController{
 		oauthUseCase: oauthUsecase,
 	}
+}
+
+// GoogleLogin initiates the Google OAuth2 login process
+// @Description  Initiate Google OAuth2 login
+// @Tags         oauth
+// @Produce      json
+// @Param        state   query     string  true  "State parameter for CSRF protection"
+// @Success      302
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /oauth/google/login [get]
+func (c *OAuthController) GoogleLogin(ctx *gin.Context) {
+	state := "assembly-visual-state"
+
+	url := conf.GetGoogleOAuthConfig().AuthCodeURL(state, oauth2.AccessTypeOffline)
+
+	ctx.Redirect(http.StatusFound, url)
 }
 
 func (c *OAuthController) HandleGoogleOAuth(ctx *gin.Context) {
@@ -35,4 +54,5 @@ func (c *OAuthController) HandleGoogleOAuth(ctx *gin.Context) {
 
 func (c *OAuthController) OAuthRegisterRoutes(r gin.IRoutes) {
 	r.GET("/oauth/google/callback", c.HandleGoogleOAuth)
+	r.GET("/oauth/google/login", c.GoogleLogin)
 }
