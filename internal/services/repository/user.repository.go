@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -90,6 +92,16 @@ func (r *userRepository) DeleteUser(ctx context.Context, userID int) error {
 			return fmt.Errorf("user with ID %d does not exist", userID)
 		}
 		return fmt.Errorf("failed to find user: %w", err)
+	}
+
+	picture_path := existingUser.Picture_path
+	if picture_path != "" {
+		fileName := filepath.Base(picture_path)
+		filePath := filepath.Join("uploads/users", fileName)
+
+		if err := os.Remove(filePath); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("failed to delete old avatar file: %w", err)
+		}
 	}
 
 	if err := r.db.WithContext(ctx).Delete(&existingUser).Error; err != nil {
