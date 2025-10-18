@@ -107,11 +107,12 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 	var userResp []types.UserResponse
 	for _, user := range users {
 		userResp = append(userResp, types.UserResponse{
-			ID:       int(user.ID),
-			Email:    user.Email,
-			Password: user.Password,
-			Name:     user.Name,
-			Tel:      user.Tel,
+			ID:           int(user.ID),
+			Email:        user.Email,
+			Password:     user.Password,
+			Name:         user.Name,
+			Tel:          user.Tel,
+			Picture_path: user.Picture_path,
 		})
 	}
 	return &userResp, nil

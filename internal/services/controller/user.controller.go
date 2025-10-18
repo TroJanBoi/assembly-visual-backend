@@ -142,6 +142,18 @@ func (u *UserController) GetMeClassesController(ctx *gin.Context) {
 	ctx.JSON(200, classes)
 }
 
+// @Summary      Upload user avatar
+// @Description  Upload an avatar for the authenticated user
+// @Tags         users
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "Avatar file"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /users/avatar [post]
+
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
 	r.PUT("/:id", u.UpdateUserController)

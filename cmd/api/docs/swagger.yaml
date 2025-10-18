@@ -265,6 +265,8 @@ definitions:
         type: string
       password:
         type: string
+      picture_path:
+        type: string
       tel:
         type: string
     type: object
@@ -1285,6 +1287,168 @@ paths:
       security:
       - BearerAuth: []
       summary: Edit user profile
+      tags:
+      - profile
+  /profile/avatar:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the avatar URL of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user avatar
+      tags:
+      - profile
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an avatar for the authenticated user
+      parameters:
+      - description: Avatar file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upload user avatar
+      tags:
+      - profile
+    put:
+      consumes:
+      - multipart/form-data
+      description: Change the avatar of the authenticated user
+      parameters:
+      - description: New avatar file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user avatar
+      tags:
+      - profile
+  /profile/avatar/{filename}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the profile picture file of the authenticated user
+      parameters:
+      - description: Filename of the avatar
+        in: path
+        name: filename
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get profile picture
       tags:
       - profile
   /profile/change-password:
