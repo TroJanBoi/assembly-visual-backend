@@ -7,8 +7,7 @@ type Invitation struct {
 	ClassID            int    `gorm:"not null"`
 	UserID             int    `gorm:"not null"`
 	InvitationEmail    string `gorm:"not null"`
-	Role               string `gorm:"not null"` // e.g., "student", "instructor"
-	GoogleInvitationID string `gorm:"null;uniqueIndex"`
+	GoogleInvitationID string `gorm:"null;"`
 	Status             string `gorm:"not null"` // e.g., "pending", "accepted", "declined"
 }
 

@@ -41,7 +41,8 @@ func startScheduler(logger *zap.Logger) {
 	_, err := c.AddFunc("* * * * *", func() {
 		logger.Info("Scheduler running...")
 
-		scheduler.CleanupSoftDeletedUsers(&model.User{}, 3) // Clean up users soft-deleted more than 3 days ago
+		scheduler.CleanupSoftDeletedUsers(&model.User{}, 3)         // Clean up users soft-deleted more than 3 days ago
+		scheduler.CleanupExpiredInvitations(&model.Invitation{}, 1) // Clean up invitations older than 3 days
 	})
 
 	if err != nil {
