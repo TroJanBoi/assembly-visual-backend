@@ -140,6 +140,7 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 			Topic:       class.Topic,
 			Description: class.Description,
 			FavScore:    class.FavScore,
+			Owner:       int(class.Owner),
 		})
 	}
 	return &classResp, nil

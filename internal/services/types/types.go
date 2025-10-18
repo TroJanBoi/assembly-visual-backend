@@ -169,4 +169,14 @@ type ClassMeResponse struct {
 	Topic       string `json:"topic"`
 	Description string `json:"description"`
 	FavScore    int64  `json:"fav_score"`
+	Owner       int    `json:"owner"`
+}
+
+type InvitationResponse struct {
+	ID               int    `json:"id"`
+	ClassID          int    `json:"class_id"`
+	UserID           int    `json:"user_id"`
+	InvitationEmail  string `json:"invitation_email"`
+	GoogleInviteCode string `json:"google_invite_code"`
+	Status           string `json:"status"`
 }

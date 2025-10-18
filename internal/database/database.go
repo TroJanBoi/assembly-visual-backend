@@ -70,6 +70,7 @@ func New() Service {
 	// 	&model.Submissions{},
 	// 	&model.TestSuites{},
 	// 	&model.TestCase{},
+	// 	&model.Member{},
 	// )
 	if config.AUTO_MIGRATE {
 		log.Println("Auto migrating database...")

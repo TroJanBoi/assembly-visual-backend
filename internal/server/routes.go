@@ -70,6 +70,14 @@ func (s *Server) Router() (http.Handler, func()) {
 	assignmentUseCaseInClass := usecases.NewAssignmentUseCase(assignmentRepositoryInClass)
 	assignmentControllerInClass := controller.NewAssignmentController(assignmentUseCaseInClass)
 
+	invitationRepository := repository.NewInvitationRepository(s.db)
+	invitationUseCase := usecases.NewInvitationUseCase(invitationRepository)
+	invitationController := controller.NewInvitationController(invitationUseCase)
+
+	invitationMeRepository := repository.NewInvitationRepository(s.db)
+	invitationMeUseCase := usecases.NewInvitationUseCase(invitationMeRepository)
+	invitationMeController := controller.NewInvitationController(invitationMeUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -100,6 +108,14 @@ func (s *Server) Router() (http.Handler, func()) {
 			{
 				assignmentControllerInClass.AssignmentRoutes(assignmentGroup)
 			}
+			invitationGroup := classGroup.Group("/:class_id/invitations").Use(security.Middleware()).(*gin.RouterGroup)
+			{
+				invitationController.InvitaionRoutes(invitationGroup)
+			}
+		}
+		invitationMeGroup := api.Group("/invitations").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			invitationMeController.InvitationMeRoutes(invitationMeGroup)
 		}
 
 	}

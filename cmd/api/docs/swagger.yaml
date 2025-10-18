@@ -75,6 +75,8 @@ definitions:
         type: integer
       id:
         type: integer
+      owner:
+        type: integer
       topic:
         type: string
     type: object
@@ -773,6 +775,86 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
+  /classes/{class_id}/invitations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all invitations for a specific class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get All Invitations by Class ID
+      tags:
+      - invitations
+  /classes/{class_id}/invitations/send:
+    post:
+      consumes:
+      - application/json
+      description: Send an email invitation to join a class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Email Address
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send Email Invitation
+      tags:
+      - invitations
   /classes/{class_id}/join:
     post:
       consumes:
@@ -851,6 +933,112 @@ paths:
       - BearerAuth: []
       tags:
       - classes
+  /invitations/{invitation_id}/accept:
+    post:
+      consumes:
+      - application/json
+      description: Accept an invitation to join a class
+      parameters:
+      - description: Invitation ID
+        in: path
+        name: invitation_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Accept Invitation
+      tags:
+      - invitations
+  /invitations/{invitation_id}/decline:
+    post:
+      consumes:
+      - application/json
+      description: Decline an invitation to join a class
+      parameters:
+      - description: Invitation ID
+        in: path
+        name: invitation_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Decline Invitation
+      tags:
+      - invitations
+  /invitations/me:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve invitations for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get My Invitations
+      tags:
+      - invitations
   /oauth/google/login:
     get:
       description: Initiate Google OAuth2 login

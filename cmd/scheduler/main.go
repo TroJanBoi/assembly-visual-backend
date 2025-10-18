@@ -13,6 +13,7 @@ func main() {
 	c.AddFunc("0 3 * * *", func() {
 		scheduler.CleanupSoftDeletedUsers(&model.User{}, 7)
 		// scheduler.CleanupSoftDeletedRecords(&model.Room{}, 30)
+		scheduler.CleanupExpiredInvitations(&model.Invitation{}, 1)
 	})
 	c.Start()
 	select {}
