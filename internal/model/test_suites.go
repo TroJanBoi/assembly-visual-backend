@@ -1,12 +1,13 @@
 package model
 
-import "time"
+import (
+	"gorm.io/gorm"
+)
 
 type TestSuites struct {
-	ID           int       `gorm:"primaryKey"`
-	AssignmentID int       `gorm:"not null"`
-	Name         string    `gorm:"not null"`
-	CreateAt     time.Time `gorm:"autoCreateTime"`
+	gorm.Model
+	AssignmentID int    `gorm:"not null"`
+	Name         string `gorm:"not null"`
 }
 
 func (TestSuites) TableName() string {

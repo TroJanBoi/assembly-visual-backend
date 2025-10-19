@@ -189,3 +189,40 @@ type InvitationResponse struct {
 type UploadAvatarRequest struct {
 	AvatarURL string `json:"avatar_url" binding:"required,url"`
 }
+
+type TestSuiteRequest struct {
+	Name string `json:"name" binding:"required"`
+}
+
+type TestSuiteResponse struct {
+	ID           int    `json:"id"`
+	AssignmentID int    `json:"assignment_id"`
+	Name         string `json:"name"`
+}
+
+type TestCaseRequest struct {
+	Name   string         `json:"name" binding:"required"`
+	Init   TestCaseInit   `json:"init" binding:"required"`
+	Assert TestCaseAssert `json:"assert" binding:"required"`
+}
+
+type TestCaseResponse struct {
+	ID          int            `json:"id"`
+	TestSuiteID int            `json:"test_suite_id"`
+	Name        string         `json:"name" binding:"required"`
+	Init        TestCaseInit   `json:"init"`
+	Assert      TestCaseAssert `json:"assert"`
+}
+
+type TestCaseInit struct {
+	Memory   map[string]int `json:"memory" binding:"required"`
+	Register map[string]int `json:"register" binding:"required"`
+	Flags    map[string]int `json:"flags" binding:"required"`
+}
+
+type TestCaseAssert struct {
+	Memory   map[string]int `json:"memory" binding:"required"`
+	Register map[string]int `json:"register" binding:"required"`
+	Flags    map[string]int `json:"flags" binding:"required"`
+	Halted   bool           `json:"halted" binding:"required"`
+}
