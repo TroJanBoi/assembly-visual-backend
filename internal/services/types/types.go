@@ -120,10 +120,12 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	MaxAttempt  int    `json:"max_attempt"`
-	Grade       int    `json:"grade"` // total grade of the assignment
+	Title       string              `json:"title" binding:"required"`
+	Description string              `json:"description" binding:"required"`
+	MaxAttempt  int                 `json:"max_attempt"`
+	Grade       int                 `json:"grade"` // total grade of the assignment
+	Settings    AssignmentSettings  `json:"settings"`
+	Condition   AssignmentCondition `json:"condition"`
 }
 
 type GradePolicy struct {
@@ -141,8 +143,8 @@ type TestCasePolicy struct {
 }
 
 type FEBehavior struct {
-	LockAfterSubmit      bool `json:"lock_after_submit"`
-	AllowResumitAfterDue bool `json:"allow_resubmit_after_due"`
+	LockAfterSubmit       bool `json:"lock_after_submit"`
+	AllowResubmitAfterDue bool `json:"allow_resubmit_after_due"`
 }
 
 type AssignmentSettings struct {
@@ -152,10 +154,12 @@ type AssignmentSettings struct {
 }
 
 type EditAssignmentRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	MaxAttempt  int    `json:"max_attempt"`
-	Grade       int    `json:"grade"` // total grade of the assignment
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	MaxAttempt  int                 `json:"max_attempt"`
+	Grade       int                 `json:"grade"` // total grade of the assignment
+	Setting     AssignmentSettings  `json:"settings"`
+	Condition   AssignmentCondition `json:"condition"`
 }
 
 type MemberResponse struct {

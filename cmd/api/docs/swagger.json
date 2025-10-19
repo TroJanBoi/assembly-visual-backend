@@ -2384,6 +2384,9 @@
                 "title"
             ],
             "properties": {
+                "condition": {
+                    "$ref": "#/definitions/types.AssignmentCondition"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2393,6 +2396,9 @@
                 },
                 "max_attempt": {
                     "type": "integer"
+                },
+                "settings": {
+                    "$ref": "#/definitions/types.AssignmentSettings"
                 },
                 "title": {
                     "type": "string"
@@ -2447,6 +2453,9 @@
         "types.EditAssignmentRequest": {
             "type": "object",
             "properties": {
+                "condition": {
+                    "$ref": "#/definitions/types.AssignmentCondition"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2456,6 +2465,9 @@
                 },
                 "max_attempt": {
                     "type": "integer"
+                },
+                "settings": {
+                    "$ref": "#/definitions/types.AssignmentSettings"
                 },
                 "title": {
                     "type": "string"

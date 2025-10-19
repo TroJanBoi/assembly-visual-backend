@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -63,7 +64,7 @@ func (c *AssignmentController) GetAssignmentsByClassID(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
-// @Param        assignment  body     types.CreateAssignmentRequest  true  "Assignment Data"
+// @Param        assignment body      types.CreateAssignmentRequest  true  "Assignment Data"
 // @Success      201   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
@@ -94,6 +95,7 @@ func (c *AssignmentController) CreateAssignment(ctx *gin.Context) {
 
 	var createAssignmentRequest types.CreateAssignmentRequest
 	if err := ctx.ShouldBindJSON(&createAssignmentRequest); err != nil {
+		log.Println("❌ JSON bind error:", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}

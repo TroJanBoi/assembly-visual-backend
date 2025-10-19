@@ -2,11 +2,14 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -68,8 +71,8 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, owne
 					VisibleToStudent: true,
 				},
 				FEBehavior: types.FEBehavior{
-					LockAfterSubmit:      true,
-					AllowResumitAfterDue: false,
+					LockAfterSubmit:       true,
+					AllowResubmitAfterDue: false,
 				},
 			},
 			Condition: types.AssignmentCondition{
@@ -111,6 +114,9 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 		return err
 	}
 
+	settingBytes, _ := json.Marshal(assignment.Settings)
+	conditionBytes, _ := json.Marshal(assignment.Condition)
+
 	newAssignment := model.Assignment{
 		ClassID:     classID,
 		Title:       assignment.Title,
@@ -118,8 +124,8 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 		DueDate:     time.Now().Add(7 * 24 * time.Hour), // Example due date set to one week from now
 		MaxAttempt:  assignment.MaxAttempt,
 		Grade:       assignment.Grade,
-		Setting:     nil,
-		Condition:   nil,
+		Setting:     datatypes.JSON(settingBytes),
+		Condition:   datatypes.JSON(conditionBytes),
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newAssignment).Error; err != nil {
@@ -147,6 +153,16 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 
 	dueDate := assignment.DueDate.Format(time.RFC3339)
 
+	var settings types.AssignmentSettings
+	if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %w", err)
+	}
+
+	var condition types.AssignmentCondition
+	if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+		return nil, fmt.Errorf("failed to parse condition: %w", err)
+	}
+
 	assignmentResponse := &types.AssignmentResponse{
 		ID:          int(assignment.ID),
 		ClassID:     classID,
@@ -155,38 +171,8 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 		DueDate:     dueDate,
 		MaxAttempt:  assignment.MaxAttempt,
 		Grade:       assignment.Grade,
-		Settings: types.AssignmentSettings{
-			GradePolicy: types.GradePolicy{
-				Mode: "auto",
-				Weight: types.WeightPolicy{
-					TestCaseWeight:         0.5,
-					NumberOfNodeUsedWeight: 0.5,
-				},
-			},
-			TestCasePolicy: types.TestCasePolicy{
-				VisibleToStudent: true,
-			},
-			FEBehavior: types.FEBehavior{
-				LockAfterSubmit:      true,
-				AllowResumitAfterDue: false,
-			},
-		},
-		Condition: types.AssignmentCondition{
-			System: map[string]int{
-				"label": 2,
-			},
-			DataMovement: map[string]int{
-				"mov": 2,
-			},
-			Arithmetic: map[string]int{
-				"add": 1,
-				"sub": 1,
-			},
-			ComparisonAndConditional: map[string]int{
-				"cmp": 1,
-				"jmp": 1,
-			},
-		},
+		Settings:    settings,
+		Condition:   condition,
 	}
 
 	return assignmentResponse, nil
@@ -229,6 +215,12 @@ func (r *assignmentRepository) EditAssignmentByAssignmentID(ctx context.Context,
 	if assignment.Grade != 0 {
 		existingAssignment.Grade = assignment.Grade
 	}
+
+	settingBytes, _ := json.Marshal(assignment.Setting)
+	conditionBytes, _ := json.Marshal(assignment.Condition)
+
+	existingAssignment.Setting = datatypes.JSON(settingBytes)
+	existingAssignment.Condition = datatypes.JSON(conditionBytes)
 
 	if err := r.db.WithContext(ctx).Save(&existingAssignment).Error; err != nil {
 		return err

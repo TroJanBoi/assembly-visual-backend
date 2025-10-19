@@ -2392,6 +2392,9 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
+                "condition": {
+                    "$ref": "#/definitions/types.AssignmentCondition"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2401,6 +2404,9 @@ const docTemplate = `{
                 },
                 "max_attempt": {
                     "type": "integer"
+                },
+                "settings": {
+                    "$ref": "#/definitions/types.AssignmentSettings"
                 },
                 "title": {
                     "type": "string"
@@ -2455,6 +2461,9 @@ const docTemplate = `{
         "types.EditAssignmentRequest": {
             "type": "object",
             "properties": {
+                "condition": {
+                    "$ref": "#/definitions/types.AssignmentCondition"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2464,6 +2473,9 @@ const docTemplate = `{
                 },
                 "max_attempt": {
                     "type": "integer"
+                },
+                "settings": {
+                    "$ref": "#/definitions/types.AssignmentSettings"
                 },
                 "title": {
                     "type": "string"

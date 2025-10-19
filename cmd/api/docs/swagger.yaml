@@ -103,6 +103,8 @@ definitions:
     type: object
   types.CreateAssignmentRequest:
     properties:
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
       description:
         type: string
       grade:
@@ -110,6 +112,8 @@ definitions:
         type: integer
       max_attempt:
         type: integer
+      settings:
+        $ref: '#/definitions/types.AssignmentSettings'
       title:
         type: string
     required:
@@ -148,6 +152,8 @@ definitions:
     type: object
   types.EditAssignmentRequest:
     properties:
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
       description:
         type: string
       grade:
@@ -155,6 +161,8 @@ definitions:
         type: integer
       max_attempt:
         type: integer
+      settings:
+        $ref: '#/definitions/types.AssignmentSettings'
       title:
         type: string
     type: object

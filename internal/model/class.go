@@ -11,7 +11,7 @@ type Class struct {
 	GoogleSyncedAt   string `gorm:"null;"`
 	FavScore         int64  `gorm:"default:0"`
 	Owner            int    `gorm:"not null"`
-	Status           int    `gorm:"default:1"`
+	Status           int    `gorm:"not null"`
 }
 
 func (Class) TableName() string {
