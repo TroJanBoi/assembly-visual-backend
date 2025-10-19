@@ -17,6 +17,7 @@ type ClassRepository interface {
 	DeleteClass(ctx context.Context, owner int, classID int) error
 	JoinClass(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
+	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
 }
 
 type classRepository struct {
@@ -214,4 +215,28 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 	}
 
 	return &memberResponses, nil
+}
+
+func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error) {
+	var classes []model.Class
+	if err := r.db.WithContext(ctx).Where("status = ?", 0).Find(&classes).Error; err != nil {
+		return nil, err
+	}
+
+	var classResponses []types.ClassResponse
+	for _, class := range classes {
+		classResponses = append(classResponses, types.ClassResponse{
+			ID:               int(class.ID),
+			Topic:            class.Topic,
+			Description:      class.Description,
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
+			FavScore:         class.FavScore,
+			Owner:            int(class.Owner),
+			Status:           class.Status,
+		})
+	}
+
+	return &classResponses, nil
 }

@@ -242,6 +242,23 @@ func (c *ClassController) GetAllMembersByClassID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, members)
 }
 
+// @Description  Retrieve all public classes
+// @Tags         classes
+// @Accept       json
+// @Produce      json
+// @Success      200   {array}   types.ClassResponse
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /classes/public [get]
+func (c *ClassController) GetAllClassPublic(ctx *gin.Context) {
+	classes, err := c.classUseCase.GetAllClassPublicUseCases(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, classes)
+}
+
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.GET("/", c.ClassGetAllClasses)
 	r.GET("/:class_id", c.ClassGetClassByID)
@@ -250,4 +267,5 @@ func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.DELETE("/:class_id", c.ClassDeleteClass)
 	r.POST("/:class_id/join", c.JoinClass)
 	r.GET("/:class_id/members", c.GetAllMembersByClassID)
+	r.GET("/public", c.GetAllClassPublic)
 }

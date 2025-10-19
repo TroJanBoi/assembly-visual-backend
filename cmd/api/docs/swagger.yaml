@@ -1507,6 +1507,30 @@ paths:
       - BearerAuth: []
       tags:
       - classes
+  /classes/public:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all public classes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classes
   /invitations/{invitation_id}/accept:
     post:
       consumes:
