@@ -1,14 +1,18 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/datatypes"
+)
 
 type GoogleCourseSyncLog struct {
-	ID       int                    `gorm:"primaryKey"`
-	UserID   int                    `gorm:"not null"`
-	Action   string                 `gorm:"not null"` // e.g., "sync_started", "sync_completed", "sync_failed"
-	Response map[string]interface{} `gorm:"type:jsonb;not null"`
-	Status   string                 `gorm:"not null"` // e.g., "success", "failure"
-	CreateAt time.Time              `gorm:"autoCreateTime"`
+	ID       int            `gorm:"primaryKey"`
+	UserID   int            `gorm:"not null"`
+	Action   string         `gorm:"not null"` // e.g., "sync_started", "sync_completed", "sync_failed"
+	Response datatypes.JSON `gorm:"type:jsonb;not null"`
+	Status   string         `gorm:"not null"` // e.g., "success", "failure"
+	CreateAt time.Time      `gorm:"autoCreateTime"`
 }
 
 func (GoogleCourseSyncLog) TableName() string {

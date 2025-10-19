@@ -51,6 +51,16 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, owne
 
 	var assignmentResponses []types.AssignmentResponse
 	for _, assignment := range assignments {
+		var setting types.AssignmentSettings
+		if err := json.Unmarshal(assignment.Setting, &setting); err != nil {
+			return nil, fmt.Errorf("failed to parse settings: %w", err)
+		}
+
+		var condition types.AssignmentCondition
+		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+			return nil, fmt.Errorf("failed to parse condition: %w", err)
+		}
+
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
 			ID:          int(assignment.ID),
 			ClassID:     classID,
@@ -59,38 +69,8 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, owne
 			DueDate:     dueDate,
 			MaxAttempt:  assignment.MaxAttempt,
 			Grade:       assignment.Grade,
-			Settings: types.AssignmentSettings{
-				GradePolicy: types.GradePolicy{
-					Mode: "auto",
-					Weight: types.WeightPolicy{
-						TestCaseWeight:         0.5,
-						NumberOfNodeUsedWeight: 0.5,
-					},
-				},
-				TestCasePolicy: types.TestCasePolicy{
-					VisibleToStudent: true,
-				},
-				FEBehavior: types.FEBehavior{
-					LockAfterSubmit:       true,
-					AllowResubmitAfterDue: false,
-				},
-			},
-			Condition: types.AssignmentCondition{
-				System: map[string]int{
-					"label": 2,
-				},
-				DataMovement: map[string]int{
-					"mov": 2,
-				},
-				Arithmetic: map[string]int{
-					"add": 1,
-					"sub": 1,
-				},
-				ComparisonAndConditional: map[string]int{
-					"cmp": 1,
-					"jmp": 1,
-				},
-			},
+			Settings:    setting,
+			Condition:   condition,
 		})
 	}
 

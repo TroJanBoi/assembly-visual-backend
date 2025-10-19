@@ -78,6 +78,15 @@ func (s *Server) Router() (http.Handler, func()) {
 	invitationMeUseCase := usecases.NewInvitationUseCase(invitationMeRepository)
 	invitationMeController := controller.NewInvitationController(invitationMeUseCase)
 
+	// Initialize TestSuiteController
+	testSuiteRepository := repository.NewTestSuiteRepository(s.db)
+	testSuiteUseCase := usecases.NewTestSuitesUseCases(testSuiteRepository)
+	testSuiteController := controller.NewTestSuiteController(testSuiteUseCase)
+
+	testCaseRepository := repository.NewTestCaseRepository(s.db)
+	testCaseUseCase := usecases.NewTestCaseUseCases(testCaseRepository)
+	testCaseController := controller.NewTestCaseController(testCaseUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -107,6 +116,15 @@ func (s *Server) Router() (http.Handler, func()) {
 			assignmentGroup := classGroup.Group("/:class_id/assignments").Use(security.Middleware()).(*gin.RouterGroup)
 			{
 				assignmentControllerInClass.AssignmentRoutes(assignmentGroup)
+				// Register TestSuite routes within the assignment group
+				testSuiteGroup := assignmentGroup.Group("/:assignment_id/test-suites").Use(security.Middleware()).(*gin.RouterGroup)
+				{
+					testSuiteController.TestSuiteRoutes(testSuiteGroup)
+					testCaseGroup := testSuiteGroup.Group("/:test_suite_id/test-cases").Use(security.Middleware()).(*gin.RouterGroup)
+					{
+						testCaseController.TestCaseRoutes(testCaseGroup)
+					}
+				}
 			}
 			invitationGroup := classGroup.Group("/:class_id/invitations").Use(security.Middleware()).(*gin.RouterGroup)
 			{

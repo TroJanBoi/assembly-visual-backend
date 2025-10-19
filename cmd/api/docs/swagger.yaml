@@ -235,10 +235,95 @@ definitions:
     - email
     - password
     type: object
+  types.TestCaseAssert:
+    properties:
+      flags:
+        additionalProperties:
+          type: integer
+        type: object
+      halted:
+        type: boolean
+      memory:
+        additionalProperties:
+          type: integer
+        type: object
+      register:
+        additionalProperties:
+          type: integer
+        type: object
+    required:
+    - flags
+    - halted
+    - memory
+    - register
+    type: object
+  types.TestCaseInit:
+    properties:
+      flags:
+        additionalProperties:
+          type: integer
+        type: object
+      memory:
+        additionalProperties:
+          type: integer
+        type: object
+      register:
+        additionalProperties:
+          type: integer
+        type: object
+    required:
+    - flags
+    - memory
+    - register
+    type: object
   types.TestCasePolicy:
     properties:
       visible_to_student:
         type: boolean
+    type: object
+  types.TestCaseRequest:
+    properties:
+      assert:
+        $ref: '#/definitions/types.TestCaseAssert'
+      init:
+        $ref: '#/definitions/types.TestCaseInit'
+      name:
+        type: string
+    required:
+    - assert
+    - init
+    - name
+    type: object
+  types.TestCaseResponse:
+    properties:
+      assert:
+        $ref: '#/definitions/types.TestCaseAssert'
+      id:
+        type: integer
+      init:
+        $ref: '#/definitions/types.TestCaseInit'
+      name:
+        type: string
+      test_suite_id:
+        type: integer
+    required:
+    - name
+    type: object
+  types.TestSuiteRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  types.TestSuiteResponse:
+    properties:
+      assignment_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   types.UpdateClassRequest:
     properties:
@@ -785,6 +870,485 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
+  /classes/{class_id}/assignments/{assignment_id}/test-suites:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all test suites by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TestSuiteResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    post:
+      consumes:
+      - application/json
+      description: Add a new test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite Data
+        in: body
+        name: testSuite
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestSuiteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a test suite by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TestSuiteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    put:
+      consumes:
+      - application/json
+      description: Update an existing test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Suite Data
+        in: body
+        name: testSuite
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestSuiteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all test cases by test suite ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TestCaseResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    post:
+      consumes:
+      - application/json
+      description: Add a new test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case Request
+        in: body
+        name: test_case
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases/{test_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a test case by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TestCaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    put:
+      consumes:
+      - application/json
+      description: Update an existing test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      - description: Test Case Data
+        in: body
+        name: test_case
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
   /classes/{class_id}/invitations:
     get:
       consumes:
