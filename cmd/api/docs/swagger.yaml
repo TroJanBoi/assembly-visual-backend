@@ -530,8 +530,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       tags:
       - classes
     post:
@@ -647,8 +645,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       tags:
       - classes
     put:
@@ -730,8 +726,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       tags:
       - assignments
     post:
@@ -850,8 +844,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       tags:
       - assignments
     put:
@@ -1557,8 +1549,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       tags:
       - classes
   /invitations/{invitation_id}/accept:

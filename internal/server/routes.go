@@ -66,9 +66,17 @@ func (s *Server) Router() (http.Handler, func()) {
 	classUseCase := usecases.NewClassUseCase(classRepository)
 	classController := controller.NewClassController(classUseCase)
 
+	classNotLoginRepository := repository.NewClassRepository(s.db)
+	classNotLoginUseCase := usecases.NewClassUseCase(classNotLoginRepository)
+	classNotLoginController := controller.NewClassController(classNotLoginUseCase)
+
 	assignmentRepositoryInClass := repository.NewAssignmentRepository(s.db)
 	assignmentUseCaseInClass := usecases.NewAssignmentUseCase(assignmentRepositoryInClass)
 	assignmentControllerInClass := controller.NewAssignmentController(assignmentUseCaseInClass)
+
+	assignmentNotLogin := repository.NewAssignmentRepository(s.db)
+	assignmentUseCaseNotLogin := usecases.NewAssignmentUseCase(assignmentNotLogin)
+	assignmentControllerNotLogin := controller.NewAssignmentController(assignmentUseCaseNotLogin)
 
 	invitationRepository := repository.NewInvitationRepository(s.db)
 	invitationUseCase := usecases.NewInvitationUseCase(invitationRepository)
@@ -134,6 +142,14 @@ func (s *Server) Router() (http.Handler, func()) {
 		invitationMeGroup := api.Group("/invitations").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			invitationMeController.InvitationMeRoutes(invitationMeGroup)
+		}
+		classNotLoginGroup := api.Group("/classes")
+		{
+			classNotLoginController.ClassNotLoginRoutes(classNotLoginGroup)
+		}
+		assignmentNotLoginGroup := api.Group("/classes/:class_id/assignments")
+		{
+			assignmentControllerNotLogin.AssignmentNotLoginRoutes(assignmentNotLoginGroup)
 		}
 
 	}

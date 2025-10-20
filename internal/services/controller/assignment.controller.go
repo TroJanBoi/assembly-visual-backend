@@ -30,27 +30,15 @@ func NewAssignmentController(assignmentUseCase usecases.AssignmentUseCase) *Assi
 // @Success      200   {array}   types.AssignmentResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
 // @Router       /classes/{class_id}/assignments [get]
 func (c *AssignmentController) GetAssignmentsByClassID(ctx *gin.Context) {
-	userIDVal, exists := ctx.Get("user_id")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-	userID, ok := userIDVal.(int)
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
-		return
-	}
-
 	classID := ctx.Param("class_id")
 	classIDInt, err := strconv.Atoi(classID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class ID"})
 		return
 	}
-	assignments, err := c.assignmentUseCase.GetAssignmentsByClassIDUseCases(ctx, userID, classIDInt)
+	assignments, err := c.assignmentUseCase.GetAssignmentsByClassIDUseCases(ctx, classIDInt)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -122,20 +110,8 @@ func (c *AssignmentController) CreateAssignment(ctx *gin.Context) {
 // @Success      200   {object}  types.AssignmentResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
 // @Router       /classes/{class_id}/assignments/{assignment_id} [get]
 func (c *AssignmentController) GetAssignmentsByAssignmentID(ctx *gin.Context) {
-	userIDVal, exists := ctx.Get("user_id")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-	userID, ok := userIDVal.(int)
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
-		return
-	}
-
 	classIDStr := ctx.Param("class_id")
 	classID, err := strconv.Atoi(classIDStr)
 	if err != nil {
@@ -150,7 +126,7 @@ func (c *AssignmentController) GetAssignmentsByAssignmentID(ctx *gin.Context) {
 		return
 	}
 
-	assignment, err := c.assignmentUseCase.GetAssignmentsByAssignmentIDUseCases(ctx, userID, classID, assignmentID)
+	assignment, err := c.assignmentUseCase.GetAssignmentsByAssignmentIDUseCases(ctx, classID, assignmentID)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -258,9 +234,12 @@ func (c *AssignmentController) DeleteAssignmentByAssignmentID(ctx *gin.Context) 
 }
 
 func (c *AssignmentController) AssignmentRoutes(r gin.IRoutes) {
-	r.GET("", c.GetAssignmentsByClassID)
 	r.POST("", c.CreateAssignment)
-	r.GET("/:assignment_id", c.GetAssignmentsByAssignmentID)
 	r.PUT("/:assignment_id", c.EditAssignmentByAssignmentID)
 	r.DELETE("/:assignment_id", c.DeleteAssignmentByAssignmentID)
+}
+
+func (c *AssignmentController) AssignmentNotLoginRoutes(rg *gin.RouterGroup) {
+	rg.GET("/:assignment_id", c.GetAssignmentsByAssignmentID)
+	rg.GET("", c.GetAssignmentsByClassID)
 }

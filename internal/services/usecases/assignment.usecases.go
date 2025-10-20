@@ -9,9 +9,9 @@ import (
 
 type AssignmentUseCase interface {
 	// Define methods related to Assignment use cases here
-	GetAssignmentsByClassIDUseCases(ctx context.Context, owner int, classID int) (*[]types.AssignmentResponse, error)
+	GetAssignmentsByClassIDUseCases(ctx context.Context, classID int) (*[]types.AssignmentResponse, error)
 	CreateAssignmentUseCases(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) (int, error)
-	GetAssignmentsByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error)
+	GetAssignmentsByAssignmentIDUseCases(ctx context.Context, classID, assignmentID int) (*types.AssignmentResponse, error)
 	EdiitAssignmentByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int, assignment *types.EditAssignmentRequest) error
 	DeleteAssignmentByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) error
 }
@@ -25,8 +25,8 @@ func NewAssignmentUseCase(assignmentRepo repository.AssignmentRepository) Assign
 	return &assignmentUseCase{assignmentRepo: assignmentRepo}
 }
 
-func (uc *assignmentUseCase) GetAssignmentsByClassIDUseCases(ctx context.Context, owner int, classID int) (*[]types.AssignmentResponse, error) {
-	resp, err := uc.assignmentRepo.GetAssignmentsByClassID(ctx, owner, classID)
+func (uc *assignmentUseCase) GetAssignmentsByClassIDUseCases(ctx context.Context, classID int) (*[]types.AssignmentResponse, error) {
+	resp, err := uc.assignmentRepo.GetAssignmentsByClassID(ctx, classID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +41,8 @@ func (uc *assignmentUseCase) CreateAssignmentUseCases(ctx context.Context, owner
 	return id, nil
 }
 
-func (uc *assignmentUseCase) GetAssignmentsByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error) {
-	resp, err := uc.assignmentRepo.GetAssignmentsByAssignmentID(ctx, owner, classID, assignmentID)
+func (uc *assignmentUseCase) GetAssignmentsByAssignmentIDUseCases(ctx context.Context, classID, assignmentID int) (*types.AssignmentResponse, error) {
+	resp, err := uc.assignmentRepo.GetAssignmentsByAssignmentID(ctx, classID, assignmentID)
 	if err != nil {
 		return nil, err
 	}

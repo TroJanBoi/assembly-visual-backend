@@ -25,7 +25,6 @@ func NewClassController(classUseCase usecases.ClassUseCase) *ClassController {
 // @Produce      json
 // @Success      200   {array}   types.ClassResponse
 // @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
 // @Router       /classes [get]
 func (c *ClassController) ClassGetAllClasses(ctx *gin.Context) {
 	classes, err := c.classUseCase.GetAllClasses(ctx)
@@ -44,7 +43,6 @@ func (c *ClassController) ClassGetAllClasses(ctx *gin.Context) {
 // @Success      200   {object}  types.ClassResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
 // @Router       /classes/{class_id} [get]
 func (c *ClassController) ClassGetClassByID(ctx *gin.Context) {
 	classID, err := strconv.Atoi(ctx.Param("class_id"))
@@ -248,7 +246,6 @@ func (c *ClassController) GetAllMembersByClassID(ctx *gin.Context) {
 // @Produce      json
 // @Success      200   {array}   types.ClassResponse
 // @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
 // @Router       /classes/public [get]
 func (c *ClassController) GetAllClassPublic(ctx *gin.Context) {
 	classes, err := c.classUseCase.GetAllClassPublicUseCases(ctx)
@@ -260,12 +257,16 @@ func (c *ClassController) GetAllClassPublic(ctx *gin.Context) {
 }
 
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
-	r.GET("/", c.ClassGetAllClasses)
-	r.GET("/:class_id", c.ClassGetClassByID)
 	r.POST("/", c.ClassCreateClass)
 	r.PUT("/:class_id", c.ClassUpdateClass)
 	r.DELETE("/:class_id", c.ClassDeleteClass)
 	r.POST("/:class_id/join", c.JoinClass)
 	r.GET("/:class_id/members", c.GetAllMembersByClassID)
-	r.GET("/public", c.GetAllClassPublic)
+}
+
+func (c *ClassController) ClassNotLoginRoutes(rg *gin.RouterGroup) {
+	// Define routes that do not require login here
+	rg.GET("/", c.ClassGetAllClasses)
+	rg.GET("/:class_id", c.ClassGetClassByID)
+	rg.GET("/public", c.GetAllClassPublic)
 }

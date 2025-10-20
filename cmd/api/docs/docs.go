@@ -177,11 +177,6 @@ const docTemplate = `{
         },
         "/classes": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Retrieve all classes",
                 "consumes": [
                     "application/json"
@@ -282,11 +277,6 @@ const docTemplate = `{
         },
         "/classes/public": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Retrieve all public classes",
                 "consumes": [
                     "application/json"
@@ -321,11 +311,6 @@ const docTemplate = `{
         },
         "/classes/{class_id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Retrieve a class by ID",
                 "consumes": [
                     "application/json"
@@ -512,11 +497,6 @@ const docTemplate = `{
         },
         "/classes/{class_id}/assignments": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Retrieve assignments by class ID",
                 "consumes": [
                     "application/json"
@@ -633,11 +613,6 @@ const docTemplate = `{
         },
         "/classes/{class_id}/assignments/{assignment_id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Retrieve an assignment by assignment ID",
                 "consumes": [
                     "application/json"
