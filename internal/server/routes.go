@@ -95,6 +95,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	testCaseUseCase := usecases.NewTestCaseUseCases(testCaseRepository)
 	testCaseController := controller.NewTestCaseController(testCaseUseCase)
 
+	systemsRepository := repository.NewSystemsRepository(s.db)
+	systemsUseCase := usecases.NewSystemsUseCase(systemsRepository)
+	systemsController := controller.NewSystemsController(systemsUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -150,6 +154,11 @@ func (s *Server) Router() (http.Handler, func()) {
 		assignmentNotLoginGroup := api.Group("/classes/:class_id/assignments")
 		{
 			assignmentControllerNotLogin.AssignmentNotLoginRoutes(assignmentNotLoginGroup)
+		}
+
+		systemsGroup := api.Group("/systems")
+		{
+			systemsController.SystemsRoutes(systemsGroup)
 		}
 
 	}

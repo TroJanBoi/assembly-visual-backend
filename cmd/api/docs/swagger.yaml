@@ -2148,6 +2148,78 @@ paths:
       summary: Delete user profile
       tags:
       - profile
+  /systems/hlt:
+    get:
+      consumes:
+      - application/json
+      description: Check if system is halted
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - systems
+  /systems/labels:
+    post:
+      consumes:
+      - application/json
+      description: Retrieve system labels
+      parameters:
+      - description: Label Filter
+        in: query
+        name: label
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - systems
+  /systems/nop:
+    get:
+      consumes:
+      - application/json
+      description: Perform NOP operation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - systems
   /users:
     get:
       consumes:
