@@ -100,12 +100,16 @@ func (c *AssignmentController) CreateAssignment(ctx *gin.Context) {
 		return
 	}
 
-	err = c.assignmentUseCase.CreateAssignmentUseCases(ctx, userID, classIDInt, &createAssignmentRequest)
+	assignmentID, err := c.assignmentUseCase.CreateAssignmentUseCases(ctx, userID, classIDInt, &createAssignmentRequest)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(201, gin.H{"message": "Assignment created successfully"})
+	ctx.JSON(201,
+		gin.H{
+			"assignment_id": assignmentID,
+			"message":       "Assignment created successfully",
+		})
 }
 
 // GetAssignmentsByAssignmentID handles the request to get an assignment by assignment ID

@@ -10,7 +10,7 @@ import (
 type AssignmentUseCase interface {
 	// Define methods related to Assignment use cases here
 	GetAssignmentsByClassIDUseCases(ctx context.Context, owner int, classID int) (*[]types.AssignmentResponse, error)
-	CreateAssignmentUseCases(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) error
+	CreateAssignmentUseCases(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) (int, error)
 	GetAssignmentsByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error)
 	EdiitAssignmentByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int, assignment *types.EditAssignmentRequest) error
 	DeleteAssignmentByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) error
@@ -33,12 +33,12 @@ func (uc *assignmentUseCase) GetAssignmentsByClassIDUseCases(ctx context.Context
 	return resp, nil
 }
 
-func (uc *assignmentUseCase) CreateAssignmentUseCases(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) error {
-	err := uc.assignmentRepo.CreateAssignment(ctx, owner, classID, assignment)
+func (uc *assignmentUseCase) CreateAssignmentUseCases(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) (int, error) {
+	id, err := uc.assignmentRepo.CreateAssignment(ctx, owner, classID, assignment)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 func (uc *assignmentUseCase) GetAssignmentsByAssignmentIDUseCases(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error) {

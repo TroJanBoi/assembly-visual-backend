@@ -3005,7 +3005,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "types.AssignmentCondition": {
+        "types.AllowedInstructions": {
             "type": "object",
             "properties": {
                 "arithmetic": {
@@ -3035,6 +3035,17 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "types.AssignmentCondition": {
+            "type": "object",
+            "properties": {
+                "allowed_instructions": {
+                    "$ref": "#/definitions/types.AllowedInstructions"
+                },
+                "execution_constraints": {
+                    "$ref": "#/definitions/types.ExecutionConstraints"
                 }
             }
         },
@@ -3273,6 +3284,20 @@ const docTemplate = `{
                 }
             }
         },
+        "types.ExecutionConstraints": {
+            "type": "object",
+            "properties": {
+                "initial_state": {
+                    "$ref": "#/definitions/types.InitialState"
+                },
+                "memory_node": {
+                    "type": "integer"
+                },
+                "register_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "types.FEBehavior": {
             "type": "object",
             "properties": {
@@ -3292,6 +3317,17 @@ const docTemplate = `{
                 },
                 "weight": {
                     "$ref": "#/definitions/types.WeightPolicy"
+                }
+            }
+        },
+        "types.InitialState": {
+            "type": "object",
+            "properties": {
+                "memory": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.Memory"
+                    }
                 }
             }
         },
@@ -3324,6 +3360,17 @@ const docTemplate = `{
                 },
                 "picture_path": {
                     "type": "string"
+                }
+            }
+        },
+        "types.Memory": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
                 }
             }
         },

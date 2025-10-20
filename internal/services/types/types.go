@@ -112,11 +112,31 @@ type AssignmentResponse struct {
 	Condition   AssignmentCondition `json:"condition"`
 }
 
-type AssignmentCondition struct {
+type AllowedInstructions struct {
 	System                   map[string]int `json:"system"`                     // LABEL, NOP, HLT
 	DataMovement             map[string]int `json:"data_movement"`              // LOAD, STORE, MOV
 	Arithmetic               map[string]int `json:"arithmetic"`                 // ADD, SUB, INC, DEC, MUL, DIV
 	ComparisonAndConditional map[string]int `json:"comparison_and_conditional"` // CMP, JMP, JC, JNZ, JZ, JNC
+}
+
+type Memory struct {
+	Address int `json:"address"`
+	Value   int `json:"value"`
+}
+
+type InitialState struct {
+	Memory []Memory `json:"memory"`
+}
+
+type ExecutionConstraints struct {
+	RegisterCount int          `json:"register_count"`
+	MemoryNode    int          `json:"memory_node"`
+	InitialState  InitialState `json:"initial_state"`
+}
+
+type AssignmentCondition struct {
+	AllowedInstructions  AllowedInstructions  `json:"allowed_instructions"`
+	ExecutionConstraints ExecutionConstraints `json:"execution_constraints"`
 }
 
 type CreateAssignmentRequest struct {

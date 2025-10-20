@@ -16,7 +16,7 @@ import (
 type AssignmentRepository interface {
 	// Define methods related to Assignment repository here
 	GetAssignmentsByClassID(ctx context.Context, owner int, classID int) (*[]types.AssignmentResponse, error)
-	CreateAssignment(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) error
+	CreateAssignment(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) (int, error)
 	GetAssignmentsByAssignmentID(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error)
 	EditAssignmentByAssignmentID(ctx context.Context, owner, classID, assignmentID int, assignment *types.EditAssignmentRequest) error
 	DeleteAssignmentByAssignmentID(ctx context.Context, owner, classID, assignmentID int) error
@@ -77,21 +77,21 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, owne
 	return &assignmentResponses, nil
 }
 
-func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) error {
+func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, classID int, assignment *types.CreateAssignmentRequest) (int, error) {
 	var users model.User
 	if err := r.db.WithContext(ctx).Where("id = ?", owner).First(&users).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
 	var classes model.Class
 	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
 	settingBytes, _ := json.Marshal(assignment.Settings)
@@ -109,9 +109,9 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newAssignment).Error; err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return int(newAssignment.ID), nil
 }
 
 func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context, owner, classID, assignmentID int) (*types.AssignmentResponse, error) {

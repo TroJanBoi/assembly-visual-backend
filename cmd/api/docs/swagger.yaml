@@ -1,5 +1,5 @@
 definitions:
-  types.AssignmentCondition:
+  types.AllowedInstructions:
     properties:
       arithmetic:
         additionalProperties:
@@ -21,6 +21,13 @@ definitions:
           type: integer
         description: LABEL, NOP, HLT
         type: object
+    type: object
+  types.AssignmentCondition:
+    properties:
+      allowed_instructions:
+        $ref: '#/definitions/types.AllowedInstructions'
+      execution_constraints:
+        $ref: '#/definitions/types.ExecutionConstraints'
     type: object
   types.AssignmentResponse:
     properties:
@@ -177,6 +184,15 @@ definitions:
       username:
         type: string
     type: object
+  types.ExecutionConstraints:
+    properties:
+      initial_state:
+        $ref: '#/definitions/types.InitialState'
+      memory_node:
+        type: integer
+      register_count:
+        type: integer
+    type: object
   types.FEBehavior:
     properties:
       allow_resubmit_after_due:
@@ -190,6 +206,13 @@ definitions:
         type: string
       weight:
         $ref: '#/definitions/types.WeightPolicy'
+    type: object
+  types.InitialState:
+    properties:
+      memory:
+        items:
+          $ref: '#/definitions/types.Memory'
+        type: array
     type: object
   types.LoginRequest:
     properties:
@@ -211,6 +234,13 @@ definitions:
         type: string
       picture_path:
         type: string
+    type: object
+  types.Memory:
+    properties:
+      address:
+        type: integer
+      value:
+        type: integer
     type: object
   types.OperationResponse:
     properties:
