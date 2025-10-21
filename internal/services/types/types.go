@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type CatResponse struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -265,9 +267,9 @@ type PlaygroundItem struct {
 	Instruction string               `json:"instruction"`
 	Label       string               `json:"label"`
 	Operands    []PlaygroundOperands `json:"operands"`
-	Next        int                  `json:"next"`
-	NextTrue    int                  `json:"next_true"`
-	NextFalse   int                  `json:"next_false"`
+	Next        *int                 `json:"next"`
+	NextTrue    *int                 `json:"next_true"`
+	NextFalse   *int                 `json:"next_false"`
 }
 
 type PlaygroundOperands struct {
@@ -303,4 +305,29 @@ type PlaygroundResponse struct {
 
 type PlaygroundMeRequest struct {
 	AssignmentID int `json:"assignment_id" binding:"required"`
+}
+
+type ExecutionState struct {
+	Registers    map[string]int    `json:"registers"`
+	Flags        map[string]int    `json:"flags"`
+	MemorySparse map[string]int    `json:"memory_sparse"`
+	Halted       bool              `json:"halted"`
+	Error        *ErrorStateDetail `json:"error"`
+}
+
+type ErrorStateDetail struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	NodeID  int    `json:"node_id"`
+}
+
+type ExecutionStepLog struct {
+	StepIndex   int            `json:"step_index"`
+	NodeID      int            `json:"node_id"`
+	Operation   string         `json:"operation"`
+	Registers   map[string]int `json:"registers"`
+	Flags       map[string]int `json:"flags"`
+	MemoryDelta map[string]int `json:"memory_delta"`
+	Stdout      []string       `json:"stdout"`
+	Timestamp   time.Time      `json:"timestamp"`
 }
