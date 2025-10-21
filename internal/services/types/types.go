@@ -246,3 +246,61 @@ type TestCaseAssert struct {
 	Flags    map[string]int `json:"flags" binding:"required"`
 	Halted   bool           `json:"halted" binding:"required"`
 }
+
+type PlaygroundRequest struct {
+	AssignmentID int            `json:"assignment_id" binding:"required"`
+	AttemptNO    int            `json:"attempt_no" binding:"required"`
+	Item         PlaygroundData `json:"item" binding:"required"`
+	Status       string         `json:"status" binding:"required"` // e.g., "in_progress", "completed", "failed"
+}
+
+type PlaygroundData struct {
+	Items    []PlaygroundItem   `json:"items"`
+	MetaData PlaygroundMetaData `json:"meta_data"`
+	UI       PlaygroundUI       `json:"ui"`
+}
+
+type PlaygroundItem struct {
+	ID          int                  `json:"id"`
+	Instruction string               `json:"instruction"`
+	Label       string               `json:"label"`
+	Operands    []PlaygroundOperands `json:"operands"`
+	Next        int                  `json:"next"`
+	NextTrue    int                  `json:"next_true"`
+	NextFalse   int                  `json:"next_false"`
+}
+
+type PlaygroundOperands struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+type PlaygroundMetaData struct {
+	ProgramName string `json:"program_name"`
+	AuthorID    int    `json:"author_id"`
+	Timestamp   string `json:"timestamp"`
+}
+
+type PlaygroundPosition struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
+type PlaygroundUI struct {
+	Position map[string]PlaygroundPosition `json:"position"`
+	Zoom     float64                       `json:"zoom"`
+	Pan      PlaygroundPosition            `json:"pan"`
+}
+
+type PlaygroundResponse struct {
+	ID           int            `json:"id"`
+	AssignmentID int            `json:"assignment_id"`
+	UserID       int            `json:"user_id"`
+	AttemptNO    int            `json:"attempt_no"`
+	Item         PlaygroundData `json:"item"`
+	Status       string         `json:"status"` // e.g., "in_progress", "completed", "failed"
+}
+
+type PlaygroundMeRequest struct {
+	AssignmentID int `json:"assignment_id" binding:"required"`
+}
