@@ -99,6 +99,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	systemsUseCase := usecases.NewSystemsUseCase(systemsRepository)
 	systemsController := controller.NewSystemsController(systemsUseCase)
 
+	playgroundRepository := repository.NewPlaygroundRepository(s.db)
+	playgroundUseCase := usecases.NewPlaygroundUseCases(playgroundRepository)
+	playgroundController := controller.NewPlaygroundController(playgroundUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -160,7 +164,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		{
 			systemsController.SystemsRoutes(systemsGroup)
 		}
-
+		playgroundGroup := api.Group("/playgrounds").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			playgroundController.PlaygroundRoutes(playgroundGroup)
+		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
 		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

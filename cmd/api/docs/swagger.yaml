@@ -251,6 +251,94 @@ definitions:
       value:
         type: number
     type: object
+  types.PlaygroundData:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/types.PlaygroundItem'
+        type: array
+      meta_data:
+        $ref: '#/definitions/types.PlaygroundMetaData'
+      ui:
+        $ref: '#/definitions/types.PlaygroundUI'
+    type: object
+  types.PlaygroundItem:
+    properties:
+      id:
+        type: integer
+      instruction:
+        type: string
+      label:
+        type: string
+      next:
+        type: integer
+      next_false:
+        type: integer
+      next_true:
+        type: integer
+      operands:
+        items:
+          $ref: '#/definitions/types.PlaygroundOperands'
+        type: array
+    type: object
+  types.PlaygroundMeRequest:
+    properties:
+      assignment_id:
+        type: integer
+    required:
+    - assignment_id
+    type: object
+  types.PlaygroundMetaData:
+    properties:
+      author_id:
+        type: integer
+      program_name:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  types.PlaygroundOperands:
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+    type: object
+  types.PlaygroundPosition:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  types.PlaygroundRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      item:
+        $ref: '#/definitions/types.PlaygroundData'
+      status:
+        description: e.g., "in_progress", "completed", "failed"
+        type: string
+    required:
+    - assignment_id
+    - attempt_no
+    - item
+    - status
+    type: object
+  types.PlaygroundUI:
+    properties:
+      pan:
+        $ref: '#/definitions/types.PlaygroundPosition'
+      position:
+        additionalProperties:
+          $ref: '#/definitions/types.PlaygroundPosition'
+        type: object
+      zoom:
+        type: number
+    type: object
   types.SignInRequest:
     properties:
       email:
@@ -1827,6 +1915,184 @@ paths:
       summary: Subtract numbers
       tags:
       - operations
+  /playgrounds:
+    post:
+      consumes:
+      - application/json
+      description: Create a new playground
+      parameters:
+      - description: Playground Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+  /playgrounds/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a playground by its ID
+      parameters:
+      - description: Playground ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+  /playgrounds/me:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a playground by user ID
+      parameters:
+      - description: Playground Query Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundMeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+    post:
+      consumes:
+      - application/json
+      description: Retrieve a playground by assignment ID and user ID
+      parameters:
+      - description: Playground Query Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundMeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+    put:
+      consumes:
+      - application/json
+      description: Update a playground by user ID
+      parameters:
+      - description: Playground Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
   /profile:
     get:
       consumes:

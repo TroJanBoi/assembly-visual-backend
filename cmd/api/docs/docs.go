@@ -2216,6 +2216,287 @@ const docTemplate = `{
                 }
             }
         },
+        "/playgrounds": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new playground",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playgrounds"
+                ],
+                "parameters": [
+                    {
+                        "description": "Playground Data",
+                        "name": "playground",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.PlaygroundRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/playgrounds/me": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a playground by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playgrounds"
+                ],
+                "parameters": [
+                    {
+                        "description": "Playground Data",
+                        "name": "playground",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.PlaygroundRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a playground by assignment ID and user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playgrounds"
+                ],
+                "parameters": [
+                    {
+                        "description": "Playground Query Data",
+                        "name": "playground",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.PlaygroundMeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a playground by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playgrounds"
+                ],
+                "parameters": [
+                    {
+                        "description": "Playground Query Data",
+                        "name": "playground",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.PlaygroundMeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/playgrounds/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a playground by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playgrounds"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Playground ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/profile": {
             "get": {
                 "security": [
@@ -3470,6 +3751,140 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.PlaygroundData": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.PlaygroundItem"
+                    }
+                },
+                "meta_data": {
+                    "$ref": "#/definitions/types.PlaygroundMetaData"
+                },
+                "ui": {
+                    "$ref": "#/definitions/types.PlaygroundUI"
+                }
+            }
+        },
+        "types.PlaygroundItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "instruction": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "next": {
+                    "type": "integer"
+                },
+                "next_false": {
+                    "type": "integer"
+                },
+                "next_true": {
+                    "type": "integer"
+                },
+                "operands": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.PlaygroundOperands"
+                    }
+                }
+            }
+        },
+        "types.PlaygroundMeRequest": {
+            "type": "object",
+            "required": [
+                "assignment_id"
+            ],
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.PlaygroundMetaData": {
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "integer"
+                },
+                "program_name": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.PlaygroundOperands": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.PlaygroundPosition": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.PlaygroundRequest": {
+            "type": "object",
+            "required": [
+                "assignment_id",
+                "attempt_no",
+                "item",
+                "status"
+            ],
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                },
+                "attempt_no": {
+                    "type": "integer"
+                },
+                "item": {
+                    "$ref": "#/definitions/types.PlaygroundData"
+                },
+                "status": {
+                    "description": "e.g., \"in_progress\", \"completed\", \"failed\"",
+                    "type": "string"
+                }
+            }
+        },
+        "types.PlaygroundUI": {
+            "type": "object",
+            "properties": {
+                "pan": {
+                    "$ref": "#/definitions/types.PlaygroundPosition"
+                },
+                "position": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/types.PlaygroundPosition"
+                    }
+                },
+                "zoom": {
                     "type": "number"
                 }
             }
