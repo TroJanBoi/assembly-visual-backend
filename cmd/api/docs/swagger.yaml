@@ -1986,6 +1986,42 @@ paths:
       - BearerAuth: []
       tags:
       - playgrounds
+  /playgrounds/{playground_id}/execute:
+    post:
+      consumes:
+      - application/json
+      description: Execute the code in a playground
+      parameters:
+      - description: Playground ID
+        in: path
+        name: playground_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Execute Playground
+      tags:
+      - executions
   /playgrounds/me:
     delete:
       consumes:

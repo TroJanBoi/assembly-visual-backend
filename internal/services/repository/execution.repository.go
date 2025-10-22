@@ -1,0 +1,263 @@
+package repository
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	"encoding/json"
+
+	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
+	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
+
+	"github.com/google/uuid"
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
+)
+
+type ExecutionRepository interface {
+	ExecutionPlayground(ctx context.Context, userID int, playgroundID int) (*types.ExecutionState, error)
+}
+
+type executionRepository struct {
+	db *gorm.DB
+}
+
+func NewExecutionRepository(db *gorm.DB) ExecutionRepository {
+	return &executionRepository{db: db}
+}
+
+func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID int, playgroundID int) (*types.ExecutionState, error) {
+	// Implementation of the execution logic goes here
+	var playground model.Playground
+	if err := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", playgroundID, userID).First(&playground).Error; err != nil {
+		return nil, fmt.Errorf("failed to find playground: %w", err)
+	}
+
+	var program types.PlaygroundData
+	if err := json.Unmarshal(playground.Item, &program); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal playground data: %w", err)
+	}
+
+	// Initialize execution state
+	state := &types.ExecutionState{
+		Registers:    map[string]int{"R0": 0, "R1": 0, "R2": 0, "R3": 0},
+		Flags:        map[string]int{"Z": 0, "N": 0, "C": 0, "V": 0},
+		MemorySparse: make(map[string]int),
+		Halted:       false,
+		Error:        nil,
+	}
+
+	log := []types.ExecutionStepLog{}
+	startAt := time.Now()
+
+	currentIndex := 0
+	stepIndex := 0
+	fmt.Println("Starting execution...")
+	for {
+		if currentIndex >= len(program.Items) {
+			fmt.Printf("Reached end of program %d\n", currentIndex)
+			state.Halted = true
+			break
+		}
+		node := program.Items[currentIndex]
+		step := types.ExecutionStepLog{
+			StepIndex: stepIndex,
+			NodeID:    node.ID,
+			Operation: node.Instruction,
+			Registers: cloneRegisters(state.Registers),
+			Flags:     cloneFlags(state.Flags),
+			Stdout:    []string{},
+			Timestamp: time.Now(),
+		}
+		fmt.Printf("Executing step %d: NodeID=%d, Instr=%s, Next=%v, T=%v, F=%v\n", stepIndex, node.ID, node.Instruction, node.Next, node.NextTrue, node.NextFalse)
+		switch node.Instruction {
+		case "NOP":
+			// No operation
+		case "LOAD":
+			r := node.Operands[0].Value
+			valStr := strings.TrimPrefix(node.Operands[1].Value, "#")
+			val, _ := strconv.Atoi(valStr)
+			state.Registers[r] = val
+			step.Registers[r] = val
+			fmt.Printf("    LOAD %s with %d\n", r, val)
+		case "LABEL":
+			// Labels are handled in findLabel function
+		case "ADD":
+			dst := node.Operands[0].Value
+			src := node.Operands[1].Value
+			var addVal int
+			if strings.HasPrefix(src, "#") {
+				vStr := strings.TrimPrefix(src, "#")
+				addVal, _ = strconv.Atoi(vStr)
+			} else {
+				addVal = state.Registers[src]
+			}
+			state.Registers[dst] += addVal
+			step.Registers[dst] = state.Registers[dst]
+		case "SUB":
+			dst := node.Operands[0].Value // destination register
+			src := node.Operands[1].Value // source register or immediate value
+			var subVal int
+			if strings.HasPrefix(src, "#") {
+				vStr := strings.TrimPrefix(src, "#")
+				subVal, _ = strconv.Atoi(vStr)
+			} else {
+				subVal = state.Registers[src]
+			}
+			state.Registers[dst] -= subVal
+			step.Registers[dst] = state.Registers[dst]
+			fmt.Printf("    SUB %s by %d => %d\n", dst, subVal, state.Registers[dst])
+		case "PRINT":
+			r := node.Operands[0].Value
+			output := fmt.Sprintf("Output from %s: %d", r, state.Registers[r])
+			step.Stdout = append(step.Stdout, output)
+		case "CMP":
+			r1 := node.Operands[0].Value
+			r2 := node.Operands[1].Value
+			var val2 int
+			if strings.HasPrefix(r2, "#") {
+				vStr := strings.TrimPrefix(r2, "#")
+				val2, _ = strconv.Atoi(vStr)
+			} else {
+				val2 = state.Registers[r2]
+			}
+			if state.Registers[r1] == val2 {
+				state.Flags["Z"] = 1
+			} else {
+				state.Flags["Z"] = 0
+			}
+			fmt.Printf("    CMP %s (%d) vs %s (%d) => Z=%d\n", r1, state.Registers[r1], r2, val2, state.Flags["Z"])
+		case "JMP":
+			label := node.Operands[0].Value
+			target := findLabel(program.Items, label)
+			if target == -1 {
+				state.Error = &types.ErrorStateDetail{
+					Code:    "RUNTIME_INVALID_LABEL",
+					Message: fmt.Sprintf("Label not found: %s", label),
+					NodeID:  node.ID,
+				}
+				goto SAVE_RESULT
+			}
+			log = append(log, step)
+			stepIndex++
+			currentIndex = target
+			continue
+		case "HLT":
+			state.Halted = true
+			log = append(log, step)
+			goto SAVE_RESULT
+
+		default:
+			state.Error = &types.ErrorStateDetail{
+				Code:    "UNKNOWN_INSTRUCTION",
+				Message: fmt.Sprintf("Unknown instruction: %s", node.Instruction),
+				NodeID:  node.ID,
+			}
+			goto SAVE_RESULT
+		}
+
+		log = append(log, step)
+		stepIndex++
+		if strings.ToUpper(node.Instruction) == "CMP" { // conditional jump
+			if state.Flags["Z"] == 1 && node.NextTrue != nil && *node.NextTrue > 0 && *node.NextTrue <= len(program.Items) { // jump if zero flag is set
+				currentIndex = *node.NextTrue - 1
+			} else if state.Flags["Z"] == 0 && node.NextFalse != nil && *node.NextFalse > 0 && *node.NextFalse <= len(program.Items) { // jump if zero flag is not set
+				currentIndex = *node.NextFalse - 1
+			} else {
+				fmt.Printf("⚠️  CMP invalid next (T=%v, F=%v)\n", node.NextTrue, node.NextFalse)
+				state.Halted = true
+				break
+			}
+			continue
+		}
+
+		if node.Next != nil {
+			if *node.Next <= 0 || *node.Next > len(program.Items) { // out of bounds
+				fmt.Printf("⚠️  Invalid next index: %v at Node %d\n", *node.Next, node.ID)
+				state.Halted = true
+				break
+			}
+			currentIndex = *node.Next - 1
+		} else { // no next defined
+			fmt.Printf("🛑 Node %d has no next → halt\n", node.ID)
+			state.Halted = true
+			break
+		}
+
+		maxStep := 10000
+		if stepIndex >= maxStep {
+			state.Error = &types.ErrorStateDetail{
+				Code:    "RUNTIME_EXCEED_MAX_STEP",
+				Message: fmt.Sprintf("Exceeded maximum execution steps: %d", maxStep),
+				NodeID:  node.ID,
+			}
+			goto SAVE_RESULT
+		}
+	}
+
+SAVE_RESULT:
+	duration := time.Since(startAt)
+	finalJson, _ := json.Marshal(state)
+
+	exec := model.Executions{
+		ExecutionsUUID: uuid.New().String(),
+		AssignmentID:   playground.AssignmentID,
+		PlaygroundID:   int(playground.ID),
+		StartAt:        startAt,
+		FinishAt:       time.Now(),
+		DurationMs:     duration.Milliseconds(),
+		StepCount:      len(log),
+		Status:         2, // completed
+		ErrorCode:      "",
+		FinalState:     datatypes.JSON(finalJson),
+		FullLogPath:    fmt.Sprintf("logs/execution_%s.log", uuid.New().String()),
+	}
+
+	if state.Error != nil {
+		exec.Status = 3 // failed
+		exec.ErrorCode = state.Error.Code
+	}
+
+	if err := r.db.WithContext(ctx).Create(&exec).Error; err != nil {
+		return nil, fmt.Errorf("failed to save execution record: %w", err)
+	}
+
+	logFile, _ := json.Marshal(log)
+	os.WriteFile(exec.FullLogPath, logFile, 0644)
+
+	fmt.Println("Execution finished.")
+	return state, nil
+}
+
+func cloneRegisters(src map[string]int) map[string]int {
+	dst := make(map[string]int)
+	for key, value := range src {
+		dst[key] = value
+	}
+	return dst
+}
+
+func cloneFlags(src map[string]int) map[string]int {
+	dst := make(map[string]int)
+	for key, value := range src {
+		dst[key] = value
+	}
+	return dst
+}
+
+func findLabel(items []types.PlaygroundItem, label string) int {
+	for i, item := range items {
+		if strings.EqualFold(item.Label, label) {
+			// ✅ ถ้า node นี้เป็น LABEL ให้ข้ามไป node ถัดไป
+			if strings.ToUpper(item.Instruction) == "LABEL" && i+1 < len(items) {
+				return i + 1
+			}
+			return i
+		}
+	}
+	return -1
+}

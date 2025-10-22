@@ -57,10 +57,10 @@ func New() Service {
 		return nil
 	}
 	// db.Migrator().DropTable(
-	// 	&model.User{},
-	// 	&model.Assignment{},
+	// 	// &model.User{},
+	// 	// &model.Assignment{},
 	// 	&model.BookMark{},
-	// 	&model.Class{},
+	// 	// &model.Class{},
 	// 	&model.Executions{},
 	// 	&model.GoogleAccount{},
 	// 	&model.GoogleCourseSyncLog{},
