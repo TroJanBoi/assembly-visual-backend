@@ -84,6 +84,21 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			state.Registers[r] = val
 			step.Registers[r] = val
 			fmt.Printf("    LOAD %s with %d\n", r, val)
+		case "MOV":
+			dst := node.Operands[0].Value // destination register
+			if strings.HasPrefix(node.Operands[1].Value, "#") {
+				vStr := strings.TrimPrefix(node.Operands[1].Value, "#")
+				val, _ := strconv.Atoi(vStr)
+				state.Registers[dst] = val
+				step.Registers[dst] = val
+				fmt.Printf("    MOV %s with immediate %d\n", dst, val)
+			} else {
+				src := node.Operands[1].Value // source register
+				val := state.Registers[src]
+				state.Registers[dst] = val
+				step.Registers[dst] = val
+				fmt.Printf("    MOV %s with %s (%d)\n", dst, src, val)
+			}
 		case "LABEL":
 			// Labels are handled in findLabel function
 		case "ADD":
