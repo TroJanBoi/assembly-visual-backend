@@ -144,6 +144,14 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			state.Registers[dst] *= mulVal
 			step.Registers[dst] = state.Registers[dst]
 			// fmt.Printf("    MUL %s by %d => %d\n", dst, mulVal, state.Registers[dst])
+		case "INC":
+			r := node.Operands[0].Value
+			state.Registers[r]++
+			step.Registers[r] = state.Registers[r]
+		case "DEC":
+			r := node.Operands[0].Value
+			state.Registers[r]--
+			step.Registers[r] = state.Registers[r]
 		case "PRINT":
 			r := node.Operands[0].Value
 			output := fmt.Sprintf("Output from %s: %d", r, state.Registers[r])
