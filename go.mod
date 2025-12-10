@@ -13,6 +13,8 @@ require (
 	gorm.io/gorm v1.30.1
 )
 
+require github.com/mattn/go-sqlite3 v1.14.22 // indirect
+
 require (
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -107,4 +109,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.7 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
+	gorm.io/driver/sqlite v1.6.0
 )

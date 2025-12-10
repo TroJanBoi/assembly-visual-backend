@@ -44,8 +44,13 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 
 	// Initialize execution state
 	state := &types.ExecutionState{
-		Registers:    map[string]int{"R0": 0, "R1": 0, "R2": 0, "R3": 0},
-		Flags:        map[string]int{"Z": 0, "N": 0, "C": 0, "V": 0},
+		Registers: map[string]int{"R0": 0, "R1": 0, "R2": 0, "R3": 0},
+		Flags:     map[string]int{"Z": 0, "N": 0, "C": 0, "V": 0},
+		// z คือ zero, n คือ negative, c = carry, v = overflow
+		// ถ้า z = 1 แสดงว่า ค่าที่เปรียบเทียบกัน เท่ากัน;
+		// ถ้า n = 1 แสดงว่า ค่าที่เปรียบเทียบกัน เป็นลบ;
+		// c = 1 แสดงว่า บวกแล้ว เกินค่า;
+		// v = 1 แสดงว่า ลบแล้ว เกินค่า
 		MemorySparse: make(map[string]int),
 		Halted:       false,
 		Error:        nil,
@@ -56,10 +61,10 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 
 	currentIndex := 0
 	stepIndex := 0
-	fmt.Println("Starting execution...")
+	// fmt.Println("Starting execution...")
 	for {
 		if currentIndex >= len(program.Items) {
-			fmt.Printf("Reached end of program %d\n", currentIndex)
+			// fmt.Printf("Reached end of program %d\n", currentIndex)
 			state.Halted = true
 			break
 		}
@@ -73,7 +78,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			Stdout:    []string{},
 			Timestamp: time.Now(),
 		}
-		fmt.Printf("Executing step %d: NodeID=%d, Instr=%s, Next=%v, T=%v, F=%v\n", stepIndex, node.ID, node.Instruction, node.Next, node.NextTrue, node.NextFalse)
+		// fmt.Printf("Executing step %d: NodeID=%d, Instr=%s, Next=%v, T=%v, F=%v\n", stepIndex, node.ID, node.Instruction, node.Next, node.NextTrue, node.NextFalse)
 		switch node.Instruction {
 		case "NOP":
 			// No operation
@@ -83,7 +88,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			val, _ := strconv.Atoi(valStr)
 			state.Registers[r] = val
 			step.Registers[r] = val
-			fmt.Printf("    LOAD %s with %d\n", r, val)
+			// fmt.Printf("    LOAD %s with %d\n", r, val)
 		case "MOV":
 			dst := node.Operands[0].Value // destination register
 			if strings.HasPrefix(node.Operands[1].Value, "#") {
@@ -91,13 +96,13 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 				val, _ := strconv.Atoi(vStr)
 				state.Registers[dst] = val
 				step.Registers[dst] = val
-				fmt.Printf("    MOV %s with immediate %d\n", dst, val)
+				// fmt.Printf("    MOV %s with immediate %d\n", dst, val)
 			} else {
 				src := node.Operands[1].Value // source register
 				val := state.Registers[src]
 				state.Registers[dst] = val
 				step.Registers[dst] = val
-				fmt.Printf("    MOV %s with %s (%d)\n", dst, src, val)
+				// fmt.Printf("    MOV %s with %s (%d)\n", dst, src, val)
 			}
 		case "LABEL":
 			// Labels are handled in findLabel function
@@ -125,7 +130,20 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			}
 			state.Registers[dst] -= subVal
 			step.Registers[dst] = state.Registers[dst]
-			fmt.Printf("    SUB %s by %d => %d\n", dst, subVal, state.Registers[dst])
+			// fmt.Printf("    SUB %s by %d => %d\n", dst, subVal, state.Registers[dst])
+		case "MUL":
+			dst := node.Operands[0].Value
+			src := node.Operands[1].Value
+			var mulVal int
+			if strings.HasPrefix(src, "#") {
+				vStr := strings.TrimPrefix(src, "#") // คือ ลบ # ที่อยู่ข้างหน้าออก
+				mulVal, _ = strconv.Atoi(vStr)
+			} else {
+				mulVal = state.Registers[src] // ดึงค่าจากรีจิสเตอร์ ถ้าไม่ใช่ immediate
+			}
+			state.Registers[dst] *= mulVal
+			step.Registers[dst] = state.Registers[dst]
+			// fmt.Printf("    MUL %s by %d => %d\n", dst, mulVal, state.Registers[dst])
 		case "PRINT":
 			r := node.Operands[0].Value
 			output := fmt.Sprintf("Output from %s: %d", r, state.Registers[r])
@@ -145,16 +163,12 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			} else {
 				state.Flags["Z"] = 0
 			}
-			fmt.Printf("    CMP %s (%d) vs %s (%d) => Z=%d\n", r1, state.Registers[r1], r2, val2, state.Flags["Z"])
+			// fmt.Printf("    CMP %s (%d) vs %s (%d) => Z=%d\n", r1, state.Registers[r1], r2, val2, state.Flags["Z"])
 		case "JMP":
 			label := node.Operands[0].Value
 			target := findLabel(program.Items, label)
 			if target == -1 {
-				state.Error = &types.ErrorStateDetail{
-					Code:    "RUNTIME_INVALID_LABEL",
-					Message: fmt.Sprintf("Label not found: %s", label),
-					NodeID:  node.ID,
-				}
+				functionSetError(state, "RUNTIME_INVALID_LABEL", fmt.Sprintf("Label not found: %s", label), node.ID)
 				goto SAVE_RESULT
 			}
 			log = append(log, step)
@@ -162,16 +176,12 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			currentIndex = target
 			continue
 		case "HLT":
-			state.Halted = true
+			functionHalt(state)
 			log = append(log, step)
 			goto SAVE_RESULT
 
 		default:
-			state.Error = &types.ErrorStateDetail{
-				Code:    "UNKNOWN_INSTRUCTION",
-				Message: fmt.Sprintf("Unknown instruction: %s", node.Instruction),
-				NodeID:  node.ID,
-			}
+			functionSetError(state, "UNKNOWN_INSTRUCTION", fmt.Sprintf("Unknown instruction: %s", node.Instruction), node.ID)
 			goto SAVE_RESULT
 		}
 
@@ -190,15 +200,15 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			continue
 		}
 
-		if node.Next != nil {
+		if node.Next != nil { // เข็ค ว่า มี next ไหม
 			if *node.Next <= 0 || *node.Next > len(program.Items) { // out of bounds
-				fmt.Printf("⚠️  Invalid next index: %v at Node %d\n", *node.Next, node.ID)
+				// fmt.Printf("⚠️  Invalid next index: %v at Node %d\n", *node.Next, node.ID)
 				state.Halted = true
 				break
 			}
 			currentIndex = *node.Next - 1
-		} else { // no next defined
-			fmt.Printf("🛑 Node %d has no next → halt\n", node.ID)
+		} else { // ถ้า next เป็น nil แสดงว่า หยุด
+			// fmt.Printf("🛑 Node %d has no next → halt\n", node.ID)
 			state.Halted = true
 			break
 		}
@@ -244,7 +254,7 @@ SAVE_RESULT:
 	logFile, _ := json.Marshal(log)
 	os.WriteFile(exec.FullLogPath, logFile, 0644)
 
-	fmt.Println("Execution finished.")
+	// fmt.Println("Execution finished.")
 	return state, nil
 }
 
@@ -275,4 +285,16 @@ func findLabel(items []types.PlaygroundItem, label string) int {
 		}
 	}
 	return -1
+}
+
+func functionHalt(state *types.ExecutionState) {
+	state.Halted = true
+}
+
+func functionSetError(state *types.ExecutionState, code string, message string, nodeID int) {
+	state.Error = &types.ErrorStateDetail{
+		Code:    code,
+		Message: message,
+		NodeID:  nodeID,
+	}
 }
