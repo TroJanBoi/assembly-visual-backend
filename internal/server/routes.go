@@ -50,9 +50,9 @@ func (s *Server) Router() (http.Handler, func()) {
 	userUseCase := usecases.NewUserUseCase(userRepository)
 	userController := controller.NewUserController(userUseCase)
 
-	operationRepository := repository.NewOperationRepository(s.db)
-	operationUsecase := usecases.NewOperationUsecase(operationRepository)
-	operationController := controller.NewOperationController(operationUsecase)
+	// operationRepository := repository.NewOperationRepository(s.db)
+	// operationUsecase := usecases.NewOperationUsecase(operationRepository)
+	// operationController := controller.NewOperationController(operationUsecase)
 
 	authRepository := repository.NewAuthRepository(s.db)
 	authUseCase := usecases.NewAuthUseCase(authRepository)
@@ -118,10 +118,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		{
 			userController.UserRoutes(userGroup)
 		}
-		operationGroup := api.Group("/operations").Use(security.Middleware())
-		{
-			operationController.OperationRegisterRoutes(operationGroup)
-		}
+		// operationGroup := api.Group("/operations").Use(security.Middleware())
+		// {
+		// 	operationController.OperationRegisterRoutes(operationGroup)
+		// }
 		authGroup := api.Group("/auth")
 		{
 			authController.AuthRoutes(authGroup)
