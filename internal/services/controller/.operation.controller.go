@@ -19,18 +19,6 @@ func NewOperationController(operationUsecase usecases.OperationUsecase) *Operati
 	}
 }
 
-// Add Numbers godoc
-// @Summary      Add numbers
-// @Description  Add a list of numbers and return the result
-// @Tags         operations
-// @Accept       json
-// @Produce      json
-// @Param body body []float64 true "List of numbers to add"
-// @Success      200   {object}  types.OperationResponse
-// @Failure      400   {object}  types.OperationResponse
-// @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
-// @Router       /operations/add [post]
 func (o *OperationController) OperationAddController(ctx *gin.Context) {
 	var values []float64
 	if err := ctx.ShouldBindJSON(&values); err != nil {
@@ -57,18 +45,6 @@ func (o *OperationController) OperationAddController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, operation)
 }
 
-// Subtract Numbers godoc
-// @Summary      Subtract numbers
-// @Description  Subtract a list of numbers and return the result
-// @Tags         operations
-// @Accept       json
-// @Produce      json
-// @Param body body []float64 true "List of numbers to subtract"
-// @Success      200   {object}  types.OperationResponse
-// @Failure      400   {object}  map[string]string
-// @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
-// @Router       /operations/sub [post]
 func (o *OperationController) OperationSubController(ctx *gin.Context) {
 	var values []float64
 	if err := ctx.ShouldBindJSON(&values); err != nil {
@@ -95,18 +71,6 @@ func (o *OperationController) OperationSubController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, operation)
 }
 
-// Multiply Numbers godoc
-// @Summary      Multiply numbers
-// @Description  Multiply a list of numbers and return the result
-// @Tags         operations
-// @Accept       json
-// @Produce      json
-// @Param body body []float64 true "List of numbers to multiply"
-// @Success      200   {object}  types.OperationResponse
-// @Failure      400   {object}  types.OperationResponse
-// @Failure      500   {object}  types.OperationResponse
-// @Security     BearerAuth
-// @Router       /operations/mul [post]
 func (o *OperationController) OperationMulController(ctx *gin.Context) {
 	var values []float64
 
@@ -138,18 +102,6 @@ func (o *OperationController) OperationMulController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, operation)
 }
 
-// Divide Numbers godoc
-// @Summary      Divide numbers
-// @Description  Divide a list of numbers and return the result
-// @Tags         operations
-// @Accept       json
-// @Produce      json
-// @Param body body []float64 true "List of numbers to divide"
-// @Success      200   {object}  types.OperationResponse
-// @Failure      400   {object}  types.OperationResponse
-// @Failure      500   {object}  types.OperationResponse
-// @Security     BearerAuth
-// @Router       /operations/div [post]
 func (o *OperationController) OperationDivController(ctx *gin.Context) {
 	var values []float64
 
