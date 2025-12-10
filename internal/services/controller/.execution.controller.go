@@ -15,17 +15,6 @@ func NewExecutionController(executionUsecase usecases.ExecutionUsecase) *Executi
 	return &ExecutionController{executionUsecase: executionUsecase}
 }
 
-// @Summary      Execute Playground
-// @Description  Execute the code in a playground
-// @Tags         executions
-// @Accept       json
-// @Produce      json
-// @Param        playground_id   path      int  true  "Playground ID"
-// @Success      200   {object}  map[string]interface{}
-// @Failure      400   {object}  map[string]string
-// @Failure      500   {object}  map[string]string
-// @Security     BearerAuth
-// @Router       /playgrounds/{playground_id}/execute [post]
 func (ec *ExecutionController) ExecutionPlayground(ctx *gin.Context) {
 	var playgroundIDParam = ctx.Param("playground_id")
 	playgroundID, err := strconv.Atoi(playgroundIDParam)

@@ -61,7 +61,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 
 	currentIndex := 0
 	stepIndex := 0
-	// fmt.Println("Starting execution...")
+	fmt.Printf("\033[1;32mStarting execution...\033[0m\n")
 	for {
 		if currentIndex >= len(program.Items) {
 			// fmt.Printf("Reached end of program %d\n", currentIndex)
@@ -265,7 +265,7 @@ SAVE_RESULT:
 	logFile, _ := json.Marshal(log)
 	os.WriteFile(exec.FullLogPath, logFile, 0644)
 
-	// fmt.Println("Execution finished.")
+	fmt.Println("\033[1;32mExecution finished.\033[0m")
 	return state, nil
 }
 

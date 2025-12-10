@@ -103,9 +103,9 @@ func (s *Server) Router() (http.Handler, func()) {
 	playgroundUseCase := usecases.NewPlaygroundUseCases(playgroundRepository)
 	playgroundController := controller.NewPlaygroundController(playgroundUseCase)
 
-	executionRepository := repository.NewExecutionRepository(s.db)
-	executionUseCase := usecases.NewExecutionUseCases(executionRepository)
-	executionController := controller.NewExecutionController(executionUseCase)
+	// executionRepository := repository.NewExecutionRepository(s.db)
+	// executionUseCase := usecases.NewExecutionUseCases(executionRepository)
+	// executionController := controller.NewExecutionController(executionUseCase)
 
 	api := r.Group("/api/v2")
 	{
@@ -171,10 +171,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		playgroundGroup := api.Group("/playgrounds").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			playgroundController.PlaygroundRoutes(playgroundGroup)
-			executionGroup := playgroundGroup.Group("/:playground_id").Use(security.Middleware()).(*gin.RouterGroup)
-			{
-				executionController.ExecutionRoutes(executionGroup)
-			}
+			// executionGroup := playgroundGroup.Group("/:playground_id").Use(security.Middleware()).(*gin.RouterGroup)
+			// {
+			// 	executionController.ExecutionRoutes(executionGroup)
+			// }
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
