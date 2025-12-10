@@ -88,7 +88,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			val, _ := strconv.Atoi(valStr)
 			state.Registers[r] = val
 			step.Registers[r] = val
-			// fmt.Printf("    LOAD %s with %d\n", r, val)
+			fmt.Printf("LOAD %s with %d\n", r, val)
 		case "MOV":
 			dst := node.Operands[0].Value // destination register
 			if strings.HasPrefix(node.Operands[1].Value, "#") {
@@ -96,13 +96,13 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 				val, _ := strconv.Atoi(vStr)
 				state.Registers[dst] = val
 				step.Registers[dst] = val
-				// fmt.Printf("    MOV %s with immediate %d\n", dst, val)
+				fmt.Printf("    MOV %s with immediate %d\n", dst, val)
 			} else {
 				src := node.Operands[1].Value // source register
 				val := state.Registers[src]
 				state.Registers[dst] = val
 				step.Registers[dst] = val
-				// fmt.Printf("    MOV %s with %s (%d)\n", dst, src, val)
+				fmt.Printf("    MOV %s with %s (%d)\n", dst, src, val)
 			}
 		case "LABEL":
 			// Labels are handled in findLabel function
@@ -118,6 +118,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			}
 			state.Registers[dst] += addVal
 			step.Registers[dst] = state.Registers[dst]
+			fmt.Printf("    	ADD %s by %d => %d\n", dst, addVal, state.Registers[dst])
 		case "SUB":
 			dst := node.Operands[0].Value // destination register
 			src := node.Operands[1].Value // source register or immediate value
@@ -130,7 +131,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			}
 			state.Registers[dst] -= subVal
 			step.Registers[dst] = state.Registers[dst]
-			// fmt.Printf("    SUB %s by %d => %d\n", dst, subVal, state.Registers[dst])
+			fmt.Printf("    	SUB %s by %d => %d\n", dst, subVal, state.Registers[dst])
 		case "MUL":
 			dst := node.Operands[0].Value
 			src := node.Operands[1].Value
@@ -143,15 +144,17 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			}
 			state.Registers[dst] *= mulVal
 			step.Registers[dst] = state.Registers[dst]
-			// fmt.Printf("    MUL %s by %d => %d\n", dst, mulVal, state.Registers[dst])
+			fmt.Printf("    	MUL %s by %d => %d\n", dst, mulVal, state.Registers[dst])
 		case "INC":
 			r := node.Operands[0].Value
 			state.Registers[r]++
 			step.Registers[r] = state.Registers[r]
+			fmt.Printf("    INC %s => %d\n", r, state.Registers[r])
 		case "DEC":
 			r := node.Operands[0].Value
 			state.Registers[r]--
 			step.Registers[r] = state.Registers[r]
+			fmt.Printf("    DEC %s => %d\n", r, state.Registers[r])
 		case "PRINT":
 			r := node.Operands[0].Value
 			output := fmt.Sprintf("Output from %s: %d", r, state.Registers[r])
@@ -171,7 +174,7 @@ func (r *executionRepository) ExecutionPlayground(ctx context.Context, userID in
 			} else {
 				state.Flags["Z"] = 0
 			}
-			// fmt.Printf("    CMP %s (%d) vs %s (%d) => Z=%d\n", r1, state.Registers[r1], r2, val2, state.Flags["Z"])
+			fmt.Printf("    CMP %s (%d) vs %s (%d) => Z=%d\n", r1, state.Registers[r1], r2, val2, state.Flags["Z"])
 		case "JMP":
 			label := node.Operands[0].Value
 			target := findLabel(program.Items, label)
