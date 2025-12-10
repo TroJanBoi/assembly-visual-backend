@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"encoding/json"
 
@@ -14,14 +15,15 @@ import (
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
 	"github.com/TroJanBoi/assembly-visual-backend/security"
+	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )
 
 var userInfo types.OAuthRequest
 
 type OAuthRepository interface {
-	// Define methods for OAuth repository
 	HandleOAuth(ctx context.Context, code string) (string, error)
+	RefreshGoogleToken(ctx context.Context, userID int) (string, error)
 }
 
 type oauthRepository struct {
@@ -62,6 +64,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 				Email:    userInfo.Email,
 				Password: userInfo.Password,
 				Name:     userInfo.Name,
+				Picture_path: userInfo.Picture,
 			}
 			if err := db.Create(&user).Error; err != nil {
 				return "", fmt.Errorf("failed to create user: %w", err)
@@ -71,10 +74,61 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 		}
 	}
 
+	var googleAcc model.GoogleAccount
+	if err := db.Where("email = ?", userInfo.Email).First(&googleAcc).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			googleAcc = model.GoogleAccount{
+				Email:        userInfo.Email,
+				GoogleUserID: userInfo.ID,
+				AccessToken:  token.AccessToken,
+				RefreshToken: token.RefreshToken,
+				UserID:       int(user.ID),
+				Expired:      token.Expiry,
+			}
+			if err := db.Create(&googleAcc).Error; err != nil {
+				return "", fmt.Errorf("failed to create google account: %w", err)
+			}
+		} else {
+			return "", fmt.Errorf("failed to find google account: %w", err)
+		}
+	} else {
+		googleAcc.AccessToken = token.AccessToken
+		googleAcc.RefreshToken = token.RefreshToken
+		if err := db.Save(&googleAcc).Error; err != nil {
+			return "", fmt.Errorf("failed to update google account: %w", err)
+		}
+	}
 	tokenStr, err := security.GenerateToken(int(user.ID))
 	if err != nil {
 		return "", fmt.Errorf("failed to generate token: %w", err)
 	}
 	log.Printf("Generated token for user %s: %s", user.Email, tokenStr)
 	return tokenStr, nil
+}
+
+func (o *oauthRepository) RefreshGoogleToken(ctx context.Context, userID int) (string, error) {
+	db := database.New().GetClient()
+	var gAcc model.GoogleAccount
+	if err := db.Where("user_id = ?", userID).First(&gAcc).Error; err != nil {
+		return "", err
+	}
+
+	if gAcc.Expired.After(time.Now()) {
+		return gAcc.AccessToken, nil
+	}
+
+	conf := conf.GetGoogleOAuthConfig()
+	tokenSource := conf.TokenSource(ctx, &oauth2.Token{RefreshToken: gAcc.RefreshToken})
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		return "", fmt.Errorf("failed to refresh google token: %w", err)
+	}
+
+	gAcc.AccessToken = newToken.AccessToken
+	gAcc.Expired = newToken.Expiry
+	if err := db.Save(&gAcc).Error; err != nil {
+		return "", fmt.Errorf("failed to update google account: %w", err)
+	}
+
+	return gAcc.AccessToken, nil
 }

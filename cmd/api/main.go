@@ -10,7 +10,10 @@ import (
 	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/conf"
+	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
+	"github.com/TroJanBoi/assembly-visual-backend/internal/scheduler"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/server"
+	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 )
 
@@ -33,6 +36,24 @@ func gracefully(srv *http.Server, log *zap.Logger, shutdownTimeout time.Duration
 	}
 }
 
+func startScheduler(logger *zap.Logger) {
+	c := cron.New(cron.WithLocation(time.FixedZone("Asia/Bangkok", 7*3600)))
+	_, err := c.AddFunc("* * * * *", func() {
+		logger.Info("Scheduler running...")
+
+		scheduler.CleanupSoftDeletedUsers(&model.User{}, 3)         // Clean up users soft-deleted more than 3 days ago
+		scheduler.CleanupExpiredInvitations(&model.Invitation{}, 1) // Clean up invitations older than 3 days
+	})
+
+	if err != nil {
+		logger.Error("Failed to start scheduler: " + err.Error())
+		return
+	}
+
+	c.Start()
+	logger.Info("Scheduler started")
+}
+
 // @title Assembly Visual API documentation
 // @version 1.0
 // @description This is the API documentation for the Assembly Visual project.
@@ -44,8 +65,10 @@ func main() {
 	config := conf.NewConfig()
 	zap, _ := zap.NewProduction()
 	defer zap.Sync()
-	srv := server.NewServer()
 
+	startScheduler(zap)
+
+	srv := server.NewServer()
 	go gracefully(srv, zap, gracefulShutdownDuration)
 
 	port := strconv.Itoa(config.PORT)
