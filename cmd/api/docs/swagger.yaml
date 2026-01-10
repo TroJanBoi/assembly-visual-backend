@@ -1639,6 +1639,39 @@ paths:
             type: object
       tags:
       - classes
+  /google/classroom/courses:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Google Classroom courses for the authenticated
+        user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List Google Classroom Courses
+      tags:
+      - google-service
   /invitations/{invitation_id}/accept:
     post:
       consumes:
