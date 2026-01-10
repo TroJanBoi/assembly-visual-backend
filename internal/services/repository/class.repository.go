@@ -18,6 +18,8 @@ type ClassRepository interface {
 	JoinClass(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
+
+	
 }
 
 type classRepository struct {

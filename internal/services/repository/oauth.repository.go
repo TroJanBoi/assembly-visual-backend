@@ -19,8 +19,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var userInfo types.OAuthRequest
-
 type OAuthRepository interface {
 	HandleOAuth(ctx context.Context, code string) (string, error)
 	RefreshGoogleToken(ctx context.Context, userID int) (string, error)
@@ -41,7 +39,8 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	}
 
 	client := conf.GetGoogleOAuthConfig().Client(ctx, token)
-	response, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	// response, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	response, err := client.Get("https://openidconnect.googleapis.com/v1/userinfo")
 	if err != nil {
 		return "", fmt.Errorf("failed to get user info: %w", err)
 	}
@@ -52,6 +51,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	var userInfo types.OAuthRequest
 	if err := json.Unmarshal(body, &userInfo); err != nil {
 		return "", fmt.Errorf("failed to unmarshal user info: %w", err)
 	}
@@ -61,9 +61,9 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	if err := db.Where("email = ?", userInfo.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			user = model.User{
-				Email:    userInfo.Email,
-				Password: userInfo.Password,
-				Name:     userInfo.Name,
+				Email:        userInfo.Email,
+				Password:     "",
+				Name:         userInfo.Name,
 				Picture_path: userInfo.Picture,
 			}
 			if err := db.Create(&user).Error; err != nil {
@@ -94,6 +94,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	} else {
 		googleAcc.AccessToken = token.AccessToken
 		googleAcc.RefreshToken = token.RefreshToken
+		googleAcc.Expired = token.Expiry
 		if err := db.Save(&googleAcc).Error; err != nil {
 			return "", fmt.Errorf("failed to update google account: %w", err)
 		}
@@ -125,6 +126,9 @@ func (o *oauthRepository) RefreshGoogleToken(ctx context.Context, userID int) (s
 	}
 
 	gAcc.AccessToken = newToken.AccessToken
+	if newToken.RefreshToken != "" {
+		gAcc.RefreshToken = newToken.RefreshToken
+	}
 	gAcc.Expired = newToken.Expiry
 	if err := db.Save(&gAcc).Error; err != nil {
 		return "", fmt.Errorf("failed to update google account: %w", err)
