@@ -63,4 +63,3 @@ clean:
 	@echo "$(RED)🧹 Cleaning build artifacts...$(RESET)"
 	@rm -f main
 	@echo "$(GREEN)✅ Clean complete!$(RESET)"
-

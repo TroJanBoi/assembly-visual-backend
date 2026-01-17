@@ -5,12 +5,14 @@ import (
 )
 
 type GoogleAccount struct {
-	UserID       int       `gorm:"primaryKey"`
-	GoogleUserID string    `gorm:"uniqueIndex;not null"`
+	GoogleUserID string    `gorm:"primaryKey;uniqueIndex;not null"`
+	UserID       int       `gorm:"not null"`
 	Email        string    `gorm:"not null"`
-	AccessToken  string    `gorm:"not null"`
-	RefreshToken string    `gorm:"not null"`
-	Expired      time.Time `gorm:"not null"`
+	AccessToken  string    `gorm:"null"`
+	RefreshToken string    `gorm:"null"`
+	ExpiredAt    time.Time `gorm:"null"`
+	CreatedAt    time.Time `gorm:"not null"`
+	User         User      `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (GoogleAccount) TableName() string {

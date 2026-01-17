@@ -27,7 +27,7 @@ func NewAuthController(authUseCase usecases.AuthUseCase) *AuthController {
 // @Failure      500   {object}  map[string]string
 // @Router       /auth/sign-up [post]
 func (a *AuthController) AuthRegisterRoutes(ctx *gin.Context) {
-	var authRequest types.SignInRequest
+	var authRequest types.SignUpRequest
 	if err := ctx.ShouldBindJSON(&authRequest); err != nil {
 		ctx.JSON(400, gin.H{"error": "Invalid request data"})
 		return
