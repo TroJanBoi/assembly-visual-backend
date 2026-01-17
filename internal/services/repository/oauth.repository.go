@@ -84,6 +84,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 				RefreshToken: token.RefreshToken,
 				UserID:       int(user.ID),
 				ExpiredAt:    token.Expiry,
+				CreatedAt:    time.Now(),
 			}
 			if err := db.Create(&googleAcc).Error; err != nil {
 				return "", fmt.Errorf("failed to create google account: %w", err)

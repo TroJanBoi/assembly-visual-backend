@@ -15,7 +15,7 @@ type CatResponse struct {
 
 type SignUpRequest struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password""`
+	Password string `json:"password"`
 	Name     string `json:"name" `
 	Tel      string `json:"tel" `
 }

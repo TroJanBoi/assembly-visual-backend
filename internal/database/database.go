@@ -77,18 +77,17 @@ func New() Service {
 		err = db.AutoMigrate(
 			// Add your models here, e.g. &model.User{}, etc.
 			&model.User{},
-			&model.Assignment{},
-			&model.BookMark{},
 			&model.Classroom{},
-			// &model.Executions{},
+			&model.Assignment{},
 			&model.GoogleAccount{},
 			&model.GoogleCourseSyncLog{},
 			&model.Invitation{},
-			&model.Playground{},
 			&model.RecentViewClass{},
+			&model.Playground{},
 			&model.Submission{},
 			&model.TestSuite{},
 			&model.TestCase{},
+			&model.BookMark{},
 			&model.Member{},
 		)
 		if err != nil {
