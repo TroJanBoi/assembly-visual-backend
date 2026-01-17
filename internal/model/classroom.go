@@ -11,7 +11,7 @@ type Classroom struct {
 	GoogleCourseID   string `gorm:"null;"`
 	GoogleCourseLink string `gorm:"null;"`
 	GoogleSyncedAt   string `gorm:"null;"`
-	User             User   `gorm:"foreignKey:Owner_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	User             User   `gorm:"foreignKey:OwnerId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (Classroom) TableName() string {

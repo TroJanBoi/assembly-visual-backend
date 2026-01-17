@@ -21,7 +21,7 @@ func NewAuthController(authUseCase usecases.AuthUseCase) *AuthController {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param body body types.SignInRequest true "User info"
+// @Param body body types.SignUpRequest true "User info"
 // @Success      201   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
