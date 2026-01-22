@@ -50,12 +50,6 @@ func (r *authRepository) RegisterUser(ctx context.Context, newUser *types.SignUp
 		return fmt.Errorf("user with email %s already exists", newUser.Email)
 	}
 
-	var gacc model.GoogleAccount
-	err = r.db.WithContext(ctx).Where("email = ?", newUser.Email).First(&gacc).Error
-	if err == nil {
-		return fmt.Errorf("user with email %s already exists in google accounts", newUser.Email)
-	}
-
 	if newUser.Name == "" {
 		newUser.Name = ""
 	}
