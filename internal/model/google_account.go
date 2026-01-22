@@ -5,9 +5,8 @@ import (
 )
 
 type GoogleAccount struct {
-	GoogleUserID string    `gorm:"primaryKey;uniqueIndex;not null"`
+	GoogleUserID string    `gorm:"primaryKey;not null"`
 	UserID       int       `gorm:"not null"`
-	Email        string    `gorm:"not null"`
 	AccessToken  string    `gorm:"null"`
 	RefreshToken string    `gorm:"null"`
 	ExpiredAt    time.Time `gorm:"null"`

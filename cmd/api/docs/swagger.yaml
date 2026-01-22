@@ -1,10 +1,207 @@
 definitions:
-  types.CatResponse:
+  types.AllowedInstructions:
     properties:
+      arithmetic:
+        additionalProperties:
+          type: integer
+        description: ADD, SUB, INC, DEC, MUL, DIV
+        type: object
+      comparison_and_conditional:
+        additionalProperties:
+          type: integer
+        description: CMP, JMP, JC, JNZ, JZ, JNC
+        type: object
+      data_movement:
+        additionalProperties:
+          type: integer
+        description: LOAD, STORE, MOV
+        type: object
+      system:
+        additionalProperties:
+          type: integer
+        description: LABEL, NOP, HLT
+        type: object
+    type: object
+  types.AssignmentCondition:
+    properties:
+      allowed_instructions:
+        $ref: '#/definitions/types.AllowedInstructions'
+      execution_constraints:
+        $ref: '#/definitions/types.ExecutionConstraints'
+    type: object
+  types.AssignmentResponse:
+    properties:
+      class_id:
+        type: integer
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
+      description:
+        type: string
+      due_date:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
       id:
         type: integer
+      max_attempt:
+        type: integer
+      setting:
+        $ref: '#/definitions/types.AssignmentSettings'
+      title:
+        type: string
+    type: object
+  types.AssignmentSettings:
+    properties:
+      fe_behavior:
+        $ref: '#/definitions/types.FEBehavior'
+      grade_policy:
+        $ref: '#/definitions/types.GradePolicy'
+      test_case_policy:
+        $ref: '#/definitions/types.TestCasePolicy'
+    type: object
+  types.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+    required:
+    - new_password
+    type: object
+  types.ClassMeResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      owner_id:
+        type: integer
+      topic:
+        type: string
+    type: object
+  types.ClassResponse:
+    properties:
+      description:
+        type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      google_synced_at:
+        type: string
+      id:
+        type: integer
+      owner_id:
+        type: integer
+      status:
+        type: integer
+      topic:
+        type: string
+    type: object
+  types.CreateAssignmentRequest:
+    properties:
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
+      description:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
+      max_attempt:
+        type: integer
+      settings:
+        $ref: '#/definitions/types.AssignmentSettings'
+      title:
+        type: string
+    required:
+    - description
+    - title
+    type: object
+  types.CreateClassRequest:
+    properties:
+      description:
+        type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      status:
+        description: public or private
+        type: integer
+      topic:
+        type: string
+    required:
+    - description
+    - topic
+    type: object
+  types.CreateUserRequest:
+    properties:
+      email:
+        type: string
       name:
         type: string
+      password:
+        type: string
+      tel:
+        type: string
+    required:
+    - email
+    type: object
+  types.EditAssignmentRequest:
+    properties:
+      condition:
+        $ref: '#/definitions/types.AssignmentCondition'
+      description:
+        type: string
+      grade:
+        description: total grade of the assignment
+        type: integer
+      max_attempt:
+        type: integer
+      settings:
+        $ref: '#/definitions/types.AssignmentSettings'
+      title:
+        type: string
+    type: object
+  types.EditProfileRequest:
+    properties:
+      name:
+        type: string
+      picture_path:
+        type: string
+      tel:
+        type: string
+      username:
+        type: string
+    type: object
+  types.ExecutionConstraints:
+    properties:
+      initial_state:
+        $ref: '#/definitions/types.InitialState'
+      memory_node:
+        type: integer
+      register_count:
+        type: integer
+    type: object
+  types.FEBehavior:
+    properties:
+      allow_resubmit_after_due:
+        type: boolean
+      lock_after_submit:
+        type: boolean
+    type: object
+  types.GradePolicy:
+    properties:
+      mode:
+        type: string
+      weight:
+        $ref: '#/definitions/types.WeightPolicy'
+    type: object
+  types.InitialState:
+    properties:
+      memory:
+        items:
+          $ref: '#/definitions/types.Memory'
+        type: array
     type: object
   types.LoginRequest:
     properties:
@@ -15,6 +212,112 @@ definitions:
     required:
     - email
     - password
+    type: object
+  types.MemberResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      picture_path:
+        type: string
+    type: object
+  types.Memory:
+    properties:
+      address:
+        type: integer
+      value:
+        type: integer
+    type: object
+  types.PlaygroundData:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/types.PlaygroundItem'
+        type: array
+      meta_data:
+        $ref: '#/definitions/types.PlaygroundMetaData'
+      ui:
+        $ref: '#/definitions/types.PlaygroundUI'
+    type: object
+  types.PlaygroundItem:
+    properties:
+      id:
+        type: integer
+      instruction:
+        type: string
+      label:
+        type: string
+      next:
+        type: integer
+      next_false:
+        type: integer
+      next_true:
+        type: integer
+      operands:
+        items:
+          $ref: '#/definitions/types.PlaygroundOperands'
+        type: array
+    type: object
+  types.PlaygroundMeRequest:
+    properties:
+      assignment_id:
+        type: integer
+    required:
+    - assignment_id
+    type: object
+  types.PlaygroundMetaData:
+    properties:
+      author_id:
+        type: integer
+      program_name:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  types.PlaygroundOperands:
+    properties:
+      type:
+        type: string
+      value:
+        type: string
+    type: object
+  types.PlaygroundPosition:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  types.PlaygroundRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      item:
+        $ref: '#/definitions/types.PlaygroundData'
+      status:
+        description: e.g., "in_progress", "completed", "failed"
+        type: string
+    required:
+    - assignment_id
+    - attempt_no
+    - item
+    - status
+    type: object
+  types.PlaygroundUI:
+    properties:
+      pan:
+        $ref: '#/definitions/types.PlaygroundPosition'
+      position:
+        additionalProperties:
+          $ref: '#/definitions/types.PlaygroundPosition'
+        type: object
+      zoom:
+        type: number
     type: object
   types.SignUpRequest:
     properties:
@@ -28,6 +331,142 @@ definitions:
         type: string
     required:
     - email
+    - password
+    type: object
+  types.TestCaseAssert:
+    properties:
+      flags:
+        additionalProperties:
+          type: integer
+        type: object
+      halted:
+        type: boolean
+      memory:
+        additionalProperties:
+          type: integer
+        type: object
+      register:
+        additionalProperties:
+          type: integer
+        type: object
+    required:
+    - flags
+    - halted
+    - memory
+    - register
+    type: object
+  types.TestCaseInit:
+    properties:
+      flags:
+        additionalProperties:
+          type: integer
+        type: object
+      memory:
+        additionalProperties:
+          type: integer
+        type: object
+      register:
+        additionalProperties:
+          type: integer
+        type: object
+    required:
+    - flags
+    - memory
+    - register
+    type: object
+  types.TestCasePolicy:
+    properties:
+      visible_to_student:
+        type: boolean
+    type: object
+  types.TestCaseRequest:
+    properties:
+      assert:
+        $ref: '#/definitions/types.TestCaseAssert'
+      init:
+        $ref: '#/definitions/types.TestCaseInit'
+      name:
+        type: string
+    required:
+    - assert
+    - init
+    - name
+    type: object
+  types.TestCaseResponse:
+    properties:
+      assert:
+        $ref: '#/definitions/types.TestCaseAssert'
+      id:
+        type: integer
+      init:
+        $ref: '#/definitions/types.TestCaseInit'
+      name:
+        type: string
+      test_suite_id:
+        type: integer
+    required:
+    - name
+    type: object
+  types.TestSuiteRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  types.TestSuiteResponse:
+    properties:
+      assignment_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  types.UpdateClassRequest:
+    properties:
+      description:
+        type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      status:
+        description: public or private
+        type: integer
+      topic:
+        type: string
+    type: object
+  types.UpdateUserRequest:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      tel:
+        type: string
+    type: object
+  types.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password_hash:
+        type: string
+      picture_path:
+        type: string
+      tel:
+        type: string
+    type: object
+  types.WeightPolicy:
+    properties:
+      number_of_node_used:
+        type: number
+      test_case:
+        type: number
     type: object
 info:
   contact: {}
@@ -114,11 +553,11 @@ paths:
       summary: Register new user
       tags:
       - auth
-  /cats:
+  /classroom:
     get:
       consumes:
       - application/json
-      description: Retrieve all cat information from the system
+      description: Retrieve all classrooms
       produces:
       - application/json
       responses:
@@ -126,8 +565,48 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/types.CatResponse'
+              $ref: '#/definitions/types.ClassResponse'
             type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - classrooms
+    post:
+      consumes:
+      - application/json
+      description: Create a new class
+      parameters:
+      - description: Class info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -136,9 +615,985 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get all cats
       tags:
-      - cats
+      - classrooms
+  /classroom/{class_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a classroom
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classrooms
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a class by ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.ClassResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - classrooms
+    put:
+      consumes:
+      - application/json
+      description: Update an existing class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Updated class info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateClassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classrooms
+  /classroom/{class_id}/assignment:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve assignments by class ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.AssignmentResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - assignments
+    post:
+      consumes:
+      - application/json
+      description: Create a new assignment
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment Data
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+  /classroom/{class_id}/assignment/{assignment_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.AssignmentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - assignments
+    put:
+      consumes:
+      - application/json
+      description: Edit an assignment by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Assignment Data
+        in: body
+        name: assignment
+        required: true
+        schema:
+          $ref: '#/definitions/types.EditAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - assignments
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all test suites by assignment ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TestSuiteResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    post:
+      consumes:
+      - application/json
+      description: Add a new test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite Data
+        in: body
+        name: testSuite
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestSuiteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a test suite by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TestSuiteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+    put:
+      consumes:
+      - application/json
+      description: Update an existing test suite
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Suite Data
+        in: body
+        name: testSuite
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestSuiteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-suites
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all test cases by test suite ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TestCaseResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    post:
+      consumes:
+      - application/json
+      description: Add a new test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case Request
+        in: body
+        name: test_case
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case/{test_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a test case by its ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TestCaseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+    put:
+      consumes:
+      - application/json
+      description: Update an existing test case
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      - description: Test Suite ID
+        in: path
+        name: test_suite_id
+        required: true
+        type: integer
+      - description: Test Case ID
+        in: path
+        name: test_id
+        required: true
+        type: integer
+      - description: Test Case Data
+        in: body
+        name: test_case
+        required: true
+        schema:
+          $ref: '#/definitions/types.TestCaseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - test-cases
+  /classroom/{class_id}/invitation:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all invitations for a specific class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get All Invitations by Class ID
+      tags:
+      - invitations
+  /classroom/{class_id}/invitation/send:
+    post:
+      consumes:
+      - application/json
+      description: Send an email invitation to join a class
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      - description: Email Address
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send Email Invitation
+      tags:
+      - invitations
+  /classroom/{class_id}/join:
+    post:
+      consumes:
+      - application/json
+      description: Join a classroom
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classrooms
+  /classroom/{class_id}/members:
+    get:
+      consumes:
+      - application/json
+      description: Get all members of a class by class ID
+      parameters:
+      - description: Class ID
+        in: path
+        name: class_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.MemberResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - classrooms
+  /classroom/public:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all public classrooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - classrooms
   /google/classroom/courses:
     get:
       consumes:
@@ -172,6 +1627,112 @@ paths:
       summary: List Google Classroom Courses
       tags:
       - google-service
+  /invitation/{invitation_id}/accept:
+    post:
+      consumes:
+      - application/json
+      description: Accept an invitation to join a class
+      parameters:
+      - description: Invitation ID
+        in: path
+        name: invitation_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Accept Invitation
+      tags:
+      - invitations
+  /invitation/{invitation_id}/decline:
+    post:
+      consumes:
+      - application/json
+      description: Decline an invitation to join a class
+      parameters:
+      - description: Invitation ID
+        in: path
+        name: invitation_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Decline Invitation
+      tags:
+      - invitations
+  /invitation/me:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve invitations for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get My Invitations
+      tags:
+      - invitations
   /oauth/google/login:
     get:
       description: Initiate Google OAuth2 login
@@ -200,6 +1761,671 @@ paths:
             type: object
       tags:
       - oauth
+  /playground:
+    post:
+      consumes:
+      - application/json
+      description: Create a new playground
+      parameters:
+      - description: Playground Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+  /playground/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a playground by its ID
+      parameters:
+      - description: Playground ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+  /playground/me:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a playground by user ID
+      parameters:
+      - description: Playground Query Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundMeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+    post:
+      consumes:
+      - application/json
+      description: Retrieve a playground by assignment ID and user ID
+      parameters:
+      - description: Playground Query Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundMeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+    put:
+      consumes:
+      - application/json
+      description: Update a playground by user ID
+      parameters:
+      - description: Playground Data
+        in: body
+        name: playground
+        required: true
+        schema:
+          $ref: '#/definitions/types.PlaygroundRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - playgrounds
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the profile of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Edit the profile of the authenticated user
+      parameters:
+      - description: Profile info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.EditProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Edit user profile
+      tags:
+      - profile
+  /profile/avatar:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the avatar URL of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user avatar
+      tags:
+      - profile
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an avatar for the authenticated user
+      parameters:
+      - description: Avatar file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upload user avatar
+      tags:
+      - profile
+    put:
+      consumes:
+      - multipart/form-data
+      description: Change the avatar of the authenticated user
+      parameters:
+      - description: New avatar file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user avatar
+      tags:
+      - profile
+  /profile/avatar/{filename}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the profile picture file of the authenticated user
+      parameters:
+      - description: Filename of the avatar
+        in: path
+        name: filename
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get profile picture
+      tags:
+      - profile
+  /profile/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Change the password of the authenticated user
+      parameters:
+      - description: New password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - profile
+  /profile/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the profile of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user profile
+      tags:
+      - profile
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.UserResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new user
+      tags:
+      - users
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated user info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /user/me/classroom:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve classes of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my classes
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     in: header

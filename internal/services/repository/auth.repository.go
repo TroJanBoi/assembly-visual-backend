@@ -59,16 +59,12 @@ func (r *authRepository) RegisterUser(ctx context.Context, newUser *types.SignUp
 	if newUser.Name == "" {
 		newUser.Name = ""
 	}
-	if newUser.Tel == "" {
-		newUser.Tel = ""
-	}
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		user := model.User{
 			Email:        newUser.Email,
 			PasswordHash: security.HashPassword(newUser.Password),
 			Name:         newUser.Name,
-			Tel:          newUser.Tel,
 		}
 		if err := r.db.WithContext(ctx).Create(&user).Error; err != nil {
 			return fmt.Errorf("failed to create user: %w", err)

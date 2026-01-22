@@ -102,9 +102,9 @@ http://localhost:9090/swagger/index.html
 ## 7) API Endpoints (current snapshot)
 **Assuming base URL http://localhost:9090**
 
-- GET /api/v2/users/ — list users
+- GET /api/v2/user/ — list users
 
-- POST /api/v2/users/signup — create user
+- POST /api/v2/user/signup — create user
 
 - GET /api/v2/cats/ — list cats (demo)
 

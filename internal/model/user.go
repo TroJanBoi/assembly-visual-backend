@@ -9,7 +9,6 @@ type User struct {
 	Email        string `gorm:"uniqueIndex;not null"`
 	PasswordHash string `gorm:"null"`
 	Name         string `gorm:"null"`
-	Tel          string `gorm:"null"`
 	PicturePath  string `gorm:"null"`
 }
 

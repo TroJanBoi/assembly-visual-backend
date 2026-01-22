@@ -39,8 +39,8 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	}
 
 	client := conf.GetGoogleOAuthConfig().Client(ctx, token)
-	// response, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
-	response, err := client.Get("https://openidconnect.googleapis.com/v1/userinfo")
+	response, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	// response, err := client.Get("https://openidconnect.googleapis.com/v1/userinfo")
 	if err != nil {
 		return "", fmt.Errorf("failed to get user info: %w", err)
 	}
@@ -75,10 +75,9 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	}
 
 	var googleAcc model.GoogleAccount
-	if err := db.Where("email = ?", userInfo.Email).First(&googleAcc).Error; err != nil {
+	if err := db.Where("user_id = ?", user.ID).First(&googleAcc).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			googleAcc = model.GoogleAccount{
-				Email:        userInfo.Email,
 				GoogleUserID: userInfo.ID,
 				AccessToken:  token.AccessToken,
 				RefreshToken: token.RefreshToken,

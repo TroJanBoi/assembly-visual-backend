@@ -15,6 +15,7 @@ type Submission struct {
 	ClientResult  datatypes.JSON `gorm:"type:jsonb;null"`
 	ServerResult  datatypes.JSON `gorm:"type:jsonb;null"`
 	Score         float64        `gorm:"null"`
+	FeedBack      string         `gorm:"null"`
 	Status        string         `gorm:"not null;default:verified"` // e.g., "submitted", "verified", "failed"
 	IsVerified    bool           `gorm:"default:false"`
 	DurationMS    int            `gorm:"not null"`
