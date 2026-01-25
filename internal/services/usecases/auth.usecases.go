@@ -9,7 +9,7 @@ import (
 
 type AuthUseCase interface {
 	// Define authentication-related use case methods here
-	RegisterUserUsecase(ctx context.Context, newUser *types.SignInRequest) error
+	RegisterUserUsecase(ctx context.Context, newUser *types.SignUpRequest) error
 	LoginUserUsecase(ctx context.Context, user *types.LoginRequest) (*types.LoginResponse, error)
 }
 
@@ -23,7 +23,7 @@ func NewAuthUseCase(authRepository repository.AuthRepository) AuthUseCase {
 	}
 }
 
-func (a *authUseCase) RegisterUserUsecase(ctx context.Context, newUser *types.SignInRequest) error {
+func (a *authUseCase) RegisterUserUsecase(ctx context.Context, newUser *types.SignUpRequest) error {
 	if err := a.authRepository.RegisterUser(ctx, newUser); err != nil {
 		return err
 	}

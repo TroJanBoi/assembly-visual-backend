@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/datatypes"
+)
 
 type CatResponse struct {
 	ID   int    `json:"id"`
@@ -18,22 +22,19 @@ type CreateUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type UserResponse struct {
 	ID           int    `json:"id"`
 	Email        string `json:"email"`
-	Password     string `json:"password"`
+	PasswordHash string `json:"password_hash"`
 	Name         string `json:"name"`
-	Tel          string `json:"tel"`
-	Picture_path string `json:"picture_path"`
+	PicturePath  string `json:"picture_path"`
 }
 
 type UpdateUserRequest struct {
 	Password string `json:"password"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type OperationResponse struct {
@@ -42,16 +43,14 @@ type OperationResponse struct {
 	Message    string  `json:"message"`
 }
 
-// DeleteUserRequest represents the request body for deleting a user
 type DeleteUserRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
-type SignInRequest struct {
+type SignUpRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type LoginRequest struct {
@@ -64,10 +63,9 @@ type LoginResponse struct {
 }
 
 type EditProfileRequest struct {
-	Username     string `json:"username"`
-	Name         string `json:"name"`
-	Tel          string `json:"tel"`
-	Picture_path string `json:"picture_path"`
+	Username    string `json:"username"`
+	Name        string `json:"name"`
+	PicturePath string `json:"picture_path"`
 }
 
 type ChangePasswordRequest struct {
@@ -76,14 +74,13 @@ type ChangePasswordRequest struct {
 
 type ClassResponse struct {
 	ID               int    `json:"id"`
+	OwnerID          int    `json:"owner_id"`
 	Topic            string `json:"topic"`
 	Description      string `json:"description"`
+	Status           int    `json:"status"`
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	GoogleSyncedAt   string `json:"google_synced_at"`
-	FavScore         int64  `json:"fav_score"`
-	Owner            int    `json:"owner"`
-	Status           int    `json:"status"`
 }
 
 type CreateClassRequest struct {
@@ -103,15 +100,17 @@ type UpdateClassRequest struct {
 }
 
 type AssignmentResponse struct {
-	ID          int                 `json:"id"`
-	ClassID     int                 `json:"class_id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	DueDate     string              `json:"due_date"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Settings    AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	ID          int    `json:"id"`
+	ClassID     int    `json:"class_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	DueDate     string `json:"due_date"`
+	MaxAttempt  int    `json:"max_attempt"`
+	// Settings    AssignmentSettings  `json:"setting"`
+	// Condition   AssignmentCondition `json:"condition"`
+	Settings  datatypes.JSON `json:"settings"`
+	Condition datatypes.JSON `json:"condition"`
+	Grade     int            `json:"grade"` // total grade of the assignment
 }
 
 type AllowedInstructions struct {
@@ -142,12 +141,13 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	Title       string              `json:"title" binding:"required"`
-	Description string              `json:"description" binding:"required"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Settings    AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	Title       string         `json:"title" binding:"required"`
+	Description string         `json:"description"`
+	DueDate     time.Time      `json:"due_date"`
+	MaxAttempt  int            `json:"max_attempt"`
+	Settings    datatypes.JSON `json:"settings"`
+	Condition   datatypes.JSON `json:"condition"`
+	Grade       int            `json:"grade"` // total grade of the assignment
 }
 
 type GradePolicy struct {
@@ -169,19 +169,21 @@ type FEBehavior struct {
 	AllowResubmitAfterDue bool `json:"allow_resubmit_after_due"`
 }
 
-type AssignmentSettings struct {
-	GradePolicy    GradePolicy    `json:"grade_policy"`
-	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
-	FEBehavior     FEBehavior     `json:"fe_behavior"`
-}
+// type AssignmentSettings struct {
+// 	GradePolicy    GradePolicy    `json:"grade_policy"`
+// 	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
+// 	FEBehavior     FEBehavior     `json:"fe_behavior"`
+// }
 
 type EditAssignmentRequest struct {
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Setting     AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	MaxAttempt  int    `json:"max_attempt"`
+	Grade       int    `json:"grade"` // total grade of the assignment
+	// Setting     AssignmentSettings  `json:"settings"`
+	// Condition   AssignmentCondition `json:"condition"`
+	Setting   datatypes.JSON `json:"setting"`
+	Condition datatypes.JSON `json:"condition"`
 }
 
 type MemberResponse struct {
@@ -195,8 +197,7 @@ type ClassMeResponse struct {
 	ID          int    `json:"id"`
 	Topic       string `json:"topic"`
 	Description string `json:"description"`
-	FavScore    int64  `json:"fav_score"`
-	Owner       int    `json:"owner"`
+	OwnerID     int    `json:"owner_id"`
 }
 
 type InvitationResponse struct {
@@ -298,21 +299,12 @@ type PlaygroundResponse struct {
 	ID           int            `json:"id"`
 	AssignmentID int            `json:"assignment_id"`
 	UserID       int            `json:"user_id"`
-	AttemptNO    int            `json:"attempt_no"`
 	Item         PlaygroundData `json:"item"`
 	Status       string         `json:"status"` // e.g., "in_progress", "completed", "failed"
 }
 
 type PlaygroundMeRequest struct {
 	AssignmentID int `json:"assignment_id" binding:"required"`
-}
-
-type ExecutionState struct {
-	Registers    map[string]int    `json:"registers"`
-	Flags        map[string]int    `json:"flags"`
-	MemorySparse map[string]int    `json:"memory_sparse"`
-	Halted       bool              `json:"halted"`
-	Error        *ErrorStateDetail `json:"error"`
 }
 
 type ErrorStateDetail struct {

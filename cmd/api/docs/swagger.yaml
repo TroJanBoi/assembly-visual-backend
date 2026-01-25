@@ -46,7 +46,7 @@ definitions:
         type: integer
       max_attempt:
         type: integer
-      settings:
+      setting:
         $ref: '#/definitions/types.AssignmentSettings'
       title:
         type: string
@@ -60,13 +60,6 @@ definitions:
       test_case_policy:
         $ref: '#/definitions/types.TestCasePolicy'
     type: object
-  types.CatResponse:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
   types.ChangePasswordRequest:
     properties:
       new_password:
@@ -78,11 +71,9 @@ definitions:
     properties:
       description:
         type: string
-      fav_score:
-        type: integer
       id:
         type: integer
-      owner:
+      owner_id:
         type: integer
       topic:
         type: string
@@ -91,8 +82,6 @@ definitions:
     properties:
       description:
         type: string
-      fav_score:
-        type: integer
       google_course_id:
         type: string
       google_course_link:
@@ -101,7 +90,7 @@ definitions:
         type: string
       id:
         type: integer
-      owner:
+      owner_id:
         type: integer
       status:
         type: integer
@@ -242,15 +231,6 @@ definitions:
       value:
         type: integer
     type: object
-  types.OperationResponse:
-    properties:
-      message:
-        type: string
-      status_code:
-        type: integer
-      value:
-        type: number
-    type: object
   types.PlaygroundData:
     properties:
       items:
@@ -339,7 +319,7 @@ definitions:
       zoom:
         type: number
     type: object
-  types.SignInRequest:
+  types.SignUpRequest:
     properties:
       email:
         type: string
@@ -474,7 +454,7 @@ definitions:
         type: integer
       name:
         type: string
-      password:
+      password_hash:
         type: string
       picture_path:
         type: string
@@ -548,7 +528,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/types.SignInRequest'
+          $ref: '#/definitions/types.SignUpRequest'
       produces:
       - application/json
       responses:
@@ -573,36 +553,11 @@ paths:
       summary: Register new user
       tags:
       - auth
-  /cats:
+  /classroom:
     get:
       consumes:
       - application/json
-      description: Retrieve all cat information from the system
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/types.CatResponse'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all cats
-      tags:
-      - cats
-  /classes:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all classes
+      description: Retrieve all classrooms
       produces:
       - application/json
       responses:
@@ -619,7 +574,7 @@ paths:
               type: string
             type: object
       tags:
-      - classes
+      - classrooms
     post:
       consumes:
       - application/json
@@ -661,12 +616,12 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
-  /classes/{class_id}:
+      - classrooms
+  /classroom/{class_id}:
     delete:
       consumes:
       - application/json
-      description: Delete a class
+      description: Delete a classroom
       parameters:
       - description: Class ID
         in: path
@@ -703,7 +658,7 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
+      - classrooms
     get:
       consumes:
       - application/json
@@ -734,7 +689,7 @@ paths:
               type: string
             type: object
       tags:
-      - classes
+      - classrooms
     put:
       consumes:
       - application/json
@@ -781,8 +736,8 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
-  /classes/{class_id}/assignments:
+      - classrooms
+  /classroom/{class_id}/assignment:
     get:
       consumes:
       - application/json
@@ -857,7 +812,7 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
-  /classes/{class_id}/assignments/{assignment_id}:
+  /classroom/{class_id}/assignment/{assignment_id}:
     delete:
       consumes:
       - application/json
@@ -980,7 +935,7 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
-  /classes/{class_id}/assignments/{assignment_id}/test-suites:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite:
     get:
       consumes:
       - application/json
@@ -1067,7 +1022,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-suites
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}:
     delete:
       consumes:
       - application/json
@@ -1207,7 +1162,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-suites
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case:
     get:
       consumes:
       - application/json
@@ -1304,7 +1259,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-cases
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases/{test_id}:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case/{test_id}:
     delete:
       consumes:
       - application/json
@@ -1459,7 +1414,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-cases
-  /classes/{class_id}/invitations:
+  /classroom/{class_id}/invitation:
     get:
       consumes:
       - application/json
@@ -1497,7 +1452,7 @@ paths:
       summary: Get All Invitations by Class ID
       tags:
       - invitations
-  /classes/{class_id}/invitations/send:
+  /classroom/{class_id}/invitation/send:
     post:
       consumes:
       - application/json
@@ -1539,11 +1494,11 @@ paths:
       summary: Send Email Invitation
       tags:
       - invitations
-  /classes/{class_id}/join:
+  /classroom/{class_id}/join:
     post:
       consumes:
       - application/json
-      description: Join a class
+      description: Join a classroom
       parameters:
       - description: Class ID
         in: path
@@ -1580,8 +1535,8 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
-  /classes/{class_id}/members:
+      - classrooms
+  /classroom/{class_id}/members:
     get:
       consumes:
       - application/json
@@ -1616,12 +1571,12 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
-  /classes/public:
+      - classrooms
+  /classroom/public:
     get:
       consumes:
       - application/json
-      description: Retrieve all public classes
+      description: Retrieve all public classrooms
       produces:
       - application/json
       responses:
@@ -1638,7 +1593,7 @@ paths:
               type: string
             type: object
       tags:
-      - classes
+      - classrooms
   /google/classroom/courses:
     get:
       consumes:
@@ -1672,7 +1627,7 @@ paths:
       summary: List Google Classroom Courses
       tags:
       - google-service
-  /invitations/{invitation_id}/accept:
+  /invitation/{invitation_id}/accept:
     post:
       consumes:
       - application/json
@@ -1709,7 +1664,7 @@ paths:
       summary: Accept Invitation
       tags:
       - invitations
-  /invitations/{invitation_id}/decline:
+  /invitation/{invitation_id}/decline:
     post:
       consumes:
       - application/json
@@ -1746,7 +1701,7 @@ paths:
       summary: Decline Invitation
       tags:
       - invitations
-  /invitations/me:
+  /invitation/me:
     get:
       consumes:
       - application/json
@@ -1806,149 +1761,7 @@ paths:
             type: object
       tags:
       - oauth
-  /operations/add:
-    post:
-      consumes:
-      - application/json
-      description: Add a list of numbers and return the result
-      parameters:
-      - description: List of numbers to add
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Add numbers
-      tags:
-      - operations
-  /operations/div:
-    post:
-      consumes:
-      - application/json
-      description: Divide a list of numbers and return the result
-      parameters:
-      - description: List of numbers to divide
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-      security:
-      - BearerAuth: []
-      summary: Divide numbers
-      tags:
-      - operations
-  /operations/mul:
-    post:
-      consumes:
-      - application/json
-      description: Multiply a list of numbers and return the result
-      parameters:
-      - description: List of numbers to multiply
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-      security:
-      - BearerAuth: []
-      summary: Multiply numbers
-      tags:
-      - operations
-  /operations/sub:
-    post:
-      consumes:
-      - application/json
-      description: Subtract a list of numbers and return the result
-      parameters:
-      - description: List of numbers to subtract
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Subtract numbers
-      tags:
-      - operations
-  /playgrounds:
+  /playground:
     post:
       consumes:
       - application/json
@@ -1984,7 +1797,7 @@ paths:
       - BearerAuth: []
       tags:
       - playgrounds
-  /playgrounds/{id}:
+  /playground/{id}:
     get:
       consumes:
       - application/json
@@ -2019,43 +1832,7 @@ paths:
       - BearerAuth: []
       tags:
       - playgrounds
-  /playgrounds/{playground_id}/execute:
-    post:
-      consumes:
-      - application/json
-      description: Execute the code in a playground
-      parameters:
-      - description: Playground ID
-        in: path
-        name: playground_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Execute Playground
-      tags:
-      - executions
-  /playgrounds/me:
+  /playground/me:
     delete:
       consumes:
       - application/json
@@ -2483,79 +2260,7 @@ paths:
       summary: Delete user profile
       tags:
       - profile
-  /systems/hlt:
-    get:
-      consumes:
-      - application/json
-      description: Check if system is halted
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - systems
-  /systems/labels:
-    post:
-      consumes:
-      - application/json
-      description: Retrieve system labels
-      parameters:
-      - description: Label Filter
-        in: query
-        name: label
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - systems
-  /systems/nop:
-    get:
-      consumes:
-      - application/json
-      description: Perform NOP operation
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - systems
-  /users:
+  /user:
     get:
       consumes:
       - application/json
@@ -2617,7 +2322,7 @@ paths:
       summary: Create new user
       tags:
       - users
-  /users/{id}:
+  /user/{id}:
     delete:
       consumes:
       - application/json
@@ -2696,7 +2401,7 @@ paths:
       summary: Update user
       tags:
       - users
-  /users/me/classes:
+  /user/me/classroom:
     get:
       consumes:
       - application/json

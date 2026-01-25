@@ -54,7 +54,6 @@ func (r *playgroundRepository) Create(ctx context.Context, userID int, playgroun
 	newPlayground := model.Playground{
 		AssignmentID: int(playground.AssignmentID),
 		UserID:       int(userID),
-		AttemptNO:    playground.AttemptNO,
 		Item:         datatypes.JSON(item),
 		Status:       playground.Status,
 	}
@@ -72,7 +71,6 @@ func (r *playgroundRepository) Create(ctx context.Context, userID int, playgroun
 		ID:           int(newPlayground.ID),
 		AssignmentID: newPlayground.AssignmentID,
 		UserID:       newPlayground.UserID,
-		AttemptNO:    newPlayground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -106,7 +104,6 @@ func (r *playgroundRepository) GetByPlaygroundID(ctx context.Context, userID int
 		ID:           int(playground.ID),
 		AssignmentID: playground.AssignmentID,
 		UserID:       playground.UserID,
-		AttemptNO:    playground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -140,7 +137,6 @@ func (r *playgroundRepository) GetPlaygroundByMe(ctx context.Context, userID int
 		ID:           int(playground.ID),
 		AssignmentID: playground.AssignmentID,
 		UserID:       playground.UserID,
-		AttemptNO:    playground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -165,7 +161,6 @@ func (r *playgroundRepository) UpdatePlaygroundByMe(ctx context.Context, userID 
 	}
 
 	item, _ := json.Marshal(playground.Item)
-	existingPlayground.AttemptNO = playground.AttemptNO + 1
 	existingPlayground.Item = datatypes.JSON(item)
 	existingPlayground.Status = playground.Status
 
@@ -182,7 +177,6 @@ func (r *playgroundRepository) UpdatePlaygroundByMe(ctx context.Context, userID 
 		ID:           int(existingPlayground.ID),
 		AssignmentID: existingPlayground.AssignmentID,
 		UserID:       existingPlayground.UserID,
-		AttemptNO:    existingPlayground.AttemptNO,
 		Item:         parseItems,
 		Status:       existingPlayground.Status,
 	}

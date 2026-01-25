@@ -9,9 +9,9 @@ type Playground struct {
 	gorm.Model
 	AssignmentID int            `gorm:"not null"`
 	UserID       int            `gorm:"not null"`
-	AttemptNO    int            `gorm:"not null"`
-	Item         datatypes.JSON `gorm:"type:jsonb"`
-	Status       string         `gorm:"not null"` // e.g., "in_progress", "completed", "failed"
+	Item         datatypes.JSON `gorm:"type:jsonb; not null"`
+	Status       string         `gorm:"not null;default:'in_progress'"` // e.g., "in_progress", "completed", "failed"
+	Assignment   Assignment     `gorm:"foreignKey:AssignmentID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (Playground) TableName() string {

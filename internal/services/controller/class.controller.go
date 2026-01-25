@@ -19,13 +19,13 @@ func NewClassController(classUseCase usecases.ClassUseCase) *ClassController {
 	}
 }
 
-// @Description  Retrieve all classes
-// @Tags         classes
+// @Description  Retrieve all classrooms
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Success      200   {array}   types.ClassResponse
 // @Failure      500   {object}  map[string]string
-// @Router       /classes [get]
+// @Router       /classroom [get]
 func (c *ClassController) ClassGetAllClasses(ctx *gin.Context) {
 	classes, err := c.classUseCase.GetAllClasses(ctx)
 	if err != nil {
@@ -36,14 +36,14 @@ func (c *ClassController) ClassGetAllClasses(ctx *gin.Context) {
 }
 
 // @Description  Retrieve a class by ID
-// @Tags         classes
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
 // @Success      200   {object}  types.ClassResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /classes/{class_id} [get]
+// @Router       /classroom/{class_id} [get]
 func (c *ClassController) ClassGetClassByID(ctx *gin.Context) {
 	classID, err := strconv.Atoi(ctx.Param("class_id"))
 	if err != nil {
@@ -59,7 +59,7 @@ func (c *ClassController) ClassGetClassByID(ctx *gin.Context) {
 }
 
 // @Description  Create a new class
-// @Tags         classes
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        body body types.CreateClassRequest true "Class info"
@@ -68,7 +68,7 @@ func (c *ClassController) ClassGetClassByID(ctx *gin.Context) {
 // @Failure      401   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes [post]
+// @Router       /classroom [post]
 func (c *ClassController) ClassCreateClass(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -96,7 +96,7 @@ func (c *ClassController) ClassCreateClass(ctx *gin.Context) {
 }
 
 // @Description  Update an existing class
-// @Tags         classes
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
@@ -106,7 +106,7 @@ func (c *ClassController) ClassCreateClass(ctx *gin.Context) {
 // @Failure      401   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id} [put]
+// @Router       /classroom/{class_id} [put]
 func (c *ClassController) ClassUpdateClass(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -139,8 +139,8 @@ func (c *ClassController) ClassUpdateClass(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Class updated successfully"})
 }
 
-// @Description  Delete a class
-// @Tags         classes
+// @Description  Delete a classroom
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
@@ -149,7 +149,7 @@ func (c *ClassController) ClassUpdateClass(ctx *gin.Context) {
 // @Failure      401   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id} [delete]
+// @Router       /classroom/{class_id} [delete]
 func (c *ClassController) ClassDeleteClass(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -176,8 +176,8 @@ func (c *ClassController) ClassDeleteClass(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Class deleted successfully"})
 }
 
-// @Description  Join a class
-// @Tags         classes
+// @Description  Join a classroom
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
@@ -186,7 +186,7 @@ func (c *ClassController) ClassDeleteClass(ctx *gin.Context) {
 // @Failure      401   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/join [post]
+// @Router       /classroom/{class_id}/join [post]
 func (c *ClassController) JoinClass(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -215,7 +215,7 @@ func (c *ClassController) JoinClass(ctx *gin.Context) {
 }
 
 // @Description  Get all members of a class by class ID
-// @Tags         classes
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Param        class_id   path      int  true  "Class ID"
@@ -223,7 +223,7 @@ func (c *ClassController) JoinClass(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/members [get]
+// @Router       /classroom/{class_id}/members [get]
 func (c *ClassController) GetAllMembersByClassID(ctx *gin.Context) {
 	classIDStr := ctx.Param("class_id")
 	classID, err := strconv.Atoi(classIDStr)
@@ -240,13 +240,13 @@ func (c *ClassController) GetAllMembersByClassID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, members)
 }
 
-// @Description  Retrieve all public classes
-// @Tags         classes
+// @Description  Retrieve all public classrooms
+// @Tags         classrooms
 // @Accept       json
 // @Produce      json
 // @Success      200   {array}   types.ClassResponse
 // @Failure      500   {object}  map[string]string
-// @Router       /classes/public [get]
+// @Router       /classroom/public [get]
 func (c *ClassController) GetAllClassPublic(ctx *gin.Context) {
 	classes, err := c.classUseCase.GetAllClassPublicUseCases(ctx)
 	if err != nil {

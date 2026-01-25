@@ -31,7 +31,7 @@ func NewClassRepository(db *gorm.DB) ClassRepository {
 }
 
 func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResponse, error) {
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Find(&classes).Error; err != nil {
 		return nil, err
 	}
@@ -45,8 +45,7 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			FavScore:         class.FavScore,
-			Owner:            int(class.Owner),
+			OwnerID:            int(class.OwnerId),
 			Status:           class.Status,
 		})
 	}
@@ -63,12 +62,12 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		return err
 	}
 
-	newClass := model.Class{
+	newClass := model.Classroom{
 		Topic:            class.Topic,
 		Description:      class.Description,
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
-		Owner:            owner,
+		OwnerId:            owner,
 		Status:           class.Status,
 	}
 
@@ -80,8 +79,8 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 }
 
 func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error {
-	var existingClass model.Class
-	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
+	var existingClass model.Classroom
+	err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -113,7 +112,7 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID in
 }
 
 func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID int) error {
-	var existingClass model.Class
+	var existingClass model.Classroom
 	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -130,7 +129,7 @@ func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID in
 }
 
 func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types.ClassResponse, error) {
-	var class model.Class
+	var class model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&class).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, gorm.ErrRecordNotFound
@@ -145,8 +144,7 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
 		GoogleSyncedAt:   class.GoogleSyncedAt,
-		FavScore:         class.FavScore,
-		Owner:            int(class.Owner),
+		OwnerID:            int(class.OwnerId),
 		Status:           class.Status,
 	}
 
@@ -164,7 +162,7 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	}
 
 	// Check if the class exists
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -212,7 +210,7 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 			ID:           int(user.ID),
 			Name:         user.Name,
 			Email:        user.Email,
-			Picture_path: user.Picture_path,
+			Picture_path: user.PicturePath,
 		})
 	}
 
@@ -220,7 +218,7 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 }
 
 func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error) {
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Where("status = ?", 0).Find(&classes).Error; err != nil {
 		return nil, err
 	}
@@ -234,8 +232,7 @@ func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.Class
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			FavScore:         class.FavScore,
-			Owner:            int(class.Owner),
+			OwnerID:            int(class.OwnerId),
 			Status:           class.Status,
 		})
 	}

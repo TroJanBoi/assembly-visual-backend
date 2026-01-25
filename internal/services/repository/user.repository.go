@@ -43,9 +43,6 @@ func (r *userRepository) UpdateUser(ctx context.Context, userID int, users *type
 	if users.Name != "" {
 		updatedData["name"] = users.Name
 	}
-	if users.Tel != "" {
-		updatedData["tel"] = users.Tel
-	}
 
 	if err := r.db.WithContext(ctx).Model(&user).Updates(updatedData).Error; err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
@@ -65,16 +62,11 @@ func (r *userRepository) CreateUser(ctx context.Context, users *types.CreateUser
 		users.Name = ""
 	}
 
-	if users.Tel == "" {
-		users.Tel = ""
-	}
-
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		newUser := model.User{
-			Email:    users.Email,
-			Password: security.HashPassword(users.Password),
-			Name:     users.Name,
-			Tel:      users.Tel,
+			Email:        users.Email,
+			PasswordHash: security.HashPassword(users.Password),
+			Name:         users.Name,
 		}
 		if err := r.db.WithContext(ctx).Create(&newUser).Error; err != nil {
 			return fmt.Errorf("failed to create user: %w", err)
@@ -94,7 +86,7 @@ func (r *userRepository) DeleteUser(ctx context.Context, userID int) error {
 		return fmt.Errorf("failed to find user: %w", err)
 	}
 
-	picture_path := existingUser.Picture_path
+	picture_path := existingUser.PicturePath
 	if picture_path != "" {
 		fileName := filepath.Base(picture_path)
 		filePath := filepath.Join("uploads/users", fileName)
@@ -121,10 +113,9 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 		userResp = append(userResp, types.UserResponse{
 			ID:           int(user.ID),
 			Email:        user.Email,
-			Password:     user.Password,
+			PasswordHash: user.PasswordHash,
 			Name:         user.Name,
-			Tel:          user.Tel,
-			Picture_path: user.Picture_path,
+			PicturePath:  user.PicturePath,
 		})
 	}
 	return &userResp, nil
@@ -141,7 +132,7 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 		classIDs = append(classIDs, int(m.ClassID))
 	}
 
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Where("id IN ?", classIDs).Find(&classes).Error; err != nil {
 		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
 	}
@@ -152,8 +143,7 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 			ID:          int(class.ID),
 			Topic:       class.Topic,
 			Description: class.Description,
-			FavScore:    class.FavScore,
-			Owner:       int(class.Owner),
+			OwnerID:     int(class.OwnerId),
 		})
 	}
 	return &classResp, nil
