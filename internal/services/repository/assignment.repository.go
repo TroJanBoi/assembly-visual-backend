@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
@@ -51,15 +50,14 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 
 	var assignmentResponses []types.AssignmentResponse
 	for _, assignment := range assignments {
-		var setting types.AssignmentSettings
-		if err := json.Unmarshal(assignment.Setting, &setting); err != nil {
-			return nil, fmt.Errorf("failed to parse settings: %w", err)
-		}
-
-		var condition types.AssignmentCondition
-		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-			return nil, fmt.Errorf("failed to parse condition: %w", err)
-		}
+		// var setting types.AssignmentSettings
+		// if err := json.Unmarshal(assignment.Setting, &setting); err != nil {
+		// 	return nil, fmt.Errorf("failed to parse settings: %w", err)
+		// }
+		// var condition types.AssignmentCondition
+		// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+		// 	return nil, fmt.Errorf("failed to parse condition: %w", err)
+		// }
 
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
 			ID:          int(assignment.ID),
@@ -68,8 +66,8 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 			Description: assignment.Description,
 			DueDate:     dueDate,
 			MaxAttempt:  assignment.MaxAttempt,
-			Settings:    setting,
-			Condition:   condition,
+			Settings:    assignment.Setting,
+			Condition:   assignment.Condition,
 			Grade:       assignment.Grade,
 		})
 	}
@@ -133,15 +131,15 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 
 	dueDate := assignment.DueDate.Format(time.RFC3339)
 
-	var settings types.AssignmentSettings
-	if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
-		return nil, fmt.Errorf("failed to parse settings: %w", err)
-	}
+	// var settings types.AssignmentSettings
+	// if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+	// 	return nil, fmt.Errorf("failed to parse settings: %w", err)
+	// }
 
-	var condition types.AssignmentCondition
-	if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-		return nil, fmt.Errorf("failed to parse condition: %w", err)
-	}
+	// var condition types.AssignmentCondition
+	// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+	// 	return nil, fmt.Errorf("failed to parse condition: %w", err)
+	// }
 
 	assignmentResponse := &types.AssignmentResponse{
 		ID:          int(assignment.ID),
@@ -150,8 +148,8 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 		Description: assignment.Description,
 		DueDate:     dueDate,
 		MaxAttempt:  assignment.MaxAttempt,
-		Settings:    settings,
-		Condition:   condition,
+		Settings:    assignment.Setting,
+		Condition:   assignment.Condition,
 		Grade:       assignment.Grade,
 	}
 

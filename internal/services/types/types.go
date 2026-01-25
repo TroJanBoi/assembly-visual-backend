@@ -1,6 +1,10 @@
 package types
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/datatypes"
+)
 
 type CatResponse struct {
 	ID   int    `json:"id"`
@@ -59,9 +63,9 @@ type LoginResponse struct {
 }
 
 type EditProfileRequest struct {
-	Username     string `json:"username"`
-	Name         string `json:"name"`
-	PicturePath  string `json:"picture_path"`
+	Username    string `json:"username"`
+	Name        string `json:"name"`
+	PicturePath string `json:"picture_path"`
 }
 
 type ChangePasswordRequest struct {
@@ -96,15 +100,17 @@ type UpdateClassRequest struct {
 }
 
 type AssignmentResponse struct {
-	ID          int                 `json:"id"`
-	ClassID     int                 `json:"class_id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	DueDate     string              `json:"due_date"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Settings    AssignmentSettings  `json:"setting"`
-	Condition   AssignmentCondition `json:"condition"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
+	ID          int    `json:"id"`
+	ClassID     int    `json:"class_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	DueDate     string `json:"due_date"`
+	MaxAttempt  int    `json:"max_attempt"`
+	// Settings    AssignmentSettings  `json:"setting"`
+	// Condition   AssignmentCondition `json:"condition"`
+	Settings  datatypes.JSON `json:"settings"`
+	Condition datatypes.JSON `json:"condition"`
+	Grade     int            `json:"grade"` // total grade of the assignment
 }
 
 type AllowedInstructions struct {
@@ -135,12 +141,13 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	Title       string              `json:"title" binding:"required"`
-	Description string              `json:"description" binding:"required"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Settings    map[string]string   `json:"settings"`
-	Condition   map[string]string `json:"condition"`
+	Title       string         `json:"title" binding:"required"`
+	Description string         `json:"description"`
+	DueDate     time.Time      `json:"due_date"`
+	MaxAttempt  int            `json:"max_attempt"`
+	Settings    datatypes.JSON `json:"settings"`
+	Condition   datatypes.JSON `json:"condition"`
+	Grade       int            `json:"grade"` // total grade of the assignment
 }
 
 type GradePolicy struct {
@@ -162,19 +169,21 @@ type FEBehavior struct {
 	AllowResubmitAfterDue bool `json:"allow_resubmit_after_due"`
 }
 
-type AssignmentSettings struct {
-	GradePolicy    GradePolicy    `json:"grade_policy"`
-	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
-	FEBehavior     FEBehavior     `json:"fe_behavior"`
-}
+// type AssignmentSettings struct {
+// 	GradePolicy    GradePolicy    `json:"grade_policy"`
+// 	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
+// 	FEBehavior     FEBehavior     `json:"fe_behavior"`
+// }
 
 type EditAssignmentRequest struct {
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Setting     AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	MaxAttempt  int    `json:"max_attempt"`
+	Grade       int    `json:"grade"` // total grade of the assignment
+	// Setting     AssignmentSettings  `json:"settings"`
+	// Condition   AssignmentCondition `json:"condition"`
+	Setting   datatypes.JSON `json:"setting"`
+	Condition datatypes.JSON `json:"condition"`
 }
 
 type MemberResponse struct {
@@ -296,14 +305,6 @@ type PlaygroundResponse struct {
 
 type PlaygroundMeRequest struct {
 	AssignmentID int `json:"assignment_id" binding:"required"`
-}
-
-type ExecutionState struct {
-	Registers    map[string]int    `json:"registers"`
-	Flags        map[string]int    `json:"flags"`
-	MemorySparse map[string]int    `json:"memory_sparse"`
-	Halted       bool              `json:"halted"`
-	Error        *ErrorStateDetail `json:"error"`
 }
 
 type ErrorStateDetail struct {
