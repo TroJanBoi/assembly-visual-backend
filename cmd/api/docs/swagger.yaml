@@ -1,40 +1,11 @@
 definitions:
-  types.AllowedInstructions:
-    properties:
-      arithmetic:
-        additionalProperties:
-          type: integer
-        description: ADD, SUB, INC, DEC, MUL, DIV
-        type: object
-      comparison_and_conditional:
-        additionalProperties:
-          type: integer
-        description: CMP, JMP, JC, JNZ, JZ, JNC
-        type: object
-      data_movement:
-        additionalProperties:
-          type: integer
-        description: LOAD, STORE, MOV
-        type: object
-      system:
-        additionalProperties:
-          type: integer
-        description: LABEL, NOP, HLT
-        type: object
-    type: object
-  types.AssignmentCondition:
-    properties:
-      allowed_instructions:
-        $ref: '#/definitions/types.AllowedInstructions'
-      execution_constraints:
-        $ref: '#/definitions/types.ExecutionConstraints'
-    type: object
   types.AssignmentResponse:
     properties:
       class_id:
         type: integer
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
         type: string
       due_date:
@@ -46,19 +17,14 @@ definitions:
         type: integer
       max_attempt:
         type: integer
-      setting:
-        $ref: '#/definitions/types.AssignmentSettings'
+      settings:
+        additionalProperties: true
+        description: |-
+          Settings    AssignmentSettings  `json:"setting"`
+          Condition   AssignmentCondition `json:"condition"`
+        type: object
       title:
         type: string
-    type: object
-  types.AssignmentSettings:
-    properties:
-      fe_behavior:
-        $ref: '#/definitions/types.FEBehavior'
-      grade_policy:
-        $ref: '#/definitions/types.GradePolicy'
-      test_case_policy:
-        $ref: '#/definitions/types.TestCasePolicy'
     type: object
   types.ChangePasswordRequest:
     properties:
@@ -100,8 +66,11 @@ definitions:
   types.CreateAssignmentRequest:
     properties:
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
+        type: string
+      due_date:
         type: string
       grade:
         description: total grade of the assignment
@@ -109,11 +78,11 @@ definitions:
       max_attempt:
         type: integer
       settings:
-        $ref: '#/definitions/types.AssignmentSettings'
+        additionalProperties: true
+        type: object
       title:
         type: string
     required:
-    - description
     - title
     type: object
   types.CreateClassRequest:
@@ -141,15 +110,14 @@ definitions:
         type: string
       password:
         type: string
-      tel:
-        type: string
     required:
     - email
     type: object
   types.EditAssignmentRequest:
     properties:
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
         type: string
       grade:
@@ -157,8 +125,12 @@ definitions:
         type: integer
       max_attempt:
         type: integer
-      settings:
-        $ref: '#/definitions/types.AssignmentSettings'
+      setting:
+        additionalProperties: true
+        description: |-
+          Setting     AssignmentSettings  `json:"settings"`
+          Condition   AssignmentCondition `json:"condition"`
+        type: object
       title:
         type: string
     type: object
@@ -168,40 +140,8 @@ definitions:
         type: string
       picture_path:
         type: string
-      tel:
-        type: string
       username:
         type: string
-    type: object
-  types.ExecutionConstraints:
-    properties:
-      initial_state:
-        $ref: '#/definitions/types.InitialState'
-      memory_node:
-        type: integer
-      register_count:
-        type: integer
-    type: object
-  types.FEBehavior:
-    properties:
-      allow_resubmit_after_due:
-        type: boolean
-      lock_after_submit:
-        type: boolean
-    type: object
-  types.GradePolicy:
-    properties:
-      mode:
-        type: string
-      weight:
-        $ref: '#/definitions/types.WeightPolicy'
-    type: object
-  types.InitialState:
-    properties:
-      memory:
-        items:
-          $ref: '#/definitions/types.Memory'
-        type: array
     type: object
   types.LoginRequest:
     properties:
@@ -223,13 +163,6 @@ definitions:
         type: string
       picture_path:
         type: string
-    type: object
-  types.Memory:
-    properties:
-      address:
-        type: integer
-      value:
-        type: integer
     type: object
   types.PlaygroundData:
     properties:
@@ -327,8 +260,6 @@ definitions:
         type: string
       password:
         type: string
-      tel:
-        type: string
     required:
     - email
     - password
@@ -373,11 +304,6 @@ definitions:
     - flags
     - memory
     - register
-    type: object
-  types.TestCasePolicy:
-    properties:
-      visible_to_student:
-        type: boolean
     type: object
   types.TestCaseRequest:
     properties:
@@ -443,8 +369,6 @@ definitions:
         type: string
       password:
         type: string
-      tel:
-        type: string
     type: object
   types.UserResponse:
     properties:
@@ -458,15 +382,6 @@ definitions:
         type: string
       picture_path:
         type: string
-      tel:
-        type: string
-    type: object
-  types.WeightPolicy:
-    properties:
-      number_of_node_used:
-        type: number
-      test_case:
-        type: number
     type: object
 info:
   contact: {}
@@ -1625,6 +1540,45 @@ paths:
       security:
       - BearerAuth: []
       summary: List Google Classroom Courses
+      tags:
+      - google-service
+  /google/classroom/courses/{course_id}/courseWork:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Google Classroom course work for a specific
+        course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assigment Google Classroom CourseWork
       tags:
       - google-service
   /invitation/{invitation_id}/accept:

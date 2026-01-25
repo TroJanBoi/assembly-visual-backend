@@ -8,6 +8,7 @@ import (
 
 type GoogleServiceUsecase interface {
 	ListGoogleClassroomCoursesUsecase(ctx context.Context, userID int) ([]byte, error)
+	AssignmentGoogleClassroomUsecase(ctx context.Context, userID int, courseID string) ([]byte, error)
 }
 
 type googleServiceUsecase struct {
@@ -26,6 +27,19 @@ func (uc *googleServiceUsecase) ListGoogleClassroomCoursesUsecase(ctx context.Co
 	}
 
 	resp, err := uc.googleServiceRepo.ListGoogleClassroomCourses(ctx, accessToken)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (uc *googleServiceUsecase) AssignmentGoogleClassroomUsecase(ctx context.Context, userID int, courseID string) ([]byte, error) {
+	accessToken, err := uc.oauthRepository.RefreshGoogleToken(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := uc.googleServiceRepo.AssignmentGoogleClassroom(ctx, accessToken, courseID)
 	if err != nil {
 		return nil, err
 	}
