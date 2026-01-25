@@ -1542,6 +1542,43 @@ paths:
       summary: List Google Classroom Courses
       tags:
       - google-service
+  /google/classroom/courses/{course_id}/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm the connection to a Google Classroom course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Confirm Google Classroom Connection
+      tags:
+      - google-service
   /google/classroom/courses/{course_id}/courseWork:
     get:
       consumes:

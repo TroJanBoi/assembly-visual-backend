@@ -50,22 +50,23 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 
 	var assignmentResponses []types.AssignmentResponse
 	for _, assignment := range assignments {
-		// var setting types.AssignmentSettings
-		// if err := json.Unmarshal(assignment.Setting, &setting); err != nil {
-		// 	return nil, fmt.Errorf("failed to parse settings: %w", err)
-		// }
-		// var condition types.AssignmentCondition
-		// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-		// 	return nil, fmt.Errorf("failed to parse condition: %w", err)
-		// }
 
 		var settings map[string]interface{}
-		if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
-			return nil, err
+		if len(assignment.Setting) > 0 {
+			if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+				return nil, err
+			}
+		} else {
+			settings = map[string]interface{}{}
 		}
+
 		var condition map[string]interface{}
-		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-			return nil, err
+		if len(assignment.Condition) > 0 {
+			if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+				return nil, err
+			}
+		} else {
+			condition = map[string]interface{}{}
 		}
 
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
