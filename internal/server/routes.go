@@ -91,7 +91,7 @@ func (s *Server) Router() (http.Handler, func()) {
 	playgroundUseCase := usecases.NewPlaygroundUseCases(playgroundRepository)
 	playgroundController := controller.NewPlaygroundController(playgroundUseCase)
 
-	googleServiceRepository := repository.NewGoogleServiceRepository()
+	googleServiceRepository := repository.NewGoogleServiceRepository(s.db)
 	googleServiceUsecase := usecases.NewGoogleServiceUsecase(googleServiceRepository, oauthRepository)
 	googleServiceController := controller.NewGoogleServiceController(googleServiceUsecase)
 

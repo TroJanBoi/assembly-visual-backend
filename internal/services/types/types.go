@@ -321,3 +321,27 @@ type ExecutionStepLog struct {
 	Stdout      []string       `json:"stdout"`
 	Timestamp   time.Time      `json:"timestamp"`
 }
+
+type CourseData struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	AlternateLink  string `json:"alternateLink"`
+	EnrollmentCode string `json:"enrollmentCode"`
+}
+
+type CourseWorkData struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	DueDate     struct {
+		Year  int `json:"year"`
+		Month int `json:"month"`
+		Day   int `json:"day"`
+	} `json:"dueDate"`
+	AlternateLink string `json:"alternateLink"`
+	MaxPoints     int    `json:"maxPoints"`
+}
+
+type CourseWorkListResponse struct {
+	CourseWork []CourseWorkData `json:"courseWork"`
+}

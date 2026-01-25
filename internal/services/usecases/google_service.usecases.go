@@ -9,6 +9,7 @@ import (
 type GoogleServiceUsecase interface {
 	ListGoogleClassroomCoursesUsecase(ctx context.Context, userID int) ([]byte, error)
 	AssignmentGoogleClassroomUsecase(ctx context.Context, userID int, courseID string) ([]byte, error)
+	ConfirmGoogleClassroomConnectionUsecase(ctx context.Context, userID int, courseID string, ownerID int) error
 }
 
 type googleServiceUsecase struct {
@@ -44,4 +45,17 @@ func (uc *googleServiceUsecase) AssignmentGoogleClassroomUsecase(ctx context.Con
 		return nil, err
 	}
 	return resp, nil
+}
+
+func (uc *googleServiceUsecase) ConfirmGoogleClassroomConnectionUsecase(ctx context.Context, userID int, courseID string, ownerID int) error {
+	accessToken, err := uc.oauthRepository.RefreshGoogleToken(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	err = uc.googleServiceRepo.ConfirmGoogleClassroomConnection(ctx, accessToken, courseID, ownerID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
