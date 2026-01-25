@@ -59,6 +59,15 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 		// 	return nil, fmt.Errorf("failed to parse condition: %w", err)
 		// }
 
+		var settings map[string]interface{}
+		if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+			return nil, err
+		}
+		var condition map[string]interface{}
+		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+			return nil, err
+		}
+
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
 			ID:          int(assignment.ID),
 			ClassID:     classID,
@@ -66,8 +75,8 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 			Description: assignment.Description,
 			DueDate:     dueDate,
 			MaxAttempt:  assignment.MaxAttempt,
-			Settings:    assignment.Setting,
-			Condition:   assignment.Condition,
+			Settings:    settings,
+			Condition:   condition,
 			Grade:       assignment.Grade,
 		})
 	}
@@ -131,15 +140,14 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 
 	dueDate := assignment.DueDate.Format(time.RFC3339)
 
-	// var settings types.AssignmentSettings
-	// if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
-	// 	return nil, fmt.Errorf("failed to parse settings: %w", err)
-	// }
-
-	// var condition types.AssignmentCondition
-	// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-	// 	return nil, fmt.Errorf("failed to parse condition: %w", err)
-	// }
+	var settings map[string]interface{}
+	if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+		return nil, err
+	}
+	var condition map[string]interface{}
+	if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+		return nil, err
+	}
 
 	assignmentResponse := &types.AssignmentResponse{
 		ID:          int(assignment.ID),
@@ -148,8 +156,8 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 		Description: assignment.Description,
 		DueDate:     dueDate,
 		MaxAttempt:  assignment.MaxAttempt,
-		Settings:    assignment.Setting,
-		Condition:   assignment.Condition,
+		Settings:    settings,
+		Condition:   condition,
 		Grade:       assignment.Grade,
 	}
 

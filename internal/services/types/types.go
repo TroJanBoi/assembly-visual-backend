@@ -2,8 +2,6 @@ package types
 
 import (
 	"time"
-
-	"gorm.io/datatypes"
 )
 
 type CatResponse struct {
@@ -108,9 +106,9 @@ type AssignmentResponse struct {
 	MaxAttempt  int    `json:"max_attempt"`
 	// Settings    AssignmentSettings  `json:"setting"`
 	// Condition   AssignmentCondition `json:"condition"`
-	Settings  datatypes.JSON `json:"settings"`
-	Condition datatypes.JSON `json:"condition"`
-	Grade     int            `json:"grade"` // total grade of the assignment
+	Settings  map[string]interface{} `json:"settings"`
+	Condition map[string]interface{} `json:"condition"`
+	Grade     int                    `json:"grade"` // total grade of the assignment
 }
 
 type AllowedInstructions struct {
@@ -141,13 +139,13 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	Title       string         `json:"title" binding:"required"`
-	Description string         `json:"description"`
-	DueDate     time.Time      `json:"due_date"`
-	MaxAttempt  int            `json:"max_attempt"`
-	Settings    datatypes.JSON `json:"settings"`
-	Condition   datatypes.JSON `json:"condition"`
-	Grade       int            `json:"grade"` // total grade of the assignment
+	Title       string                 `json:"title" binding:"required"`
+	Description string                 `json:"description"`
+	DueDate     time.Time              `json:"due_date"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Settings    map[string]interface{} `json:"settings"`
+	Condition   map[string]interface{} `json:"condition"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
 }
 
 type GradePolicy struct {
@@ -182,8 +180,8 @@ type EditAssignmentRequest struct {
 	Grade       int    `json:"grade"` // total grade of the assignment
 	// Setting     AssignmentSettings  `json:"settings"`
 	// Condition   AssignmentCondition `json:"condition"`
-	Setting   datatypes.JSON `json:"setting"`
-	Condition datatypes.JSON `json:"condition"`
+	Setting   map[string]interface{} `json:"setting"`
+	Condition map[string]interface{} `json:"condition"`
 }
 
 type MemberResponse struct {

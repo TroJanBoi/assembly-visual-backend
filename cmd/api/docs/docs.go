@@ -1792,6 +1792,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/google/classroom/courses/{course_id}/courseWork": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of Google Classroom course work for a specific course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google-service"
+                ],
+                "summary": "Assigment Google Classroom CourseWork",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "course_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/invitation/me": {
             "get": {
                 "security": [
@@ -3046,50 +3105,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "types.AllowedInstructions": {
-            "type": "object",
-            "properties": {
-                "arithmetic": {
-                    "description": "ADD, SUB, INC, DEC, MUL, DIV",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "comparison_and_conditional": {
-                    "description": "CMP, JMP, JC, JNZ, JZ, JNC",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "data_movement": {
-                    "description": "LOAD, STORE, MOV",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "system": {
-                    "description": "LABEL, NOP, HLT",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.AssignmentCondition": {
-            "type": "object",
-            "properties": {
-                "allowed_instructions": {
-                    "$ref": "#/definitions/types.AllowedInstructions"
-                },
-                "execution_constraints": {
-                    "$ref": "#/definitions/types.ExecutionConstraints"
-                }
-            }
-        },
         "types.AssignmentResponse": {
             "type": "object",
             "properties": {
@@ -3097,7 +3112,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
                     "type": "string"
@@ -3115,25 +3131,13 @@ const docTemplate = `{
                 "max_attempt": {
                     "type": "integer"
                 },
-                "setting": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                "settings": {
+                    "description": "Settings    AssignmentSettings  ` + "`" + `json:\"setting\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
                     "type": "string"
-                }
-            }
-        },
-        "types.AssignmentSettings": {
-            "type": "object",
-            "properties": {
-                "fe_behavior": {
-                    "$ref": "#/definitions/types.FEBehavior"
-                },
-                "grade_policy": {
-                    "$ref": "#/definitions/types.GradePolicy"
-                },
-                "test_case_policy": {
-                    "$ref": "#/definitions/types.TestCasePolicy"
                 }
             }
         },
@@ -3197,14 +3201,17 @@ const docTemplate = `{
         "types.CreateAssignmentRequest": {
             "type": "object",
             "required": [
-                "description",
                 "title"
             ],
             "properties": {
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
+                    "type": "string"
+                },
+                "due_date": {
                     "type": "string"
                 },
                 "grade": {
@@ -3215,7 +3222,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "settings": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
                     "type": "string"
@@ -3261,9 +3269,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
                 }
             }
         },
@@ -3271,7 +3276,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
                     "type": "string"
@@ -3283,8 +3289,10 @@ const docTemplate = `{
                 "max_attempt": {
                     "type": "integer"
                 },
-                "settings": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                "setting": {
+                    "description": "Setting     AssignmentSettings  ` + "`" + `json:\"settings\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
                     "type": "string"
@@ -3300,58 +3308,8 @@ const docTemplate = `{
                 "picture_path": {
                     "type": "string"
                 },
-                "tel": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "types.ExecutionConstraints": {
-            "type": "object",
-            "properties": {
-                "initial_state": {
-                    "$ref": "#/definitions/types.InitialState"
-                },
-                "memory_node": {
-                    "type": "integer"
-                },
-                "register_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "types.FEBehavior": {
-            "type": "object",
-            "properties": {
-                "allow_resubmit_after_due": {
-                    "type": "boolean"
-                },
-                "lock_after_submit": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "types.GradePolicy": {
-            "type": "object",
-            "properties": {
-                "mode": {
-                    "type": "string"
-                },
-                "weight": {
-                    "$ref": "#/definitions/types.WeightPolicy"
-                }
-            }
-        },
-        "types.InitialState": {
-            "type": "object",
-            "properties": {
-                "memory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.Memory"
-                    }
                 }
             }
         },
@@ -3384,17 +3342,6 @@ const docTemplate = `{
                 },
                 "picture_path": {
                     "type": "string"
-                }
-            }
-        },
-        "types.Memory": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "integer"
-                },
-                "value": {
-                    "type": "integer"
                 }
             }
         },
@@ -3547,9 +3494,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
                 }
             }
         },
@@ -3610,14 +3554,6 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "integer"
                     }
-                }
-            }
-        },
-        "types.TestCasePolicy": {
-            "type": "object",
-            "properties": {
-                "visible_to_student": {
-                    "type": "boolean"
                 }
             }
         },
@@ -3717,9 +3653,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
                 }
             }
         },
@@ -3740,20 +3673,6 @@ const docTemplate = `{
                 },
                 "picture_path": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.WeightPolicy": {
-            "type": "object",
-            "properties": {
-                "number_of_node_used": {
-                    "type": "number"
-                },
-                "test_case": {
-                    "type": "number"
                 }
             }
         }
