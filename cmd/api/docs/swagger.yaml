@@ -2417,6 +2417,31 @@ paths:
       summary: Get my classes
       tags:
       - users
+  /user/owner/classroom:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve classes owned by the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get owner classes
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     in: header

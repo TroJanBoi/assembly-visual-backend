@@ -142,17 +142,33 @@ func (u *UserController) GetMeClassesController(ctx *gin.Context) {
 	ctx.JSON(200, classes)
 }
 
-// @Summary      Upload user avatar
-// @Description  Upload an avatar for the authenticated user
+// @Summary      Get owner classes
+// @Description  Retrieve classes owned by the authenticated user
 // @Tags         users
-// @Accept       multipart/form-data
+// @Accept       json
 // @Produce      json
-// @Param        file  formData  file  true  "Avatar file"
-// @Success      200   {object}  map[string]string
-// @Failure      400   {object}  map[string]string
+// @Success      200   {array}   types.ClassMeResponse
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /user/avatar [post]
+// @Router       /user/owner/classroom [get]
+func (u *UserController) GetOwnerClassesController(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+	classes, err := u.userUseCase.GetOwnerClassUsecase(ctx, userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": "Failed to retrieve classes"})
+		return
+	}
+	ctx.JSON(200, classes)
+}
 
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
@@ -160,4 +176,5 @@ func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.DELETE("/:id", u.DeleteUserController)
 	r.POST("/", u.CreateUserController)
 	r.GET("/me/classroom", u.GetMeClassesController)
+	r.GET("/owner/classroom", u.GetOwnerClassesController)
 }
