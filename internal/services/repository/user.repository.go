@@ -19,6 +19,7 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, userID int, users *types.UpdateUserRequest) error
 	DeleteUser(ctx context.Context, userID int) error
 	GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
+	GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 }
 
 type userRepository struct {
@@ -121,6 +122,7 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 	return &userResp, nil
 }
 
+// Get me's classes joined
 func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error) {
 	var member []model.Member
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&member).Error; err != nil {
@@ -144,6 +146,28 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 			Topic:       class.Topic,
 			Description: class.Description,
 			OwnerID:     int(class.OwnerId),
+		})
+	}
+	return &classResp, nil
+}
+
+func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error) {
+	var classes []model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ?", userID).Find(&classes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
+	}
+
+	var classResp []types.ClassMeResponse
+	for _, class := range classes {
+		classResp = append(classResp, types.ClassMeResponse{
+			ID:               int(class.ID),
+			Topic:            class.Topic,
+			Description:      class.Description,
+			OwnerID:          int(class.OwnerId),
+			Status:           int(class.Status),
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
 		})
 	}
 	return &classResp, nil

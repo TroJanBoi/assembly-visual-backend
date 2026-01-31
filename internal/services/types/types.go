@@ -192,10 +192,14 @@ type MemberResponse struct {
 }
 
 type ClassMeResponse struct {
-	ID          int    `json:"id"`
-	Topic       string `json:"topic"`
-	Description string `json:"description"`
-	OwnerID     int    `json:"owner_id"`
+	ID               int    `json:"id"`
+	Topic            string `json:"topic"`
+	Description      string `json:"description"`
+	OwnerID          int    `json:"owner_id"`
+	Status           int    `json:"status"`
+	GoogleCourseID   string `json:"google_course_id"`
+	GoogleCourseLink string `json:"google_course_link"`
+	GoogleSyncedAt   string `json:"google_synced_at"`
 }
 
 type InvitationResponse struct {
@@ -344,4 +348,11 @@ type CourseWorkData struct {
 
 type CourseWorkListResponse struct {
 	CourseWork []CourseWorkData `json:"courseWork"`
+}
+
+type CreateSubmissionRequest struct {
+	AssignmentID int `json:"assignment_id" binding:"required"`
+	UserID       int `json:"user_id" binding:"required"`
+	PlaygroundID int `json:"playground_id" binding:"required"`
+	AttemptNO    int
 }
