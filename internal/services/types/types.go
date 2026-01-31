@@ -98,15 +98,15 @@ type UpdateClassRequest struct {
 }
 
 type AssignmentResponse struct {
-	ID          int    `json:"id"`
-	ClassID     int    `json:"class_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	DueDate     string `json:"due_date"`
-	MaxAttempt  int    `json:"max_attempt"`
-	Settings  map[string]interface{} `json:"settings"`
-	Condition map[string]interface{} `json:"condition"`
-	Grade     int                    `json:"grade"` // total grade of the assignment
+	ID          int                    `json:"id"`
+	ClassID     int                    `json:"class_id"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	DueDate     string                 `json:"due_date"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Settings    map[string]interface{} `json:"settings"`
+	Condition   map[string]interface{} `json:"condition"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
 }
 
 type AllowedInstructions struct {
@@ -251,16 +251,15 @@ type TestCaseAssert struct {
 }
 
 type PlaygroundRequest struct {
-	AssignmentID int            `json:"assignment_id" binding:"required"`
-	AttemptNO    int            `json:"attempt_no" binding:"required"`
-	Item         PlaygroundData `json:"item" binding:"required"`
-	Status       string         `json:"status" binding:"required"` // e.g., "in_progress", "completed", "failed"
+	AssignmentID int                    `json:"assignment_id" binding:"required"`
+	Item         map[string]interface{} `json:"item" binding:"required"`
+	Status       string                 `json:"status" binding:"required"` // e.g., "in_progress", "completed", "failed"
 }
 
 type PlaygroundData struct {
-	Items    []PlaygroundItem   `json:"items"`
-	MetaData PlaygroundMetaData `json:"meta_data"`
-	UI       PlaygroundUI       `json:"ui"`
+	Items    map[string]interface{} `json:"items"`
+	MetaData map[string]interface{} `json:"meta_data"`
+	UI       map[string]interface{} `json:"ui"`
 }
 
 type PlaygroundItem struct {
@@ -296,11 +295,11 @@ type PlaygroundUI struct {
 }
 
 type PlaygroundResponse struct {
-	ID           int            `json:"id"`
-	AssignmentID int            `json:"assignment_id"`
-	UserID       int            `json:"user_id"`
-	Item         PlaygroundData `json:"item"`
-	Status       string         `json:"status"` // e.g., "in_progress", "completed", "failed"
+	ID           int                    `json:"id"`
+	AssignmentID int                    `json:"assignment_id"`
+	UserID       int                    `json:"user_id"`
+	Item         map[string]interface{} `json:"item"`
+	Status       string                 `json:"status"` // e.g., "in_progress", "completed", "failed"
 }
 
 type PlaygroundMeRequest struct {

@@ -62,9 +62,17 @@ func (r *playgroundRepository) Create(ctx context.Context, userID int, playgroun
 		return nil, fmt.Errorf("failed to create playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	// var parseItems types.PlaygroundData
+	// if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	// }
+	var parseItems map[string]interface{}
+	if len(newPlayground.Item) > 0 {
+		if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
@@ -95,9 +103,13 @@ func (r *playgroundRepository) GetByPlaygroundID(ctx context.Context, userID int
 		return nil, fmt.Errorf("failed to find playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(playground.Item) > 0 {
+		if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
@@ -128,9 +140,13 @@ func (r *playgroundRepository) GetPlaygroundByMe(ctx context.Context, userID int
 		return nil, fmt.Errorf("failed to find playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(playground.Item) > 0 {
+		if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
@@ -168,9 +184,13 @@ func (r *playgroundRepository) UpdatePlaygroundByMe(ctx context.Context, userID 
 		return nil, fmt.Errorf("failed to update playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(existingPlayground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(existingPlayground.Item) > 0 {
+		if err := json.Unmarshal(existingPlayground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
