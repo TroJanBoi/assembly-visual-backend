@@ -90,7 +90,7 @@ func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID
 
 	// Check if class exists and is owned by the user
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -132,7 +132,7 @@ func (r *testCaseRepository) UpdateTestCase(ctx context.Context, owner int, clas
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}

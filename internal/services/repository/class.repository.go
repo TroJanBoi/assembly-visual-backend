@@ -18,8 +18,6 @@ type ClassRepository interface {
 	JoinClass(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
-
-	
 }
 
 type classRepository struct {
@@ -45,7 +43,7 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			OwnerID:            int(class.OwnerId),
+			OwnerID:          int(class.OwnerId),
 			Status:           class.Status,
 		})
 	}
@@ -67,7 +65,7 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		Description:      class.Description,
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
-		OwnerId:            owner,
+		OwnerId:          owner,
 		Status:           class.Status,
 	}
 
@@ -113,7 +111,7 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID in
 
 func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID int) error {
 	var existingClass model.Classroom
-	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
+	err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -144,7 +142,7 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
 		GoogleSyncedAt:   class.GoogleSyncedAt,
-		OwnerID:            int(class.OwnerId),
+		OwnerID:          int(class.OwnerId),
 		Status:           class.Status,
 	}
 
@@ -171,7 +169,7 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	}
 
 	// Check if the user is the owner of the class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, userID).First(&classes).Error; err == nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, userID).First(&classes).Error; err == nil {
 		return errors.New("owner cannot join their own class as member")
 	}
 
@@ -232,7 +230,7 @@ func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.Class
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			OwnerID:            int(class.OwnerId),
+			OwnerID:          int(class.OwnerId),
 			Status:           class.Status,
 		})
 	}

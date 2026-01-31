@@ -32,7 +32,7 @@ func (r *invitationRepository) SendEmailInvitation(ctx context.Context, email st
 	}
 
 	var class model.Classroom
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&class).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&class).Error; err != nil {
 		return errors.New("class not found or you are not the owner")
 	}
 

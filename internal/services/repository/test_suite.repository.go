@@ -58,7 +58,7 @@ func (r *testSuiteRepository) AddTestSuite(ctx context.Context, owner int, class
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -94,7 +94,7 @@ func (r *testSuiteRepository) UpdateTestSuite(ctx context.Context, owner int, cl
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -138,7 +138,7 @@ func (r *testSuiteRepository) DeleteTestSuite(ctx context.Context, owner int, cl
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -189,7 +189,7 @@ func (r *testSuiteRepository) GetTestSuiteByID(ctx context.Context, owner int, c
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
 		}
