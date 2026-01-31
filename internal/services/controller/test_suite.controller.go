@@ -102,13 +102,16 @@ func (c *TestSuiteController) AddTestSuite(ctx *gin.Context) {
 		return
 	}
 
-	err = c.testCaseUseCase.AddTestSuiteUsecase(ctx, ownerID, classID, assignmentID, testSuiteRequest)
+	id, err := c.testCaseUseCase.AddTestSuiteUsecase(ctx, ownerID, classID, assignmentID, testSuiteRequest)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Test suite added successfully"})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Test suite added successfully",
+		"id":      id,
+	})
 }
 
 // UpdateTestSuite handles the request to update an existing test suite
