@@ -104,8 +104,6 @@ type AssignmentResponse struct {
 	Description string `json:"description"`
 	DueDate     string `json:"due_date"`
 	MaxAttempt  int    `json:"max_attempt"`
-	// Settings    AssignmentSettings  `json:"setting"`
-	// Condition   AssignmentCondition `json:"condition"`
 	Settings  map[string]interface{} `json:"settings"`
 	Condition map[string]interface{} `json:"condition"`
 	Grade     int                    `json:"grade"` // total grade of the assignment

@@ -3230,7 +3230,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "settings": {
-                    "description": "Settings    AssignmentSettings  ` + "`" + `json:\"setting\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
                     "type": "object",
                     "additionalProperties": true
                 },
@@ -3256,10 +3255,22 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "google_course_id": {
+                    "type": "string"
+                },
+                "google_course_link": {
+                    "type": "string"
+                },
+                "google_synced_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "owner_id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "integer"
                 },
                 "topic": {

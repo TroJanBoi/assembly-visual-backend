@@ -141,13 +141,31 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 
 	dueDate := assignment.DueDate.Format(time.RFC3339)
 
+	// var settings map[string]interface{}
+	// if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+	// 	return nil, err
+	// }
+	// var condition map[string]interface{}
+	// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+	// 	return nil, err
+	// }
+
 	var settings map[string]interface{}
-	if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
-		return nil, err
+	if len(assignment.Setting) > 0 {
+		if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+			return nil, err
+		}
+	} else {
+		settings = map[string]interface{}{}
 	}
+
 	var condition map[string]interface{}
-	if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-		return nil, err
+	if len(assignment.Condition) > 0 {
+		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+			return nil, err
+		}
+	} else {
+		condition = map[string]interface{}{}
 	}
 
 	assignmentResponse := &types.AssignmentResponse{

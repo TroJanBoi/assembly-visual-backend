@@ -19,9 +19,6 @@ definitions:
         type: integer
       settings:
         additionalProperties: true
-        description: |-
-          Settings    AssignmentSettings  `json:"setting"`
-          Condition   AssignmentCondition `json:"condition"`
         type: object
       title:
         type: string
@@ -37,9 +34,17 @@ definitions:
     properties:
       description:
         type: string
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      google_synced_at:
+        type: string
       id:
         type: integer
       owner_id:
+        type: integer
+      status:
         type: integer
       topic:
         type: string
