@@ -17,6 +17,7 @@ type ClassUseCase interface {
 	JoinClassUseCases(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublicUseCases(ctx context.Context) (*[]types.ClassResponse, error)
+	ChangePermissionMemberUseCases(ctx context.Context, userID, classID int, newRole string) error
 }
 
 type classUseCase struct {
@@ -89,4 +90,12 @@ func (uc *classUseCase) GetAllClassPublicUseCases(ctx context.Context) (*[]types
 		return nil, err
 	}
 	return resp, nil
+}
+
+func (uc *classUseCase) ChangePermissionMemberUseCases(ctx context.Context, userID, classID int, newRole string) error {
+	err := uc.classRepo.ChangePermissionMember(ctx, userID, classID, newRole)
+	if err != nil {
+		return err
+	}
+	return nil
 }
