@@ -95,6 +95,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	googleServiceUsecase := usecases.NewGoogleServiceUsecase(googleServiceRepository, oauthRepository)
 	googleServiceController := controller.NewGoogleServiceController(googleServiceUsecase)
 
+	submissionRepository := repository.NewSubmissionRepository(s.db)
+	submissionUsecase := usecases.NewSubmissionUseCase(submissionRepository)
+	submissionController := controller.NewSubmissionController(submissionUsecase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -150,6 +154,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		googleServiceGroup := api.Group("/google").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			googleServiceController.GoogleServiceRegisterRoutes(googleServiceGroup)
+		}
+		submissionGroup := api.Group("/submission").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			submissionController.SubmissionRoutes(submissionGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {

@@ -359,15 +359,56 @@ type CourseWorkListResponse struct {
 	CourseWork []CourseWorkData `json:"courseWork"`
 }
 
-type CreateSubmissionRequest struct {
-	AssignmentID int `json:"assignment_id" binding:"required"`
-	UserID       int `json:"user_id" binding:"required"`
-	PlaygroundID int `json:"playground_id" binding:"required"`
-	AttemptNO    int
-}
-
 type NewRoleRequest struct {
 	ClassID int    `json:"class_id" binding:"required"`
 	UserID  int    `json:"user_id" binding:"required"`
 	NewRole string `json:"new_role" binding:"required"`
+}
+
+type RemoveMemberRequest struct {
+	ClassID int `json:"class_id" binding:"required"`
+	UserID  int `json:"user_id" binding:"required"`
+}
+
+type CreateSubmissionRequest struct {
+	AssignmentID  int                    `json:"assignment_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+}
+
+type UpdateSubmissionRequest struct {
+	AssignmentID  int                    `json:"assignment_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+}
+
+type SubmissionResponse struct {
+	ID            int                    `json:"id"`
+	AssignmentID  int                    `json:"assignment_id"`
+	UserID        int                    `json:"user_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+	CreatedAt     string                 `json:"created_at"`
+	UpdatedAt     string                 `json:"updated_at"`
 }

@@ -121,6 +121,32 @@ definitions:
     - description
     - topic
     type: object
+  types.CreateSubmissionRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      duration_ms:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
+        type: string
+    type: object
   types.CreateUserRequest:
     properties:
       email:
@@ -178,6 +204,8 @@ definitions:
         type: string
       id:
         type: integer
+      join_at:
+        type: string
       name:
         type: string
       picture_path:
@@ -220,6 +248,16 @@ definitions:
     - item
     - status
     type: object
+  types.RemoveMemberRequest:
+    properties:
+      class_id:
+        type: integer
+      user_id:
+        type: integer
+    required:
+    - class_id
+    - user_id
+    type: object
   types.SignUpRequest:
     properties:
       email:
@@ -231,6 +269,40 @@ definitions:
     required:
     - email
     - password
+    type: object
+  types.SubmissionResponse:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      created_at:
+        type: string
+      duration_ms:
+        type: integer
+      id:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   types.TestCaseAssert:
     properties:
@@ -339,6 +411,32 @@ definitions:
         description: public or private
         type: integer
       topic:
+        type: string
+    type: object
+  types.UpdateSubmissionRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      duration_ms:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
         type: string
     type: object
   types.UpdateUserRequest:
@@ -1517,6 +1615,50 @@ paths:
       summary: Get all members of a class by class ID
       tags:
       - classrooms
+  /classroom/member:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a member from a class
+      parameters:
+      - description: Remove member info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.RemoveMemberRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove a member from a class
+      tags:
+      - classrooms
   /classroom/public:
     get:
       consumes:
@@ -2282,6 +2424,152 @@ paths:
       summary: Delete user profile
       tags:
       - profile
+  /submission:
+    post:
+      consumes:
+      - application/json
+      description: Create a new submission for an assignment
+      parameters:
+      - description: Submission Data
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new submission
+      tags:
+      - Submission
+  /submission/{submission_id}:
+    get:
+      description: Retrieve a submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get submission by ID
+      tags:
+      - Submission
+    put:
+      consumes:
+      - application/json
+      description: Update an existing submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      - description: Updated Submission Data
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateSubmissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an existing submission
+      tags:
+      - Submission
+  /submission/assignment/{assignment_id}:
+    get:
+      description: Retrieve a submission for a specific assignment by assignment ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get submission by assignment ID
+      tags:
+      - Submission
   /user:
     get:
       consumes:

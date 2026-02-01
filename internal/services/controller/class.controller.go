@@ -291,6 +291,33 @@ func (c *ClassController) ChangePermissionMember(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Member role updated successfully"})
 }
 
+// @Summary      Remove a member from a class
+// @Description  Remove a member from a class
+// @Tags         classrooms
+// @Accept       json
+// @Produce      json
+// @Param        body body types.RemoveMemberRequest true "Remove member info"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      401   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /classroom/member [delete]
+func (c *ClassController) RemoveMemberInClass(ctx *gin.Context) {
+	var removeMemberReq types.RemoveMemberRequest
+	if err := ctx.ShouldBindJSON(&removeMemberReq); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err := c.classUseCase.RemoveMemberInClassUseCases(ctx, removeMemberReq.ClassID, removeMemberReq.UserID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Member removed from class successfully"})
+}
+
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.POST("/", c.ClassCreateClass)
 	r.PUT("/:class_id", c.ClassUpdateClass)
@@ -298,6 +325,7 @@ func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.POST("/:class_id/join", c.JoinClass)
 	r.GET("/:class_id/members", c.GetAllMembersByClassID)
 	r.PUT("/:class_id/member/permission", c.ChangePermissionMember)
+	r.DELETE("/member", c.RemoveMemberInClass)
 }
 
 func (c *ClassController) ClassNotLoginRoutes(rg *gin.RouterGroup) {
