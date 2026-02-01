@@ -116,13 +116,13 @@ func (c *TestCaseController) AddTestCase(ctx *gin.Context) {
 		return
 	}
 
-	err = c.testCaseUseCase.AddTestCaseUsecase(ctx, ownerID, classID, assignmentID, testSuiteID, testCase)
+	id, err := c.testCaseUseCase.AddTestCaseUsecase(ctx, ownerID, classID, assignmentID, testSuiteID, testCase)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Test case added successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Test case added successfully", "id": id})
 }
 
 // UpdateTestCase handles the request to update a test case

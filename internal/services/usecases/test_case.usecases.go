@@ -9,7 +9,7 @@ import (
 
 type TestCaseUseCase interface {
 	GetAllTestCaseByTestSuiteIDUsecases(ctx context.Context, classID int, assignmentID int, testSuiteID int) (*[]types.TestCaseResponse, error)
-	AddTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error
+	AddTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error)
 	UpdateTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error
 	DeleteTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int) error
 	GetTestCaseByIDUsecase(ctx context.Context, classID int, assignmentID int, testSuiteID int, testCaseID int) (*types.TestCaseResponse, error)
@@ -31,12 +31,12 @@ func (uc *testCaseUseCase) GetAllTestCaseByTestSuiteIDUsecases(ctx context.Conte
 	return resp, nil
 }
 
-func (uc *testCaseUseCase) AddTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error {
-	err := uc.testCaseRepo.AddTestCase(ctx, owner, classID, assignmentID, testSuiteID, testCase)
+func (uc *testCaseUseCase) AddTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error) {
+	id, err := uc.testCaseRepo.AddTestCase(ctx, owner, classID, assignmentID, testSuiteID, testCase)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 func (uc *testCaseUseCase) UpdateTestCaseUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error {

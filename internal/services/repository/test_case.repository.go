@@ -12,7 +12,7 @@ import (
 
 type TestCaseRepository interface {
 	GetAllTestCaseByTestSuiteID(ctx context.Context, classID int, assignmentID int, testSuiteID int) (*[]types.TestCaseResponse, error)
-	AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error
+	AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error)
 	UpdateTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error
 	DeleteTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int) error
 	GetTestCaseByID(ctx context.Context, classID int, assignmentID int, testSuiteID int, testCaseID int) (*types.TestCaseResponse, error)
@@ -79,32 +79,30 @@ func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, cl
 	return &testCaseResponses, nil
 }
 
-func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error {
-	// Check if user exists
+func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error) {
+
 	var usr model.User
 	if err := r.db.WithContext(ctx).Where("id = ?", owner).First(&usr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	// Check if class exists and is owned by the user
 	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	// Check if assignment exists and is owned by the user
 	var assignment model.Assignment
 	if err := r.db.WithContext(ctx).Where("id = ? AND class_id = ?", assignmentID, classID).First(&assignment).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
 	testCaseInit, _ := json.Marshal(testCase.Init)
@@ -118,10 +116,10 @@ func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newTestCase).Error; err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return int(newTestCase.ID), nil
 }
 
 func (r *testCaseRepository) UpdateTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error {
@@ -192,7 +190,7 @@ func (r *testCaseRepository) DeleteTestCase(ctx context.Context, owner int, clas
 	}
 
 	var classes model.Classroom
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
