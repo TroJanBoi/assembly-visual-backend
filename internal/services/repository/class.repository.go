@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -18,6 +19,7 @@ type ClassRepository interface {
 	JoinClass(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
+	ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error
 }
 
 type classRepository struct {
@@ -34,17 +36,32 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 		return nil, err
 	}
 
-	var classResponses []types.ClassResponse
+	classResponses := make([]types.ClassResponse, 0, len(classes))
+
 	for _, class := range classes {
+		var owner model.User
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+			return nil, err
+		}
+
+		var memberCount int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+			return nil, err
+		}
 		classResponses = append(classResponses, types.ClassResponse{
 			ID:               int(class.ID),
 			Topic:            class.Topic,
 			Description:      class.Description,
+			Code:             class.Code,
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
 			OwnerID:          int(class.OwnerId),
+			OwnerName:        owner.Name,
 			Status:           class.Status,
+			MemberAmount:     memberCount,
+			Favorite:         class.Favorite,
+			BannerID:         class.BannerID,
 		})
 	}
 
@@ -66,6 +83,7 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
 		OwnerId:          owner,
+		BannerID:         class.BannerID,
 		Status:           class.Status,
 	}
 
@@ -101,7 +119,6 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID in
 	if class.Status != 0 {
 		existingClass.Status = class.Status
 	}
-
 	if err := r.db.WithContext(ctx).Save(&existingClass).Error; err != nil {
 		return err
 	}
@@ -135,15 +152,30 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		return nil, err
 	}
 
+	var owner model.User
+	if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+		return nil, err
+	}
+
+	var memberCount int64
+	if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+		return nil, err
+	}
+
 	classResponse := types.ClassResponse{
 		ID:               int(class.ID),
 		Topic:            class.Topic,
 		Description:      class.Description,
+		Code:             class.Code,
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
 		GoogleSyncedAt:   class.GoogleSyncedAt,
 		OwnerID:          int(class.OwnerId),
+		OwnerName:        owner.Name,
+		MemberAmount:     memberCount,
 		Status:           class.Status,
+		Favorite:         class.Favorite,
+		BannerID:         class.BannerID,
 	}
 
 	return &classResponse, nil
@@ -182,6 +214,8 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	newMember := model.Member{
 		UserID:  userID,
 		ClassID: classID,
+		JoinAt:  time.Now(),
+		Role:    "member",
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newMember).Error; err != nil {
@@ -209,6 +243,8 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 			Name:         user.Name,
 			Email:        user.Email,
 			Picture_path: user.PicturePath,
+			Role:         member.Role,
+			JoinAt:       member.JoinAt,
 		})
 	}
 
@@ -221,19 +257,53 @@ func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.Class
 		return nil, err
 	}
 
-	var classResponses []types.ClassResponse
+	classResponses := make([]types.ClassResponse, 0, len(classes))
+
 	for _, class := range classes {
+		var owner model.User
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+			return nil, err
+		}
+
+		var memberCount int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+			return nil, err
+		}
 		classResponses = append(classResponses, types.ClassResponse{
 			ID:               int(class.ID),
 			Topic:            class.Topic,
 			Description:      class.Description,
+			Code:             class.Code,
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
 			OwnerID:          int(class.OwnerId),
+			OwnerName:        owner.Name,
+			MemberAmount:     memberCount,
 			Status:           class.Status,
+			Favorite:         class.Favorite,
+			BannerID:         class.BannerID,
 		})
 	}
 
 	return &classResponses, nil
+}
+
+func (r *classRepository) ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error {
+	var member model.Member
+	err := r.db.WithContext(ctx).Where("user_id = ? AND class_id = ?", userID, classID).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+
+	member.Role = newRole
+
+	if err := r.db.WithContext(ctx).Save(&member).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

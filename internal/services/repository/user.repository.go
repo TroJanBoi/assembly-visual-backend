@@ -143,6 +143,7 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 	for _, class := range classes {
 		classResp = append(classResp, types.ClassMeResponse{
 			ID:          int(class.ID),
+			Code:        class.Code,
 			Topic:       class.Topic,
 			Description: class.Description,
 			OwnerID:     int(class.OwnerId),
@@ -164,6 +165,7 @@ func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]type
 			Topic:            class.Topic,
 			Description:      class.Description,
 			OwnerID:          int(class.OwnerId),
+			Code:             class.Code,
 			Status:           int(class.Status),
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,

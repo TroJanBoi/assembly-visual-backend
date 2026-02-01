@@ -147,6 +147,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Get all classrooms",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -184,6 +185,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Create a new class",
                 "parameters": [
                     {
                         "description": "Class info",
@@ -247,6 +249,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Get all public classrooms",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -281,6 +284,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Get class by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -333,6 +337,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Update an existing class",
                 "parameters": [
                     {
                         "type": "integer",
@@ -396,7 +401,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a classroom",
+                "description": "Delete a class\nDelete a classroom",
                 "consumes": [
                     "application/json"
                 ],
@@ -1636,6 +1641,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Join a classroom",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1643,6 +1649,75 @@ const docTemplate = `{
                         "name": "class_id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/classroom/{class_id}/member/permission": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change permission of a member in a class",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "classrooms"
+                ],
+                "summary": "Change permission of a member in a class",
+                "parameters": [
+                    {
+                        "description": "New role info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.NewRoleRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -1702,6 +1777,7 @@ const docTemplate = `{
                 "tags": [
                     "classrooms"
                 ],
+                "summary": "Get all members of a class by class ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3252,6 +3328,9 @@ const docTemplate = `{
         "types.ClassMeResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -3281,8 +3360,17 @@ const docTemplate = `{
         "types.ClassResponse": {
             "type": "object",
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
+                },
+                "favorite": {
+                    "type": "integer"
                 },
                 "google_course_id": {
                     "type": "string"
@@ -3296,8 +3384,14 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "member_amount": {
+                    "type": "integer"
+                },
                 "owner_id": {
                     "type": "integer"
+                },
+                "owner_name": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"
@@ -3346,6 +3440,9 @@ const docTemplate = `{
                 "topic"
             ],
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -3451,52 +3548,28 @@ const docTemplate = `{
                 },
                 "picture_path": {
                     "type": "string"
+                },
+                "role": {
+                    "type": "string"
                 }
             }
         },
-        "types.PlaygroundData": {
+        "types.NewRoleRequest": {
             "type": "object",
+            "required": [
+                "class_id",
+                "new_role",
+                "user_id"
+            ],
             "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.PlaygroundItem"
-                    }
-                },
-                "meta_data": {
-                    "$ref": "#/definitions/types.PlaygroundMetaData"
-                },
-                "ui": {
-                    "$ref": "#/definitions/types.PlaygroundUI"
-                }
-            }
-        },
-        "types.PlaygroundItem": {
-            "type": "object",
-            "properties": {
-                "id": {
+                "class_id": {
                     "type": "integer"
                 },
-                "instruction": {
+                "new_role": {
                     "type": "string"
                 },
-                "label": {
-                    "type": "string"
-                },
-                "next": {
+                "user_id": {
                     "type": "integer"
-                },
-                "next_false": {
-                    "type": "integer"
-                },
-                "next_true": {
-                    "type": "integer"
-                },
-                "operands": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.PlaygroundOperands"
-                    }
                 }
             }
         },
@@ -3511,47 +3584,10 @@ const docTemplate = `{
                 }
             }
         },
-        "types.PlaygroundMetaData": {
-            "type": "object",
-            "properties": {
-                "author_id": {
-                    "type": "integer"
-                },
-                "program_name": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.PlaygroundOperands": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.PlaygroundPosition": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "integer"
-                },
-                "y": {
-                    "type": "integer"
-                }
-            }
-        },
         "types.PlaygroundRequest": {
             "type": "object",
             "required": [
                 "assignment_id",
-                "attempt_no",
                 "item",
                 "status"
             ],
@@ -3559,32 +3595,13 @@ const docTemplate = `{
                 "assignment_id": {
                     "type": "integer"
                 },
-                "attempt_no": {
-                    "type": "integer"
-                },
                 "item": {
-                    "$ref": "#/definitions/types.PlaygroundData"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "status": {
                     "description": "e.g., \"in_progress\", \"completed\", \"failed\"",
                     "type": "string"
-                }
-            }
-        },
-        "types.PlaygroundUI": {
-            "type": "object",
-            "properties": {
-                "pan": {
-                    "$ref": "#/definitions/types.PlaygroundPosition"
-                },
-                "position": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/types.PlaygroundPosition"
-                    }
-                },
-                "zoom": {
-                    "type": "number"
                 }
             }
         },
@@ -3610,7 +3627,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "flags",
-                "halted",
                 "memory",
                 "register"
             ],
@@ -3623,6 +3639,12 @@ const docTemplate = `{
                 },
                 "halted": {
                     "type": "boolean"
+                },
+                "io_output": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "memory": {
                     "type": "object",
@@ -3646,10 +3668,20 @@ const docTemplate = `{
                 "register"
             ],
             "properties": {
+                "_meta": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "flags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "integer"
+                    }
+                },
+                "io_input": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
                     }
                 },
                 "memory": {
