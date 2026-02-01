@@ -20,6 +20,7 @@ type ClassRepository interface {
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
 	ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error
+	RemoveMemberInClass(ctx context.Context, classID, userID int) error
 }
 
 type classRepository struct {
@@ -302,6 +303,23 @@ func (r *classRepository) ChangePermissionMember(ctx context.Context, userID, cl
 	member.Role = newRole
 
 	if err := r.db.WithContext(ctx).Save(&member).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *classRepository) RemoveMemberInClass(ctx context.Context, classID, userID int) error {
+	var member model.Member
+	err := r.db.WithContext(ctx).Where("user_id = ? AND class_id = ?", userID, classID).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+
+	if err := r.db.WithContext(ctx).Delete(&member).Error; err != nil {
 		return err
 	}
 
