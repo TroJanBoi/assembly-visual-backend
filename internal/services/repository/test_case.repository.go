@@ -111,6 +111,7 @@ func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID
 
 	newTestCase := model.TestCase{
 		TestSuiteID: testSuiteID,
+		Name:        testCase.Name,
 		Init:        testCaseInit,
 		Assert:      testCaseAssert,
 	}

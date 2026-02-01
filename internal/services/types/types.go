@@ -238,16 +238,19 @@ type TestCaseResponse struct {
 }
 
 type TestCaseInit struct {
-	Memory   map[string]int `json:"memory" binding:"required"`
-	Register map[string]int `json:"register" binding:"required"`
-	Flags    map[string]int `json:"flags" binding:"required"`
+	Memory   map[string]int         `json:"memory" binding:"required"`
+	Register map[string]int         `json:"register" binding:"required"`
+	Flags    map[string]int         `json:"flags" binding:"required"`
+	IOInput  map[string]string      `json:"io_input,omitempty"`
+	Meta     map[string]interface{} `json:"_meta,omitempty"`
 }
 
 type TestCaseAssert struct {
-	Memory   map[string]int `json:"memory" binding:"required"`
-	Register map[string]int `json:"register" binding:"required"`
-	Flags    map[string]int `json:"flags" binding:"required"`
-	Halted   bool           `json:"halted" binding:"required"`
+	Memory   map[string]int    `json:"memory" binding:"required"`
+	Register map[string]int    `json:"register" binding:"required"`
+	Flags    map[string]int    `json:"flags" binding:"required"`
+	Halted   bool              `json:"halted"`
+	IOOutput map[string]string `json:"io_output,omitempty"`
 }
 
 type PlaygroundRequest struct {

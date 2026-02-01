@@ -111,7 +111,8 @@ func (c *TestCaseController) AddTestCase(ctx *gin.Context) {
 
 	var testCase types.TestCaseRequest
 	if err := ctx.ShouldBindJSON(&testCase); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		// ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body", "details": err.Error()})
 		return
 	}
 
