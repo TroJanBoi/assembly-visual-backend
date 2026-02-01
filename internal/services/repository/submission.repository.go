@@ -14,7 +14,7 @@ type SubmissionRepository interface {
 	CreateSubmission(ctx context.Context, userId int, request types.CreateSubmissionRequest) error
 	UpdateSubmission(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error
 	GetAllSubmissionByAssignmentID(ctx context.Context, ownerID, assignmentID int) (*[]types.SubmissionResponse, error)
-	GetSubmissionByID(ctx context.Context, submissionID int) (*types.SubmissionResponse, error)
+	GetSubmissionByID(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error)
 }
 
 type submissionRepository struct {
@@ -69,7 +69,14 @@ func (r *submissionRepository) CreateSubmission(ctx context.Context, userId int,
 
 func (r *submissionRepository) UpdateSubmission(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error {
 	var submission model.Submission
-	err := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", submissionID, userID).First(&submission).Error
+	err := r.db.WithContext(ctx).Where("id = ?", submissionID, userID).First(&submission).Error
+	if err != nil {
+		return err
+	}
+
+	// อนุญาตให้แก้ไขได้ทุกฟิลด์ เจ้าของ submission และ owner ของ assignment และ member ที่เป็น TA เท่านั้น
+	// Select * FROM classroom c JOIN assignment a ON a.class_id = c.id JOIN member m ON m.class_id = c.id WHERE a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?))
+	err = r.db.WithContext(ctx).Table("classroom c").Select("c.id, c.owner_id").Joins("JOIN assignment a ON a.class_id = c.id").Joins("JOIN member m ON m.class_id = c.id").Joins("JOIN submission s ON s.assignment_id = a.id").Where("a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?) OR s.user_id = ?)", submission.AssignmentID, userID, userID, "ta", userID).First(&model.Classroom{}).Error
 	if err != nil {
 		return err
 	}
@@ -105,8 +112,9 @@ func (r *submissionRepository) GetAllSubmissionByAssignmentID(ctx context.Contex
 		return nil, err
 	}
 
-	// Select * FROM classroom c JOIN assignment a ON a.class_id = c.id WHERE a.id = ? AND c.owner_id = ?
-	err = r.db.WithContext(ctx).Table("classroom c").Select("c.id, c.owner_id").Joins("JOIN assignment a ON a.class_id = c.id").Where("a.id = ? AND c.owner_id = ?", assignmentID, ownerID).First(&model.Classroom{}).Error
+	// อนุญาตให้แก้ไขได้ทุกฟิลด์ เจ้าของ submission และ owner ของ assignment และ member ที่เป็น TA เท่านั้น
+	// Select * FROM classroom c JOIN assignment a ON a.class_id = c.id JOIN member m ON m.class_id = c.id WHERE a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?))
+	err = r.db.WithContext(ctx).Table("classroom c").Select("c.id, c.owner_id").Joins("JOIN assignment a ON a.class_id = c.id").Joins("JOIN member m ON m.class_id = c.id").Where("a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?))", assignmentID, ownerID, ownerID, "ta").First(&model.Classroom{}).Error
 	if err != nil {
 		return nil, err
 	}
@@ -159,9 +167,16 @@ func (r *submissionRepository) GetAllSubmissionByAssignmentID(ctx context.Contex
 	return &submissionResponse, nil
 }
 
-func (r *submissionRepository) GetSubmissionByID(ctx context.Context, submissionID int) (*types.SubmissionResponse, error) {
+func (r *submissionRepository) GetSubmissionByID(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error) {
 	var submission model.Submission
 	err := r.db.WithContext(ctx).Where("id = ?", submissionID).First(&submission).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// อนุญาตให้แก้ไขได้ทุกฟิลด์ เจ้าของ submission และ owner ของ assignment และ member ที่เป็น TA เท่านั้น
+	// Select * FROM classroom c JOIN assignment a ON a.class_id = c.id JOIN member m ON m.class_id = c.id WHERE a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?))
+	err = r.db.WithContext(ctx).Table("classroom c").Select("c.id, c.owner_id").Joins("JOIN assignment a ON a.class_id = c.id").Joins("JOIN member m ON m.class_id = c.id").Joins("JOIN submission s ON s.assignment_id = a.id").Where("a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?) OR s.user_id = ?)", submission.AssignmentID, userID, userID, "ta", userID).First(&model.Classroom{}).Error
 	if err != nil {
 		return nil, err
 	}

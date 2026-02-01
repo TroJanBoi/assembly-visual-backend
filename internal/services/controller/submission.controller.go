@@ -78,12 +78,6 @@ func (c *SubmissionController) UpdateSubmission(ctx *gin.Context) {
 		return
 	}
 
-	var req types.UpdateSubmissionRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
 	userIDVal, exist := ctx.Get("user_id")
 	if !exist {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -93,6 +87,12 @@ func (c *SubmissionController) UpdateSubmission(ctx *gin.Context) {
 	userID, ok := userIDVal.(int)
 	if !ok {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	var req types.UpdateSubmissionRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -162,7 +162,19 @@ func (c *SubmissionController) GetSubmissionByID(ctx *gin.Context) {
 		return
 	}
 
-	submissionResponse, err := c.submissionUseCase.GetSubmissionByIDUseCase(ctx.Request.Context(), submissionID)
+	userIDVal, exist := ctx.Get("user_id")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	submissionResponse, err := c.submissionUseCase.GetSubmissionByIDUseCase(ctx.Request.Context(), userID, submissionID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
