@@ -71,6 +71,7 @@ func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, cl
 		testCaseResponses = append(testCaseResponses, types.TestCaseResponse{
 			ID:          int(tc.ID),
 			TestSuiteID: tc.TestSuiteID,
+			Name:        tc.Name,
 			Init:        initCondition,
 			Assert:      assertCondition,
 		})
@@ -275,6 +276,7 @@ func (r *testCaseRepository) GetTestCaseByID(ctx context.Context, classID int, a
 	testCaseResponse := &types.TestCaseResponse{
 		ID:          int(testCase.ID),
 		TestSuiteID: testCase.TestSuiteID,
+		Name:        testCase.Name,
 		Init:        testCaseInit,
 		Assert:      testCaseAssert,
 	}
