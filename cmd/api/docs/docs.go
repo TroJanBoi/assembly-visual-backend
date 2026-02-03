@@ -3119,7 +3119,7 @@ const docTemplate = `{
                 "tags": [
                     "Submission"
                 ],
-                "summary": "Get submission by assignment ID",
+                "summary": "Get all submission by assignment ID",
                 "parameters": [
                     {
                         "type": "integer",

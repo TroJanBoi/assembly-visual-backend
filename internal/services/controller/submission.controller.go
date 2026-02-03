@@ -105,7 +105,7 @@ func (c *SubmissionController) UpdateSubmission(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "submission updated successfully"})
 }
 
-// @Summary Get submission by assignment ID
+// @Summary Get all submission by assignment ID
 // @Description Retrieve a submission for a specific assignment by assignment ID
 // @Tags Submission
 // @Produce json

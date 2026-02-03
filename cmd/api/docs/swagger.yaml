@@ -2567,7 +2567,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Get submission by assignment ID
+      summary: Get all submission by assignment ID
       tags:
       - Submission
   /user:
