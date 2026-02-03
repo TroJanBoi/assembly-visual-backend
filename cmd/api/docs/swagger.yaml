@@ -2570,6 +2570,40 @@ paths:
       summary: Get all submission by assignment ID
       tags:
       - Submission
+  /submission/assignment/{assignment_id}/user:
+    get:
+      description: Retrieve all submissions for a specific assignment by assignment
+        ID and user ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all submission by assignment ID and user ID
+      tags:
+      - Submission
   /user:
     get:
       consumes:

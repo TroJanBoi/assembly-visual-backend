@@ -183,9 +183,49 @@ func (c *SubmissionController) GetSubmissionByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, submissionResponse)
 }
 
+// @Summary Get all submission by assignment ID and user ID
+// @Description Retrieve all submissions for a specific assignment by assignment ID and user ID
+// @Tags Submission
+// @Produce json
+// @Param assignment_id path int true "Assignment ID"
+// @Success 200 {object} types.SubmissionResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security     BearerAuth
+// @Router /submission/assignment/{assignment_id}/user [get]
+func (c *SubmissionController) GetAllSubmissionByAssignmentIDandUserID(ctx *gin.Context) {
+	assignmentIDStr := ctx.Param("assignment_id")
+	assignmentID, err := strconv.Atoi(assignmentIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid assignment ID"})
+		return
+	}
+
+	userIDVal, exist := ctx.Get("user_id")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	submissionResponse, err := c.submissionUseCase.GetAllSubmissionByAssignmentIDandUserIDUseCase(ctx.Request.Context(), assignmentID, userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, submissionResponse)
+}
+
 func (c *SubmissionController) SubmissionRoutes(r gin.IRoutes) {
 	r.POST("/", c.CreateSubmission)
 	r.PUT("/:submission_id", c.UpdateSubmission)
 	r.GET("/assignment/:assignment_id", c.GetAllSubmissionByAssignmentID)
 	r.GET("/:submission_id", c.GetSubmissionByID)
+	r.GET("/assignment/:assignment_id/user", c.GetAllSubmissionByAssignmentIDandUserID)
 }

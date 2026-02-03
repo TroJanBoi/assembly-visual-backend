@@ -15,6 +15,7 @@ type SubmissionRepository interface {
 	UpdateSubmission(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error
 	GetAllSubmissionByAssignmentID(ctx context.Context, ownerID, assignmentID int) (*[]types.SubmissionResponse, error)
 	GetSubmissionByID(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error)
+	GetAllSubmissionByAssignmentIDandUserID(ctx context.Context, assignmentID, userID int) (*[]types.SubmissionResponse, error)
 }
 
 type submissionRepository struct {
@@ -223,4 +224,65 @@ func (r *submissionRepository) GetSubmissionByID(ctx context.Context, userID, su
 		DurationMS:    submission.DurationMS,
 	}
 	return submissionResponse, nil
+}
+
+func (r *submissionRepository) GetAllSubmissionByAssignmentIDandUserID(ctx context.Context, assignmentID, userID int) (*[]types.SubmissionResponse, error) {
+	var user model.User
+	if err := r.db.WithContext(ctx).Where("id = ?", userID).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	var submission []model.Submission
+	err := r.db.WithContext(ctx).Where("assignment_id = ? AND user_id = ?", assignmentID, userID).Find(&submission).Error
+	if err != nil {
+		return nil, err
+	}
+
+	submissionResponse := make([]types.SubmissionResponse, 0, len(submission))
+
+	for _, sub := range submission {
+
+		var ItemSnapshot map[string]interface{}
+		if len(sub.ItemSnapshot) > 0 {
+			if err := json.Unmarshal(sub.ItemSnapshot, &ItemSnapshot); err != nil {
+				return nil, err
+			}
+		} else {
+			ItemSnapshot = map[string]interface{}{}
+		}
+
+		var ClientResult map[string]interface{}
+		if len(sub.ClientResult) > 0 {
+			if err := json.Unmarshal(sub.ClientResult, &ClientResult); err != nil {
+				return nil, err
+			}
+		} else {
+			ClientResult = map[string]interface{}{}
+		}
+
+		var ServerResult map[string]interface{}
+		if len(sub.ServerResult) > 0 {
+			if err := json.Unmarshal(sub.ServerResult, &ServerResult); err != nil {
+				return nil, err
+			}
+		} else {
+			ServerResult = map[string]interface{}{}
+		}
+
+		submissionResponse = append(submissionResponse, types.SubmissionResponse{
+			ID:            int(sub.ID),
+			AssignmentID:  sub.AssignmentID,
+			UserID:        sub.UserID,
+			PlaygroundID:  sub.PlaygroundID,
+			AttemptNumber: sub.AttemptNumber,
+			ItemSnapshot:  ItemSnapshot,
+			ClientResult:  ClientResult,
+			ServerResult:  ServerResult,
+			Score:         sub.Score,
+			Status:        sub.Status,
+			IsVerified:    sub.IsVerified,
+			DurationMS:    sub.DurationMS,
+		})
+	}
+	return &submissionResponse, nil
 }

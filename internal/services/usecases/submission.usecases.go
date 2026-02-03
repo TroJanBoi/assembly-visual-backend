@@ -12,6 +12,7 @@ type SubmissionUseCase interface {
 	UpdateSubmissionUseCase(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error
 	GetAllSubmissionByAssignmentIDUseCase(ctx context.Context, ownerID, assignmentID int) (*[]types.SubmissionResponse, error)
 	GetSubmissionByIDUseCase(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error)
+	GetAllSubmissionByAssignmentIDandUserIDUseCase(ctx context.Context, assignmentID, userID int) (*[]types.SubmissionResponse, error)
 }
 
 type submissionUseCase struct {
@@ -48,6 +49,14 @@ func (uc *submissionUseCase) GetAllSubmissionByAssignmentIDUseCase(ctx context.C
 
 func (uc *submissionUseCase) GetSubmissionByIDUseCase(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error) {
 	resp, err := uc.submissionRepo.GetSubmissionByID(ctx, userID, submissionID)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (uc *submissionUseCase) GetAllSubmissionByAssignmentIDandUserIDUseCase(ctx context.Context, assignmentID, userID int) (*[]types.SubmissionResponse, error) {
+	resp, err := uc.submissionRepo.GetAllSubmissionByAssignmentIDandUserID(ctx, assignmentID, userID)
 	if err != nil {
 		return nil, err
 	}
