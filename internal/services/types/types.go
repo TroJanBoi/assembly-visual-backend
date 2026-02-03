@@ -92,6 +92,7 @@ type CreateClassRequest struct {
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	BannerID         int    `json:"banner_id"`
+	Code             string `json:"code"`
 	Status           int    `json:"status"` // public or private
 }
 

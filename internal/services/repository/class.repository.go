@@ -86,6 +86,7 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		OwnerId:          owner,
 		BannerID:         class.BannerID,
 		Status:           class.Status,
+		Code:             class.Code,
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newClass).Error; err != nil {
