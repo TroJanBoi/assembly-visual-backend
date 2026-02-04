@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"math/big"
 	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
@@ -29,6 +31,23 @@ type classRepository struct {
 
 func NewClassRepository(db *gorm.DB) ClassRepository {
 	return &classRepository{db: db}
+}
+
+func generateClassCode() (string, error) {
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	codeLength := 8
+
+	b := make([]byte, codeLength)
+	max := big.NewInt(int64(len(letters)))
+
+	for i := 0; i < codeLength; i++ {
+		n, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", err
+		}
+		b[i] = letters[n.Int64()]
+	}
+	return string(b), nil
 }
 
 func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResponse, error) {
@@ -78,6 +97,11 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		return err
 	}
 
+	code, err := generateClassCode()
+	if err != nil {
+		return err
+	}
+
 	newClass := model.Classroom{
 		Topic:            class.Topic,
 		Description:      class.Description,
@@ -86,7 +110,7 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		OwnerId:          owner,
 		BannerID:         class.BannerID,
 		Status:           class.Status,
-		Code:             class.Code,
+		Code:             code,
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newClass).Error; err != nil {
