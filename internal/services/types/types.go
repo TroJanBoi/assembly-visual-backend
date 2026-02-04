@@ -190,21 +190,25 @@ type EditAssignmentRequest struct {
 }
 
 type MemberResponse struct {
-	ID           int       `json:"id"`
-	Name         string    `json:"name"`
-	Email        string    `json:"email"`
-	Picture_path string    `json:"picture_path"`
-	Role         string    `json:"role"`
-	JoinAt       time.Time `json:"join_at"`
+	ID          int       `json:"id"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	PicturePath string    `json:"picture_path"`
+	Role        string    `json:"role"`
+	JoinAt      time.Time `json:"join_at"`
 }
 
 type ClassMeResponse struct {
 	ID               int    `json:"id"`
+	OwnerID          int    `json:"owner_id"`
+	OwnerName        string `json:"owner_name"`
+	MemberAmount     int64  `json:"member_amount"`
+	Code             string `json:"code"`
 	Topic            string `json:"topic"`
 	Description      string `json:"description"`
-	Code             string `json:"code"`
-	OwnerID          int    `json:"owner_id"`
 	Status           int    `json:"status"`
+	Favorite         int    `json:"favorite"`
+	BannerID         int    `json:"banner_id"`
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	GoogleSyncedAt   string `json:"google_synced_at"`

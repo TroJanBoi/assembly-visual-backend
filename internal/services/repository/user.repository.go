@@ -139,14 +139,33 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
 	}
 
+	var user model.User
+
 	var classResp []types.ClassMeResponse
 	for _, class := range classes {
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&user).Error; err != nil {
+			return nil, fmt.Errorf("failed to retrieve user: %w", err)
+		}
+
+		var countMember int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&countMember).Error; err != nil {
+			return nil, fmt.Errorf("failed to count members: %w", err)
+		}
+
 		classResp = append(classResp, types.ClassMeResponse{
-			ID:          int(class.ID),
-			Code:        class.Code,
-			Topic:       class.Topic,
-			Description: class.Description,
-			OwnerID:     int(class.OwnerId),
+			ID:               int(class.ID),
+			Code:             class.Code,
+			Topic:            class.Topic,
+			Description:      class.Description,
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        user.Name,
+			Status:           int(class.Status),
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
+			Favorite:         int(class.Favorite),
+			BannerID:         int(class.BannerID),
+			MemberAmount:     countMember,
 		})
 	}
 	return &classResp, nil
@@ -158,18 +177,34 @@ func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]type
 		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
 	}
 
+	var user model.User
+
 	var classResp []types.ClassMeResponse
 	for _, class := range classes {
+
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&user).Error; err != nil {
+			return nil, fmt.Errorf("failed to retrieve user: %w", err)
+		}
+
+		var countMember int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&countMember).Error; err != nil {
+			return nil, fmt.Errorf("failed to count members: %w", err)
+		}
+
 		classResp = append(classResp, types.ClassMeResponse{
 			ID:               int(class.ID),
+			Code:             class.Code,
 			Topic:            class.Topic,
 			Description:      class.Description,
 			OwnerID:          int(class.OwnerId),
-			Code:             class.Code,
+			OwnerName:        user.Name,
 			Status:           int(class.Status),
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
+			Favorite:         int(class.Favorite),
+			BannerID:         int(class.BannerID),
+			MemberAmount:     countMember,
 		})
 	}
 	return &classResp, nil

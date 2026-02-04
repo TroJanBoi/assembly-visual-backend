@@ -265,12 +265,12 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 		}
 
 		memberResponses = append(memberResponses, types.MemberResponse{
-			ID:           int(user.ID),
-			Name:         user.Name,
-			Email:        user.Email,
-			Picture_path: user.PicturePath,
-			Role:         member.Role,
-			JoinAt:       member.JoinAt,
+			ID:          int(user.ID),
+			Name:        user.Name,
+			Email:       user.Email,
+			PicturePath: user.PicturePath,
+			Role:        member.Role,
+			JoinAt:      member.JoinAt,
 		})
 	}
 
