@@ -12,7 +12,7 @@ import (
 
 type TestCaseRepository interface {
 	GetAllTestCaseByTestSuiteID(ctx context.Context, classID int, assignmentID int, testSuiteID int) (*[]types.TestCaseResponse, error)
-	AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error
+	AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error)
 	UpdateTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error
 	DeleteTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int) error
 	GetTestCaseByID(ctx context.Context, classID int, assignmentID int, testSuiteID int, testCaseID int) (*types.TestCaseResponse, error)
@@ -27,7 +27,7 @@ func NewTestCaseRepository(db *gorm.DB) TestCaseRepository {
 }
 
 func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, classID int, assignmentID int, testSuiteID int) (*[]types.TestCaseResponse, error) {
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
@@ -43,7 +43,7 @@ func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, cl
 		return nil, err
 	}
 
-	var testSuites model.TestSuites
+	var testSuites model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&testSuites).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
@@ -71,6 +71,7 @@ func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, cl
 		testCaseResponses = append(testCaseResponses, types.TestCaseResponse{
 			ID:          int(tc.ID),
 			TestSuiteID: tc.TestSuiteID,
+			Name:        tc.Name,
 			Init:        initCondition,
 			Assert:      assertCondition,
 		})
@@ -78,32 +79,30 @@ func (r *testCaseRepository) GetAllTestCaseByTestSuiteID(ctx context.Context, cl
 	return &testCaseResponses, nil
 }
 
-func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) error {
-	// Check if user exists
+func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCase types.TestCaseRequest) (int, error) {
+
 	var usr model.User
 	if err := r.db.WithContext(ctx).Where("id = ?", owner).First(&usr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	// Check if class exists and is owned by the user
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	// Check if assignment exists and is owned by the user
 	var assignment model.Assignment
 	if err := r.db.WithContext(ctx).Where("id = ? AND class_id = ?", assignmentID, classID).First(&assignment).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
 	testCaseInit, _ := json.Marshal(testCase.Init)
@@ -111,15 +110,16 @@ func (r *testCaseRepository) AddTestCase(ctx context.Context, owner int, classID
 
 	newTestCase := model.TestCase{
 		TestSuiteID: testSuiteID,
+		Name:        testCase.Name,
 		Init:        testCaseInit,
 		Assert:      testCaseAssert,
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newTestCase).Error; err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return int(newTestCase.ID), nil
 }
 
 func (r *testCaseRepository) UpdateTestCase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testCaseID int, testCase types.TestCaseRequest) error {
@@ -131,8 +131,8 @@ func (r *testCaseRepository) UpdateTestCase(ctx context.Context, owner int, clas
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -147,7 +147,7 @@ func (r *testCaseRepository) UpdateTestCase(ctx context.Context, owner int, clas
 		return err
 	}
 
-	var testSuite model.TestSuites
+	var testSuite model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&testSuite).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
@@ -189,8 +189,8 @@ func (r *testCaseRepository) DeleteTestCase(ctx context.Context, owner int, clas
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -205,7 +205,7 @@ func (r *testCaseRepository) DeleteTestCase(ctx context.Context, owner int, clas
 		return err
 	}
 
-	var testSuite model.TestSuites
+	var testSuite model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&testSuite).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
@@ -229,7 +229,7 @@ func (r *testCaseRepository) DeleteTestCase(ctx context.Context, owner int, clas
 }
 
 func (r *testCaseRepository) GetTestCaseByID(ctx context.Context, classID int, assignmentID int, testSuiteID int, testCaseID int) (*types.TestCaseResponse, error) {
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
@@ -245,7 +245,7 @@ func (r *testCaseRepository) GetTestCaseByID(ctx context.Context, classID int, a
 		return nil, err
 	}
 
-	var testSuites model.TestSuites
+	var testSuites model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&testSuites).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
@@ -274,6 +274,7 @@ func (r *testCaseRepository) GetTestCaseByID(ctx context.Context, classID int, a
 	testCaseResponse := &types.TestCaseResponse{
 		ID:          int(testCase.ID),
 		TestSuiteID: testCase.TestSuiteID,
+		Name:        testCase.Name,
 		Init:        testCaseInit,
 		Assert:      testCaseAssert,
 	}

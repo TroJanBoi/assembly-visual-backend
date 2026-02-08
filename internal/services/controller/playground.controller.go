@@ -29,7 +29,7 @@ func NewPlaygroundController(playgroundUsecase usecases.PlaygroundUsecase) *Play
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /playgrounds [post]
+// @Router       /playground [post]
 func (p *PlaygroundController) CreatePlayground(ctx *gin.Context) {
 	var playgroundRequest types.PlaygroundRequest
 	if err := ctx.ShouldBindJSON(&playgroundRequest); err != nil {
@@ -66,7 +66,7 @@ func (p *PlaygroundController) CreatePlayground(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /playgrounds/{id} [get]
+// @Router       /playground/{id} [get]
 func (p *PlaygroundController) GetPlaygroundByID(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -104,7 +104,7 @@ func (p *PlaygroundController) GetPlaygroundByID(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /playgrounds/me [post]
+// @Router       /playground/me [post]
 func (p *PlaygroundController) GetPlaygroundByMe(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -141,7 +141,7 @@ func (p *PlaygroundController) GetPlaygroundByMe(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /playgrounds/me [put]
+// @Router       /playground/me [put]
 func (p *PlaygroundController) UpdatePlaygroundByMe(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -178,7 +178,7 @@ func (p *PlaygroundController) UpdatePlaygroundByMe(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /playgrounds/me [delete]
+// @Router       /playground/me [delete]
 func (p *PlaygroundController) DeletePlaygroundByMe(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {

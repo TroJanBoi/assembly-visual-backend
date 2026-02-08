@@ -100,7 +100,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.SignInRequest"
+                            "$ref": "#/definitions/types.SignUpRequest"
                         }
                     }
                 ],
@@ -135,14 +135,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/cats": {
+        "/classroom": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Retrieve all cat information from the system",
+                "description": "Retrieve all classrooms",
                 "consumes": [
                     "application/json"
                 ],
@@ -150,43 +145,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "cats"
+                    "classrooms"
                 ],
-                "summary": "Get all cats",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/types.CatResponse"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/classes": {
-            "get": {
-                "description": "Retrieve all classes",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "classes"
-                ],
+                "summary": "Get all classrooms",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -222,8 +183,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Create a new class",
                 "parameters": [
                     {
                         "description": "Class info",
@@ -275,9 +237,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/public": {
-            "get": {
-                "description": "Retrieve all public classes",
+        "/classroom/member": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Remove a member from a class",
                 "consumes": [
                     "application/json"
                 ],
@@ -285,8 +252,73 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Remove a member from a class",
+                "parameters": [
+                    {
+                        "description": "Remove member info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.RemoveMemberRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/classroom/public": {
+            "get": {
+                "description": "Retrieve all public classrooms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "classrooms"
+                ],
+                "summary": "Get all public classrooms",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -309,7 +341,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}": {
+        "/classroom/{class_id}": {
             "get": {
                 "description": "Retrieve a class by ID",
                 "consumes": [
@@ -319,8 +351,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Get class by ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -371,8 +404,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Update an existing class",
                 "parameters": [
                     {
                         "type": "integer",
@@ -436,7 +470,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a class",
+                "description": "Delete a class\nDelete a classroom",
                 "consumes": [
                     "application/json"
                 ],
@@ -444,7 +478,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
                 "parameters": [
                     {
@@ -495,7 +529,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments": {
+        "/classroom/{class_id}/assignment": {
             "get": {
                 "description": "Retrieve assignments by class ID",
                 "consumes": [
@@ -611,7 +645,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments/{assignment_id}": {
+        "/classroom/{class_id}/assignment/{assignment_id}": {
             "get": {
                 "description": "Retrieve an assignment by assignment ID",
                 "consumes": [
@@ -800,7 +834,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments/{assignment_id}/test-suites": {
+        "/classroom/{class_id}/assignment/{assignment_id}/test-suite": {
             "get": {
                 "security": [
                     {
@@ -935,7 +969,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}": {
+        "/classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}": {
             "get": {
                 "security": [
                     {
@@ -1150,7 +1184,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases": {
+        "/classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case": {
             "get": {
                 "security": [
                     {
@@ -1299,7 +1333,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases/{test_id}": {
+        "/classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case/{test_id}": {
             "get": {
                 "security": [
                     {
@@ -1535,7 +1569,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/invitations": {
+        "/classroom/{class_id}/invitation": {
             "get": {
                 "security": [
                     {
@@ -1594,7 +1628,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/invitations/send": {
+        "/classroom/{class_id}/invitation/send": {
             "post": {
                 "security": [
                     {
@@ -1659,14 +1693,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/join": {
+        "/classroom/{class_id}/join": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Join a class",
+                "description": "Join a classroom",
                 "consumes": [
                     "application/json"
                 ],
@@ -1674,8 +1708,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Join a classroom",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1725,7 +1760,76 @@ const docTemplate = `{
                 }
             }
         },
-        "/classes/{class_id}/members": {
+        "/classroom/{class_id}/member/permission": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Change permission of a member in a class",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "classrooms"
+                ],
+                "summary": "Change permission of a member in a class",
+                "parameters": [
+                    {
+                        "description": "New role info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.NewRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/classroom/{class_id}/members": {
             "get": {
                 "security": [
                     {
@@ -1740,8 +1844,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "classes"
+                    "classrooms"
                 ],
+                "summary": "Get all members of a class by class ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1782,7 +1887,174 @@ const docTemplate = `{
                 }
             }
         },
-        "/invitations/me": {
+        "/google/classroom/courses": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of Google Classroom courses for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google-service"
+                ],
+                "summary": "List Google Classroom Courses",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/google/classroom/courses/{course_id}/confirm": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Confirm the connection to a Google Classroom course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google-service"
+                ],
+                "summary": "Confirm Google Classroom Connection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "course_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/google/classroom/courses/{course_id}/courseWork": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of Google Classroom course work for a specific course",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "google-service"
+                ],
+                "summary": "Assigment Google Classroom CourseWork",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Course ID",
+                        "name": "course_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/invitation/me": {
             "get": {
                 "security": [
                     {
@@ -1832,7 +2104,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/invitations/{invitation_id}/accept": {
+        "/invitation/{invitation_id}/accept": {
             "post": {
                 "security": [
                     {
@@ -1890,7 +2162,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/invitations/{invitation_id}/decline": {
+        "/invitation/{invitation_id}/decline": {
             "post": {
                 "security": [
                     {
@@ -1991,232 +2263,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/operations/add": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Add a list of numbers and return the result",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "operations"
-                ],
-                "summary": "Add numbers",
-                "parameters": [
-                    {
-                        "description": "List of numbers to add",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/operations/div": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Divide a list of numbers and return the result",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "operations"
-                ],
-                "summary": "Divide numbers",
-                "parameters": [
-                    {
-                        "description": "List of numbers to divide",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/operations/mul": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Multiply a list of numbers and return the result",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "operations"
-                ],
-                "summary": "Multiply numbers",
-                "parameters": [
-                    {
-                        "description": "List of numbers to multiply",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/operations/sub": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Subtract a list of numbers and return the result",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "operations"
-                ],
-                "summary": "Subtract numbers",
-                "parameters": [
-                    {
-                        "description": "List of numbers to subtract",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/types.OperationResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/playgrounds": {
+        "/playground": {
             "post": {
                 "security": [
                     {
@@ -2273,7 +2320,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/playgrounds/me": {
+        "/playground/me": {
             "put": {
                 "security": [
                     {
@@ -2442,7 +2489,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/playgrounds/{id}": {
+        "/playground/{id}": {
             "get": {
                 "security": [
                     {
@@ -2464,62 +2511,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Playground ID",
                         "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/playgrounds/{playground_id}/execute": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Execute the code in a playground",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "executions"
-                ],
-                "summary": "Execute Playground",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Playground ID",
-                        "name": "playground_id",
                         "in": "path",
                         "required": true
                     }
@@ -3054,9 +3045,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/systems/hlt": {
-            "get": {
-                "description": "Check if system is halted",
+        "/submission": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new submission for an assignment",
                 "consumes": [
                     "application/json"
                 ],
@@ -3064,15 +3060,36 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "systems"
+                    "Submission"
+                ],
+                "summary": "Create a new submission",
+                "parameters": [
+                    {
+                        "description": "Submission Data",
+                        "name": "submission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateSubmissionRequest"
+                        }
+                    }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "boolean"
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     },
@@ -3088,24 +3105,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/systems/labels": {
-            "post": {
-                "description": "Retrieve system labels",
-                "consumes": [
-                    "application/json"
+        "/submission/assignment/{assignment_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
                 ],
+                "description": "Retrieve a submission for a specific assignment by assignment ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "systems"
+                    "Submission"
                 ],
+                "summary": "Get all submission by assignment ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Label Filter",
-                        "name": "label",
-                        "in": "query",
+                        "type": "integer",
+                        "description": "Assignment ID",
+                        "name": "assignment_id",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -3113,6 +3133,12 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/types.SubmissionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string"
@@ -3131,9 +3157,116 @@ const docTemplate = `{
                 }
             }
         },
-        "/systems/nop": {
+        "/submission/assignment/{assignment_id}/user": {
             "get": {
-                "description": "Perform NOP operation",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all submissions for a specific assignment by assignment ID and user ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submission"
+                ],
+                "summary": "Get all submission by assignment ID and user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Assignment ID",
+                        "name": "assignment_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.SubmissionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/submission/{submission_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a submission by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submission"
+                ],
+                "summary": "Get submission by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "submission_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.SubmissionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update an existing submission by its ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -3141,7 +3274,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "systems"
+                    "Submission"
+                ],
+                "summary": "Update an existing submission",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "submission_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Submission Data",
+                        "name": "submission",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateSubmissionRequest"
+                        }
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -3153,6 +3305,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -3165,7 +3326,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/user": {
             "get": {
                 "security": [
                     {
@@ -3263,7 +3424,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/me/classes": {
+        "/user/me/classroom": {
             "get": {
                 "security": [
                     {
@@ -3303,7 +3464,47 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{id}": {
+        "/user/owner/classroom": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve classes owned by the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get owner classes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ClassMeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
             "put": {
                 "security": [
                     {
@@ -3428,50 +3629,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "types.AllowedInstructions": {
-            "type": "object",
-            "properties": {
-                "arithmetic": {
-                    "description": "ADD, SUB, INC, DEC, MUL, DIV",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "comparison_and_conditional": {
-                    "description": "CMP, JMP, JC, JNZ, JZ, JNC",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "data_movement": {
-                    "description": "LOAD, STORE, MOV",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                },
-                "system": {
-                    "description": "LABEL, NOP, HLT",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "types.AssignmentCondition": {
-            "type": "object",
-            "properties": {
-                "allowed_instructions": {
-                    "$ref": "#/definitions/types.AllowedInstructions"
-                },
-                "execution_constraints": {
-                    "$ref": "#/definitions/types.ExecutionConstraints"
-                }
-            }
-        },
         "types.AssignmentResponse": {
             "type": "object",
             "properties": {
@@ -3479,7 +3636,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
                     "type": "string"
@@ -3498,34 +3656,10 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "settings": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.AssignmentSettings": {
-            "type": "object",
-            "properties": {
-                "fe_behavior": {
-                    "$ref": "#/definitions/types.FEBehavior"
-                },
-                "grade_policy": {
-                    "$ref": "#/definitions/types.GradePolicy"
-                },
-                "test_case_policy": {
-                    "$ref": "#/definitions/types.TestCasePolicy"
-                }
-            }
-        },
-        "types.CatResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
                     "type": "string"
                 }
             }
@@ -3544,16 +3678,28 @@ const docTemplate = `{
         "types.ClassMeResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
-                "fav_score": {
-                    "type": "integer"
+                "google_course_id": {
+                    "type": "string"
+                },
+                "google_course_link": {
+                    "type": "string"
+                },
+                "google_synced_at": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "owner": {
+                "owner_id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "integer"
                 },
                 "topic": {
@@ -3564,10 +3710,16 @@ const docTemplate = `{
         "types.ClassResponse": {
             "type": "object",
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
-                "fav_score": {
+                "favorite": {
                     "type": "integer"
                 },
                 "google_course_id": {
@@ -3582,8 +3734,14 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "owner": {
+                "member_amount": {
                     "type": "integer"
+                },
+                "owner_id": {
+                    "type": "integer"
+                },
+                "owner_name": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "integer"
@@ -3596,14 +3754,17 @@ const docTemplate = `{
         "types.CreateAssignmentRequest": {
             "type": "object",
             "required": [
-                "description",
                 "title"
             ],
             "properties": {
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
+                    "type": "string"
+                },
+                "due_date": {
                     "type": "string"
                 },
                 "grade": {
@@ -3614,7 +3775,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "settings": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
                     "type": "string"
@@ -3628,6 +3790,9 @@ const docTemplate = `{
                 "topic"
             ],
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -3646,6 +3811,44 @@ const docTemplate = `{
                 }
             }
         },
+        "types.CreateSubmissionRequest": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                },
+                "attempt_no": {
+                    "type": "integer"
+                },
+                "client_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "duration_ms": {
+                    "type": "integer"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "item_snapshot": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "playground_id": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "server_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "types.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -3660,9 +3863,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
                 }
             }
         },
@@ -3670,7 +3870,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "condition": {
-                    "$ref": "#/definitions/types.AssignmentCondition"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "description": {
                     "type": "string"
@@ -3682,8 +3883,10 @@ const docTemplate = `{
                 "max_attempt": {
                     "type": "integer"
                 },
-                "settings": {
-                    "$ref": "#/definitions/types.AssignmentSettings"
+                "setting": {
+                    "description": "Setting     AssignmentSettings  ` + "`" + `json:\"settings\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "title": {
                     "type": "string"
@@ -3699,58 +3902,8 @@ const docTemplate = `{
                 "picture_path": {
                     "type": "string"
                 },
-                "tel": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "types.ExecutionConstraints": {
-            "type": "object",
-            "properties": {
-                "initial_state": {
-                    "$ref": "#/definitions/types.InitialState"
-                },
-                "memory_node": {
-                    "type": "integer"
-                },
-                "register_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "types.FEBehavior": {
-            "type": "object",
-            "properties": {
-                "allow_resubmit_after_due": {
-                    "type": "boolean"
-                },
-                "lock_after_submit": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "types.GradePolicy": {
-            "type": "object",
-            "properties": {
-                "mode": {
-                    "type": "string"
-                },
-                "weight": {
-                    "$ref": "#/definitions/types.WeightPolicy"
-                }
-            }
-        },
-        "types.InitialState": {
-            "type": "object",
-            "properties": {
-                "memory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.Memory"
-                    }
                 }
             }
         },
@@ -3778,82 +3931,36 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "join_at": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "picture_path": {
                     "type": "string"
+                },
+                "role": {
+                    "type": "string"
                 }
             }
         },
-        "types.Memory": {
+        "types.NewRoleRequest": {
             "type": "object",
+            "required": [
+                "class_id",
+                "new_role",
+                "user_id"
+            ],
             "properties": {
-                "address": {
+                "class_id": {
                     "type": "integer"
                 },
-                "value": {
-                    "type": "integer"
-                }
-            }
-        },
-        "types.OperationResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
+                "new_role": {
                     "type": "string"
                 },
-                "status_code": {
+                "user_id": {
                     "type": "integer"
-                },
-                "value": {
-                    "type": "number"
-                }
-            }
-        },
-        "types.PlaygroundData": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.PlaygroundItem"
-                    }
-                },
-                "meta_data": {
-                    "$ref": "#/definitions/types.PlaygroundMetaData"
-                },
-                "ui": {
-                    "$ref": "#/definitions/types.PlaygroundUI"
-                }
-            }
-        },
-        "types.PlaygroundItem": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "instruction": {
-                    "type": "string"
-                },
-                "label": {
-                    "type": "string"
-                },
-                "next": {
-                    "type": "integer"
-                },
-                "next_false": {
-                    "type": "integer"
-                },
-                "next_true": {
-                    "type": "integer"
-                },
-                "operands": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.PlaygroundOperands"
-                    }
                 }
             }
         },
@@ -3868,47 +3975,10 @@ const docTemplate = `{
                 }
             }
         },
-        "types.PlaygroundMetaData": {
-            "type": "object",
-            "properties": {
-                "author_id": {
-                    "type": "integer"
-                },
-                "program_name": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.PlaygroundOperands": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.PlaygroundPosition": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "integer"
-                },
-                "y": {
-                    "type": "integer"
-                }
-            }
-        },
         "types.PlaygroundRequest": {
             "type": "object",
             "required": [
                 "assignment_id",
-                "attempt_no",
                 "item",
                 "status"
             ],
@@ -3916,11 +3986,9 @@ const docTemplate = `{
                 "assignment_id": {
                     "type": "integer"
                 },
-                "attempt_no": {
-                    "type": "integer"
-                },
                 "item": {
-                    "$ref": "#/definitions/types.PlaygroundData"
+                    "type": "object",
+                    "additionalProperties": true
                 },
                 "status": {
                     "description": "e.g., \"in_progress\", \"completed\", \"failed\"",
@@ -3928,24 +3996,22 @@ const docTemplate = `{
                 }
             }
         },
-        "types.PlaygroundUI": {
+        "types.RemoveMemberRequest": {
             "type": "object",
+            "required": [
+                "class_id",
+                "user_id"
+            ],
             "properties": {
-                "pan": {
-                    "$ref": "#/definitions/types.PlaygroundPosition"
+                "class_id": {
+                    "type": "integer"
                 },
-                "position": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/types.PlaygroundPosition"
-                    }
-                },
-                "zoom": {
-                    "type": "number"
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
-        "types.SignInRequest": {
+        "types.SignUpRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -3960,9 +4026,56 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "types.SubmissionResponse": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
                 },
-                "tel": {
+                "attempt_no": {
+                    "type": "integer"
+                },
+                "client_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "created_at": {
                     "type": "string"
+                },
+                "duration_ms": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "item_snapshot": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "playground_id": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "server_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -3970,7 +4083,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "flags",
-                "halted",
                 "memory",
                 "register"
             ],
@@ -3983,6 +4095,12 @@ const docTemplate = `{
                 },
                 "halted": {
                     "type": "boolean"
+                },
+                "io_output": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "memory": {
                     "type": "object",
@@ -4006,10 +4124,20 @@ const docTemplate = `{
                 "register"
             ],
             "properties": {
+                "_meta": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
                 "flags": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "integer"
+                    }
+                },
+                "io_input": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
                     }
                 },
                 "memory": {
@@ -4023,14 +4151,6 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "integer"
                     }
-                }
-            }
-        },
-        "types.TestCasePolicy": {
-            "type": "object",
-            "properties": {
-                "visible_to_student": {
-                    "type": "boolean"
                 }
             }
         },
@@ -4122,6 +4242,44 @@ const docTemplate = `{
                 }
             }
         },
+        "types.UpdateSubmissionRequest": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                },
+                "attempt_no": {
+                    "type": "integer"
+                },
+                "client_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "duration_ms": {
+                    "type": "integer"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "item_snapshot": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "playground_id": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "server_result": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "types.UpdateUserRequest": {
             "type": "object",
             "properties": {
@@ -4129,9 +4287,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "tel": {
                     "type": "string"
                 }
             }
@@ -4148,25 +4303,11 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "password": {
+                "password_hash": {
                     "type": "string"
                 },
                 "picture_path": {
                     "type": "string"
-                },
-                "tel": {
-                    "type": "string"
-                }
-            }
-        },
-        "types.WeightPolicy": {
-            "type": "object",
-            "properties": {
-                "number_of_node_used": {
-                    "type": "number"
-                },
-                "test_case": {
-                    "type": "number"
                 }
             }
         }

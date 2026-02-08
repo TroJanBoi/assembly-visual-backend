@@ -19,8 +19,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var userInfo types.OAuthRequest
-
 type OAuthRepository interface {
 	HandleOAuth(ctx context.Context, code string) (string, error)
 	RefreshGoogleToken(ctx context.Context, userID int) (string, error)
@@ -42,6 +40,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 
 	client := conf.GetGoogleOAuthConfig().Client(ctx, token)
 	response, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	// response, err := client.Get("https://openidconnect.googleapis.com/v1/userinfo")
 	if err != nil {
 		return "", fmt.Errorf("failed to get user info: %w", err)
 	}
@@ -52,6 +51,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	var userInfo types.OAuthRequest
 	if err := json.Unmarshal(body, &userInfo); err != nil {
 		return "", fmt.Errorf("failed to unmarshal user info: %w", err)
 	}
@@ -61,10 +61,10 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	if err := db.Where("email = ?", userInfo.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			user = model.User{
-				Email:    userInfo.Email,
-				Password: userInfo.Password,
-				Name:     userInfo.Name,
-				Picture_path: userInfo.Picture,
+				Email:        userInfo.Email,
+				PasswordHash: "",
+				Name:         userInfo.Name,
+				PicturePath:  userInfo.Picture,
 			}
 			if err := db.Create(&user).Error; err != nil {
 				return "", fmt.Errorf("failed to create user: %w", err)
@@ -75,15 +75,15 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	}
 
 	var googleAcc model.GoogleAccount
-	if err := db.Where("email = ?", userInfo.Email).First(&googleAcc).Error; err != nil {
+	if err := db.Where("user_id = ?", user.ID).First(&googleAcc).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			googleAcc = model.GoogleAccount{
-				Email:        userInfo.Email,
 				GoogleUserID: userInfo.ID,
 				AccessToken:  token.AccessToken,
 				RefreshToken: token.RefreshToken,
 				UserID:       int(user.ID),
-				Expired:      token.Expiry,
+				ExpiredAt:    token.Expiry,
+				CreatedAt:    time.Now(),
 			}
 			if err := db.Create(&googleAcc).Error; err != nil {
 				return "", fmt.Errorf("failed to create google account: %w", err)
@@ -94,6 +94,7 @@ func (o *oauthRepository) HandleOAuth(ctx context.Context, code string) (string,
 	} else {
 		googleAcc.AccessToken = token.AccessToken
 		googleAcc.RefreshToken = token.RefreshToken
+		googleAcc.ExpiredAt = token.Expiry
 		if err := db.Save(&googleAcc).Error; err != nil {
 			return "", fmt.Errorf("failed to update google account: %w", err)
 		}
@@ -113,7 +114,7 @@ func (o *oauthRepository) RefreshGoogleToken(ctx context.Context, userID int) (s
 		return "", err
 	}
 
-	if gAcc.Expired.After(time.Now()) {
+	if gAcc.ExpiredAt.After(time.Now()) {
 		return gAcc.AccessToken, nil
 	}
 
@@ -125,7 +126,10 @@ func (o *oauthRepository) RefreshGoogleToken(ctx context.Context, userID int) (s
 	}
 
 	gAcc.AccessToken = newToken.AccessToken
-	gAcc.Expired = newToken.Expiry
+	if newToken.RefreshToken != "" {
+		gAcc.RefreshToken = newToken.RefreshToken
+	}
+	gAcc.ExpiredAt = newToken.Expiry
 	if err := db.Save(&gAcc).Error; err != nil {
 		return "", fmt.Errorf("failed to update google account: %w", err)
 	}

@@ -13,7 +13,7 @@ import (
 
 type AuthRepository interface {
 	// Define authentication-related methods here
-	RegisterUser(ctx context.Context, newUser *types.SignInRequest) error
+	RegisterUser(ctx context.Context, newUser *types.SignUpRequest) error
 	LoginUser(ctx context.Context, user *types.LoginRequest) (*types.LoginResponse, error)
 }
 
@@ -27,7 +27,7 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 
 func (r *authRepository) LoginUser(ctx context.Context, user *types.LoginRequest) (*types.LoginResponse, error) {
 	var users model.User
-	err := r.db.WithContext(ctx).Where("email = ? AND password = ?", user.Email, user.Password).First(&users).Error
+	err := r.db.WithContext(ctx).Where("email = ? AND password_hash = ?", user.Email, security.HashPassword(user.Password)).First(&users).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &types.LoginResponse{}, fmt.Errorf("user with email %s does not exist", user.Email)
@@ -43,32 +43,22 @@ func (r *authRepository) LoginUser(ctx context.Context, user *types.LoginRequest
 	return &types.LoginResponse{Token: tokenStr}, nil
 }
 
-func (r *authRepository) RegisterUser(ctx context.Context, newUser *types.SignInRequest) error {
+func (r *authRepository) RegisterUser(ctx context.Context, newUser *types.SignUpRequest) error {
 	var users model.User
 	err := r.db.WithContext(ctx).Where("email = ?", newUser.Email).First(&users).Error
 	if err == nil {
 		return fmt.Errorf("user with email %s already exists", newUser.Email)
 	}
 
-	var gacc model.GoogleAccount
-	err = r.db.WithContext(ctx).Where("email = ?", newUser.Email).First(&gacc).Error
-	if err == nil {
-		return fmt.Errorf("user with email %s already exists in google accounts", newUser.Email)
-	}
-
 	if newUser.Name == "" {
 		newUser.Name = ""
-	}
-	if newUser.Tel == "" {
-		newUser.Tel = ""
 	}
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		user := model.User{
-			Email:    newUser.Email,
-			Password: newUser.Password,
-			Name:     newUser.Name,
-			Tel:      newUser.Tel,
+			Email:        newUser.Email,
+			PasswordHash: security.HashPassword(newUser.Password),
+			Name:         newUser.Name,
 		}
 		if err := r.db.WithContext(ctx).Create(&user).Error; err != nil {
 			return fmt.Errorf("failed to create user: %w", err)

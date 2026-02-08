@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
@@ -31,7 +30,7 @@ func NewAssignmentRepository(db *gorm.DB) AssignmentRepository {
 }
 
 func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, classID int) (*[]types.AssignmentResponse, error) {
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).Find(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, gorm.ErrRecordNotFound
@@ -51,14 +50,23 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 
 	var assignmentResponses []types.AssignmentResponse
 	for _, assignment := range assignments {
-		var setting types.AssignmentSettings
-		if err := json.Unmarshal(assignment.Setting, &setting); err != nil {
-			return nil, fmt.Errorf("failed to parse settings: %w", err)
+
+		var settings map[string]interface{}
+		if len(assignment.Setting) > 0 {
+			if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+				return nil, err
+			}
+		} else {
+			settings = map[string]interface{}{}
 		}
 
-		var condition types.AssignmentCondition
-		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-			return nil, fmt.Errorf("failed to parse condition: %w", err)
+		var condition map[string]interface{}
+		if len(assignment.Condition) > 0 {
+			if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+				return nil, err
+			}
+		} else {
+			condition = map[string]interface{}{}
 		}
 
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
@@ -68,9 +76,9 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 			Description: assignment.Description,
 			DueDate:     dueDate,
 			MaxAttempt:  assignment.MaxAttempt,
-			Grade:       assignment.Grade,
-			Settings:    setting,
+			Settings:    settings,
 			Condition:   condition,
+			Grade:       assignment.Grade,
 		})
 	}
 
@@ -86,8 +94,8 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 		return 0, err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, gorm.ErrRecordNotFound
 		}
@@ -103,9 +111,9 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 		Description: assignment.Description,
 		DueDate:     time.Now().Add(7 * 24 * time.Hour), // Example due date set to one week from now
 		MaxAttempt:  assignment.MaxAttempt,
-		Grade:       assignment.Grade,
 		Setting:     datatypes.JSON(settingBytes),
 		Condition:   datatypes.JSON(conditionBytes),
+		Grade:       assignment.Grade,
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newAssignment).Error; err != nil {
@@ -115,7 +123,7 @@ func (r *assignmentRepository) CreateAssignment(ctx context.Context, owner int, 
 }
 
 func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context, classID, assignmentID int) (*types.AssignmentResponse, error) {
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, gorm.ErrRecordNotFound
@@ -133,14 +141,31 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 
 	dueDate := assignment.DueDate.Format(time.RFC3339)
 
-	var settings types.AssignmentSettings
-	if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
-		return nil, fmt.Errorf("failed to parse settings: %w", err)
+	// var settings map[string]interface{}
+	// if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+	// 	return nil, err
+	// }
+	// var condition map[string]interface{}
+	// if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+	// 	return nil, err
+	// }
+
+	var settings map[string]interface{}
+	if len(assignment.Setting) > 0 {
+		if err := json.Unmarshal(assignment.Setting, &settings); err != nil {
+			return nil, err
+		}
+	} else {
+		settings = map[string]interface{}{}
 	}
 
-	var condition types.AssignmentCondition
-	if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
-		return nil, fmt.Errorf("failed to parse condition: %w", err)
+	var condition map[string]interface{}
+	if len(assignment.Condition) > 0 {
+		if err := json.Unmarshal(assignment.Condition, &condition); err != nil {
+			return nil, err
+		}
+	} else {
+		condition = map[string]interface{}{}
 	}
 
 	assignmentResponse := &types.AssignmentResponse{
@@ -150,9 +175,9 @@ func (r *assignmentRepository) GetAssignmentsByAssignmentID(ctx context.Context,
 		Description: assignment.Description,
 		DueDate:     dueDate,
 		MaxAttempt:  assignment.MaxAttempt,
-		Grade:       assignment.Grade,
 		Settings:    settings,
 		Condition:   condition,
+		Grade:       assignment.Grade,
 	}
 
 	return assignmentResponse, nil
@@ -167,8 +192,8 @@ func (r *assignmentRepository) EditAssignmentByAssignmentID(ctx context.Context,
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
 		}
@@ -218,8 +243,8 @@ func (r *assignmentRepository) DeleteAssignmentByAssignmentID(ctx context.Contex
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
 		}

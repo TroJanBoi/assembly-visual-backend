@@ -2,7 +2,10 @@ package repository
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"math/big"
+	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -18,6 +21,8 @@ type ClassRepository interface {
 	JoinClass(ctx context.Context, userID, classID int) error
 	GetAllMembersByClassID(ctx context.Context, classID int) (*[]types.MemberResponse, error)
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
+	ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error
+	RemoveMemberInClass(ctx context.Context, classID, userID int) error
 }
 
 type classRepository struct {
@@ -28,24 +33,55 @@ func NewClassRepository(db *gorm.DB) ClassRepository {
 	return &classRepository{db: db}
 }
 
+func generateClassCode() (string, error) {
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	codeLength := 8
+
+	b := make([]byte, codeLength)
+	max := big.NewInt(int64(len(letters)))
+
+	for i := 0; i < codeLength; i++ {
+		n, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", err
+		}
+		b[i] = letters[n.Int64()]
+	}
+	return string(b), nil
+}
+
 func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResponse, error) {
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Find(&classes).Error; err != nil {
 		return nil, err
 	}
 
-	var classResponses []types.ClassResponse
+	classResponses := make([]types.ClassResponse, 0, len(classes))
+
 	for _, class := range classes {
+		var owner model.User
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+			return nil, err
+		}
+
+		var memberCount int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+			return nil, err
+		}
 		classResponses = append(classResponses, types.ClassResponse{
 			ID:               int(class.ID),
 			Topic:            class.Topic,
 			Description:      class.Description,
+			Code:             class.Code,
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			FavScore:         class.FavScore,
-			Owner:            int(class.Owner),
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        owner.Name,
 			Status:           class.Status,
+			MemberAmount:     memberCount,
+			Favorite:         class.Favorite,
+			BannerID:         class.BannerID,
 		})
 	}
 
@@ -61,13 +97,20 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 		return err
 	}
 
-	newClass := model.Class{
+	code, err := generateClassCode()
+	if err != nil {
+		return err
+	}
+
+	newClass := model.Classroom{
 		Topic:            class.Topic,
 		Description:      class.Description,
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
-		Owner:            owner,
+		OwnerId:          owner,
+		BannerID:         class.BannerID,
 		Status:           class.Status,
+		Code:             code,
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newClass).Error; err != nil {
@@ -78,8 +121,8 @@ func (r *classRepository) CreateClass(ctx context.Context, owner int, class *typ
 }
 
 func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID int, class *types.UpdateClassRequest) error {
-	var existingClass model.Class
-	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
+	var existingClass model.Classroom
+	err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -102,7 +145,6 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID in
 	if class.Status != 0 {
 		existingClass.Status = class.Status
 	}
-
 	if err := r.db.WithContext(ctx).Save(&existingClass).Error; err != nil {
 		return err
 	}
@@ -111,8 +153,8 @@ func (r *classRepository) UpdateClass(ctx context.Context, owner int, classID in
 }
 
 func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID int) error {
-	var existingClass model.Class
-	err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&existingClass).Error
+	var existingClass model.Classroom
+	err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&existingClass).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -128,7 +170,7 @@ func (r *classRepository) DeleteClass(ctx context.Context, owner int, classID in
 }
 
 func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types.ClassResponse, error) {
-	var class model.Class
+	var class model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&class).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, gorm.ErrRecordNotFound
@@ -136,16 +178,30 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		return nil, err
 	}
 
+	var owner model.User
+	if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+		return nil, err
+	}
+
+	var memberCount int64
+	if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+		return nil, err
+	}
+
 	classResponse := types.ClassResponse{
 		ID:               int(class.ID),
 		Topic:            class.Topic,
 		Description:      class.Description,
+		Code:             class.Code,
 		GoogleCourseID:   class.GoogleCourseID,
 		GoogleCourseLink: class.GoogleCourseLink,
 		GoogleSyncedAt:   class.GoogleSyncedAt,
-		FavScore:         class.FavScore,
-		Owner:            int(class.Owner),
+		OwnerID:          int(class.OwnerId),
+		OwnerName:        owner.Name,
+		MemberAmount:     memberCount,
 		Status:           class.Status,
+		Favorite:         class.Favorite,
+		BannerID:         class.BannerID,
 	}
 
 	return &classResponse, nil
@@ -162,7 +218,7 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	}
 
 	// Check if the class exists
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return gorm.ErrRecordNotFound
@@ -171,7 +227,7 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	}
 
 	// Check if the user is the owner of the class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, userID).First(&classes).Error; err == nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, userID).First(&classes).Error; err == nil {
 		return errors.New("owner cannot join their own class as member")
 	}
 
@@ -184,6 +240,8 @@ func (r *classRepository) JoinClass(ctx context.Context, userID, classID int) er
 	newMember := model.Member{
 		UserID:  userID,
 		ClassID: classID,
+		JoinAt:  time.Now(),
+		Role:    "member",
 	}
 
 	if err := r.db.WithContext(ctx).Create(&newMember).Error; err != nil {
@@ -207,10 +265,12 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 		}
 
 		memberResponses = append(memberResponses, types.MemberResponse{
-			ID:           int(user.ID),
-			Name:         user.Name,
-			Email:        user.Email,
-			Picture_path: user.Picture_path,
+			ID:          int(user.ID),
+			Name:        user.Name,
+			Email:       user.Email,
+			PicturePath: user.PicturePath,
+			Role:        member.Role,
+			JoinAt:      member.JoinAt,
 		})
 	}
 
@@ -218,25 +278,75 @@ func (r *classRepository) GetAllMembersByClassID(ctx context.Context, classID in
 }
 
 func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error) {
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Where("status = ?", 0).Find(&classes).Error; err != nil {
 		return nil, err
 	}
 
-	var classResponses []types.ClassResponse
+	classResponses := make([]types.ClassResponse, 0, len(classes))
+
 	for _, class := range classes {
+		var owner model.User
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+			return nil, err
+		}
+
+		var memberCount int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+			return nil, err
+		}
 		classResponses = append(classResponses, types.ClassResponse{
 			ID:               int(class.ID),
 			Topic:            class.Topic,
 			Description:      class.Description,
+			Code:             class.Code,
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			FavScore:         class.FavScore,
-			Owner:            int(class.Owner),
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        owner.Name,
+			MemberAmount:     memberCount,
 			Status:           class.Status,
+			Favorite:         class.Favorite,
+			BannerID:         class.BannerID,
 		})
 	}
 
 	return &classResponses, nil
+}
+
+func (r *classRepository) ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error {
+	var member model.Member
+	err := r.db.WithContext(ctx).Where("user_id = ? AND class_id = ?", userID, classID).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+
+	member.Role = newRole
+
+	if err := r.db.WithContext(ctx).Save(&member).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *classRepository) RemoveMemberInClass(ctx context.Context, classID, userID int) error {
+	var member model.Member
+	err := r.db.WithContext(ctx).Where("user_id = ? AND class_id = ?", userID, classID).First(&member).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+
+	if err := r.db.WithContext(ctx).Delete(&member).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

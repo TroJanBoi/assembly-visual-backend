@@ -19,6 +19,7 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, userID int, users *types.UpdateUserRequest) error
 	DeleteUser(ctx context.Context, userID int) error
 	GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
+	GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 }
 
 type userRepository struct {
@@ -43,9 +44,6 @@ func (r *userRepository) UpdateUser(ctx context.Context, userID int, users *type
 	if users.Name != "" {
 		updatedData["name"] = users.Name
 	}
-	if users.Tel != "" {
-		updatedData["tel"] = users.Tel
-	}
 
 	if err := r.db.WithContext(ctx).Model(&user).Updates(updatedData).Error; err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
@@ -65,16 +63,11 @@ func (r *userRepository) CreateUser(ctx context.Context, users *types.CreateUser
 		users.Name = ""
 	}
 
-	if users.Tel == "" {
-		users.Tel = ""
-	}
-
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		newUser := model.User{
-			Email:    users.Email,
-			Password: security.HashPassword(users.Password),
-			Name:     users.Name,
-			Tel:      users.Tel,
+			Email:        users.Email,
+			PasswordHash: security.HashPassword(users.Password),
+			Name:         users.Name,
 		}
 		if err := r.db.WithContext(ctx).Create(&newUser).Error; err != nil {
 			return fmt.Errorf("failed to create user: %w", err)
@@ -94,7 +87,7 @@ func (r *userRepository) DeleteUser(ctx context.Context, userID int) error {
 		return fmt.Errorf("failed to find user: %w", err)
 	}
 
-	picture_path := existingUser.Picture_path
+	picture_path := existingUser.PicturePath
 	if picture_path != "" {
 		fileName := filepath.Base(picture_path)
 		filePath := filepath.Join("uploads/users", fileName)
@@ -121,15 +114,15 @@ func (r *userRepository) GetAllUsers(ctx context.Context) (*[]types.UserResponse
 		userResp = append(userResp, types.UserResponse{
 			ID:           int(user.ID),
 			Email:        user.Email,
-			Password:     user.Password,
+			PasswordHash: user.PasswordHash,
 			Name:         user.Name,
-			Tel:          user.Tel,
-			Picture_path: user.Picture_path,
+			PicturePath:  user.PicturePath,
 		})
 	}
 	return &userResp, nil
 }
 
+// Get me's classes joined
 func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error) {
 	var member []model.Member
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&member).Error; err != nil {
@@ -141,19 +134,77 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 		classIDs = append(classIDs, int(m.ClassID))
 	}
 
-	var classes []model.Class
+	var classes []model.Classroom
 	if err := r.db.WithContext(ctx).Where("id IN ?", classIDs).Find(&classes).Error; err != nil {
 		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
 	}
 
+	var user model.User
+
 	var classResp []types.ClassMeResponse
 	for _, class := range classes {
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&user).Error; err != nil {
+			return nil, fmt.Errorf("failed to retrieve user: %w", err)
+		}
+
+		var countMember int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&countMember).Error; err != nil {
+			return nil, fmt.Errorf("failed to count members: %w", err)
+		}
+
 		classResp = append(classResp, types.ClassMeResponse{
-			ID:          int(class.ID),
-			Topic:       class.Topic,
-			Description: class.Description,
-			FavScore:    class.FavScore,
-			Owner:       int(class.Owner),
+			ID:               int(class.ID),
+			Code:             class.Code,
+			Topic:            class.Topic,
+			Description:      class.Description,
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        user.Name,
+			Status:           int(class.Status),
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
+			Favorite:         int(class.Favorite),
+			BannerID:         int(class.BannerID),
+			MemberAmount:     countMember,
+		})
+	}
+	return &classResp, nil
+}
+
+func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error) {
+	var classes []model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ?", userID).Find(&classes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
+	}
+
+	var user model.User
+
+	var classResp []types.ClassMeResponse
+	for _, class := range classes {
+
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&user).Error; err != nil {
+			return nil, fmt.Errorf("failed to retrieve user: %w", err)
+		}
+
+		var countMember int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&countMember).Error; err != nil {
+			return nil, fmt.Errorf("failed to count members: %w", err)
+		}
+
+		classResp = append(classResp, types.ClassMeResponse{
+			ID:               int(class.ID),
+			Code:             class.Code,
+			Topic:            class.Topic,
+			Description:      class.Description,
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        user.Name,
+			Status:           int(class.Status),
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
+			Favorite:         int(class.Favorite),
+			BannerID:         int(class.BannerID),
+			MemberAmount:     countMember,
 		})
 	}
 	return &classResp, nil

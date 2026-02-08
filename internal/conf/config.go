@@ -49,6 +49,8 @@ func GetGoogleOAuthConfig() *oauth2.Config {
 			"profile",
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/classroom.coursework.students",
+			"https://www.googleapis.com/auth/classroom.courses.readonly",
 		},
 		Endpoint: google.Endpoint,
 	}

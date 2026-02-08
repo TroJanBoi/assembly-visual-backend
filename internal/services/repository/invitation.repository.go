@@ -31,8 +31,8 @@ func (r *invitationRepository) SendEmailInvitation(ctx context.Context, email st
 		return errors.New("user with the provided email does not exist")
 	}
 
-	var class model.Class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&class).Error; err != nil {
+	var class model.Classroom
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&class).Error; err != nil {
 		return errors.New("class not found or you are not the owner")
 	}
 
@@ -41,15 +41,15 @@ func (r *invitationRepository) SendEmailInvitation(ctx context.Context, email st
 		return errors.New("user is already a member of the class")
 	}
 
-	if class.Owner == int(user.ID) {
+	if class.OwnerId == int(user.ID) {
 		return errors.New("cannot invite the class owner")
 	}
 
 	invitation := model.Invitation{
-		InvitationEmail: email,
-		ClassID:         int(classID),
-		UserID:          int(user.ID),
-		Status:          "pending",
+		InvitedEmail:  email,
+		ClassID:       int(classID),
+		InvitedUserID: int(user.ID),
+		Status:        "pending",
 	}
 
 	if err := r.db.WithContext(ctx).Create(&invitation).Error; err != nil {
@@ -70,8 +70,8 @@ func (r *invitationRepository) GetAllInvitationsByClassID(ctx context.Context, c
 		invitationResponses = append(invitationResponses, types.InvitationResponse{
 			ID:              int(invitation.ID),
 			ClassID:         invitation.ClassID,
-			UserID:          invitation.UserID,
-			InvitationEmail: invitation.InvitationEmail,
+			UserID:          invitation.InvitedUserID,
+			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
 		})
 	}
@@ -95,8 +95,8 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 		invitationResponses = append(invitationResponses, types.InvitationResponse{
 			ID:              int(invitation.ID),
 			ClassID:         invitation.ClassID,
-			UserID:          invitation.UserID,
-			InvitationEmail: invitation.InvitationEmail,
+			UserID:          invitation.InvitedUserID,
+			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
 		})
 	}
@@ -124,7 +124,7 @@ func (r *invitationRepository) UpdateInvitationStatus(ctx context.Context, invit
 		return errors.New("invitation has expired")
 	}
 
-	if invitation.UserID != userID {
+	if invitation.InvitedUserID != userID {
 		return errors.New("you are not recipient of this invitation")
 	}
 
