@@ -19,6 +19,7 @@ type ClassUseCase interface {
 	GetAllClassPublicUseCases(ctx context.Context) (*[]types.ClassResponse, error)
 	ChangePermissionMemberUseCases(ctx context.Context, userID, classID int, newRole string) error
 	RemoveMemberInClassUseCases(ctx context.Context, classID, userID int) error
+	GetClassRecentManyIDsUseCases(ctx context.Context, limit []int) (*[]types.ClassResponse, error)
 }
 
 type classUseCase struct {
@@ -107,4 +108,12 @@ func (uc *classUseCase) RemoveMemberInClassUseCases(ctx context.Context, classID
 		return err
 	}
 	return nil
+}
+
+func (uc *classUseCase) GetClassRecentManyIDsUseCases(ctx context.Context, limit []int) (*[]types.ClassResponse, error) {
+	resp, err := uc.classRepo.GetClassRecentManyIDs(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

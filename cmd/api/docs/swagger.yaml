@@ -1729,6 +1729,44 @@ paths:
       summary: Get all public classrooms
       tags:
       - classrooms
+  /classroom/recent:
+    get:
+      consumes:
+      - application/json
+      description: 'Get recent classes by many IDs (GET: ?class_id=1&class_id=2, POST:
+        {"class_id":[1,2]})'
+      parameters:
+      - collectionFormat: csv
+        description: List of Class IDs (GET)
+        in: query
+        items:
+          type: integer
+        name: class_id
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get recent classes by many IDs
+      tags:
+      - classrooms
   /google/classroom/courses:
     get:
       consumes:
