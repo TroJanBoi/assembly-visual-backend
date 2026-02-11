@@ -220,6 +220,10 @@ func (r *assignmentRepository) EditAssignmentByAssignmentID(ctx context.Context,
 	if assignment.Grade != 0 {
 		existingAssignment.Grade = assignment.Grade
 	}
+	// Update DueDate if provided (check for non-zero time)
+	if !assignment.DueDate.IsZero() {
+		existingAssignment.DueDate = assignment.DueDate
+	}
 
 	settingBytes, _ := json.Marshal(assignment.Setting)
 	conditionBytes, _ := json.Marshal(assignment.Condition)
