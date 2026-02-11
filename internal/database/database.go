@@ -57,39 +57,39 @@ func New() Service {
 		return nil
 	}
 	// db.Migrator().DropTable(
-	// 	// &model.User{},
-	// 	// &model.Assignment{},
-	// 	&model.BookMark{},
-	// 	// &model.Class{},
-	// 	&model.Executions{},
+	// 	&model.User{},
+	// 	&model.Classroom{},
+	// 	&model.Assignment{},
 	// 	&model.GoogleAccount{},
 	// 	&model.GoogleCourseSyncLog{},
 	// 	&model.Invitation{},
+	// 	&model.RecentViewClass{},
 	// 	&model.Playground{},
-	// 	&model.RecentClasses{},
-	// 	&model.Submissions{},
-	// 	&model.TestSuites{},
+	// 	&model.Submission{},
+	// 	&model.TestSuite{},
 	// 	&model.TestCase{},
+	// 	&model.BookMark{},
 	// 	&model.Member{},
+	// 	&model.Notification{},
 	// )
 	if config.AUTO_MIGRATE {
 		log.Println("Auto migrating database...")
 		err = db.AutoMigrate(
 			// Add your models here, e.g. &model.User{}, etc.
 			&model.User{},
+			&model.Classroom{},
 			&model.Assignment{},
-			&model.BookMark{},
-			&model.Class{},
-			&model.Executions{},
 			&model.GoogleAccount{},
 			&model.GoogleCourseSyncLog{},
 			&model.Invitation{},
+			&model.RecentViewClass{},
 			&model.Playground{},
-			&model.RecentClasses{},
-			&model.Submissions{},
-			&model.TestSuites{},
+			&model.Submission{},
+			&model.TestSuite{},
 			&model.TestCase{},
+			&model.BookMark{},
 			&model.Member{},
+			&model.Notification{},
 		)
 		if err != nil {
 			log.Fatalf("Error auto migrating database: %v", err)

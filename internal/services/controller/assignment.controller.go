@@ -30,7 +30,7 @@ func NewAssignmentController(assignmentUseCase usecases.AssignmentUseCase) *Assi
 // @Success      200   {array}   types.AssignmentResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /classes/{class_id}/assignments [get]
+// @Router       /classroom/{class_id}/assignment [get]
 func (c *AssignmentController) GetAssignmentsByClassID(ctx *gin.Context) {
 	classID := ctx.Param("class_id")
 	classIDInt, err := strconv.Atoi(classID)
@@ -57,7 +57,7 @@ func (c *AssignmentController) GetAssignmentsByClassID(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments [post]
+// @Router       /classroom/{class_id}/assignment [post]
 func (c *AssignmentController) CreateAssignment(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -110,7 +110,7 @@ func (c *AssignmentController) CreateAssignment(ctx *gin.Context) {
 // @Success      200   {object}  types.AssignmentResponse
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /classes/{class_id}/assignments/{assignment_id} [get]
+// @Router       /classroom/{class_id}/assignment/{assignment_id} [get]
 func (c *AssignmentController) GetAssignmentsByAssignmentID(ctx *gin.Context) {
 	classIDStr := ctx.Param("class_id")
 	classID, err := strconv.Atoi(classIDStr)
@@ -146,7 +146,7 @@ func (c *AssignmentController) GetAssignmentsByAssignmentID(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id} [put]
+// @Router       /classroom/{class_id}/assignment/{assignment_id} [put]
 func (c *AssignmentController) EditAssignmentByAssignmentID(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -198,7 +198,7 @@ func (c *AssignmentController) EditAssignmentByAssignmentID(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id} [delete]
+// @Router       /classroom/{class_id}/assignment/{assignment_id} [delete]
 func (c *AssignmentController) DeleteAssignmentByAssignmentID(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {

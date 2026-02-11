@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/conf"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/usecases"
@@ -48,7 +49,9 @@ func (c *OAuthController) HandleGoogleOAuth(ctx *gin.Context) {
 		return
 	}
 
-	redirectURL := fmt.Sprintf("http://localhost:3000/success?token=%s", token)
+	pathFE := os.Getenv("FE_URL")
+
+	redirectURL := fmt.Sprintf("%s/success?token=%s", pathFE, token)
 	ctx.Redirect(http.StatusFound, redirectURL)
 }
 

@@ -28,7 +28,7 @@ func NewUserController(userUseCase usecases.UserUseCase) *UserController {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users [post]
+// @Router       /user [post]
 func (u *UserController) CreateUserController(ctx *gin.Context) {
 	var request types.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -53,7 +53,7 @@ func (u *UserController) CreateUserController(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/{id} [put]
+// @Router       /user/{id} [put]
 func (u *UserController) UpdateUserController(ctx *gin.Context) {
 	userID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -82,7 +82,7 @@ func (u *UserController) UpdateUserController(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/{id} [delete]
+// @Router       /user/{id} [delete]
 func (u *UserController) DeleteUserController(ctx *gin.Context) {
 	var userID, err = strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -104,7 +104,7 @@ func (u *UserController) DeleteUserController(ctx *gin.Context) {
 // @Success      200   {array}   types.UserResponse
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users [get]
+// @Router       /user [get]
 func (u *UserController) GetAllUsersController(ctx *gin.Context) {
 	users, err := u.userUseCase.GetAllUsersUsecase(ctx)
 	if err != nil {
@@ -122,7 +122,7 @@ func (u *UserController) GetAllUsersController(ctx *gin.Context) {
 // @Success      200   {array}   types.ClassMeResponse
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/me/classes [get]
+// @Router       /user/me/classroom [get]
 func (u *UserController) GetMeClassesController(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -142,22 +142,39 @@ func (u *UserController) GetMeClassesController(ctx *gin.Context) {
 	ctx.JSON(200, classes)
 }
 
-// @Summary      Upload user avatar
-// @Description  Upload an avatar for the authenticated user
+// @Summary      Get owner classes
+// @Description  Retrieve classes owned by the authenticated user
 // @Tags         users
-// @Accept       multipart/form-data
+// @Accept       json
 // @Produce      json
-// @Param        file  formData  file  true  "Avatar file"
-// @Success      200   {object}  map[string]string
-// @Failure      400   {object}  map[string]string
+// @Success      200   {array}   types.ClassMeResponse
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /users/avatar [post]
+// @Router       /user/owner/classroom [get]
+func (u *UserController) GetOwnerClassesController(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(401, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(400, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+	classes, err := u.userUseCase.GetOwnerClassUsecase(ctx, userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": "Failed to retrieve classes"})
+		return
+	}
+	ctx.JSON(200, classes)
+}
 
 func (u *UserController) UserRoutes(r gin.IRoutes) {
 	r.GET("/", u.GetAllUsersController)
 	r.PUT("/:id", u.UpdateUserController)
 	r.DELETE("/:id", u.DeleteUserController)
 	r.POST("/", u.CreateUserController)
-	r.GET("/me/classes", u.GetMeClassesController)
+	r.GET("/me/classroom", u.GetMeClassesController)
+	r.GET("/owner/classroom", u.GetOwnerClassesController)
 }

@@ -43,10 +43,9 @@ func (r *profileRepository) GetProfile(ctx context.Context, userID int) (*types.
 	userResp := &types.UserResponse{
 		ID:           int(user.ID),
 		Email:        user.Email,
-		Password:     user.Password,
+		PasswordHash: user.PasswordHash,
 		Name:         user.Name,
-		Tel:          user.Tel,
-		Picture_path: user.Picture_path,
+		PicturePath:  user.PicturePath,
 	}
 	return userResp, nil
 }
@@ -66,11 +65,8 @@ func (r *profileRepository) EditProfile(ctx context.Context, userID int, user *t
 	if user.Name != "" && user.Name != "string" {
 		updatedData["name"] = user.Name
 	}
-	if user.Tel != "" && user.Tel != "string" {
-		updatedData["tel"] = user.Tel
-	}
-	if user.Picture_path != "" && user.Picture_path != "string" {
-		updatedData["picture_path"] = user.Picture_path
+	if user.PicturePath != "" && user.PicturePath != "string" {
+		updatedData["picture_path"] = user.PicturePath
 	}
 
 	if err := r.db.WithContext(ctx).Model(&existingUser).Updates(updatedData).Error; err != nil {
@@ -86,7 +82,7 @@ func (r *profileRepository) ChangePassword(ctx context.Context, userID int, newP
 		return fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
-	oldPassword := user.Password
+	oldPassword := user.PasswordHash
 	if oldPassword == newPassword {
 		return fmt.Errorf("new password cannot be the same as the old password")
 	}
@@ -108,8 +104,8 @@ func (r *profileRepository) DeleteProfile(ctx context.Context, userID int) error
 		return fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
-	if user.Picture_path != "" {
-		fileName := filepath.Base(user.Picture_path)
+	if user.PicturePath != "" {
+		fileName := filepath.Base(user.PicturePath)
 		filePath := filepath.Join("uploads/users", fileName)
 
 		if err := os.Remove(filePath); err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -143,7 +139,7 @@ func (r *profileRepository) GetAvatar(ctx context.Context, userID int) (string, 
 		return "", fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
-	return user.Picture_path, nil
+	return user.PicturePath, nil
 }
 
 func (r *profileRepository) ChangeAvatar(ctx context.Context, userID int, avatarURL string) error {
@@ -153,9 +149,9 @@ func (r *profileRepository) ChangeAvatar(ctx context.Context, userID int, avatar
 		return fmt.Errorf("user with ID %d does not exist", userID)
 	}
 
-	old_path := user.Picture_path
-	if old_path != "" {
-		fileName := filepath.Base(old_path)
+	oldPath := user.PicturePath
+	if oldPath != "" {
+		fileName := filepath.Base(oldPath)
 		filePath := filepath.Join("uploads/users", fileName)
 
 		if err := os.Remove(filePath); err != nil && !errors.Is(err, os.ErrNotExist) {

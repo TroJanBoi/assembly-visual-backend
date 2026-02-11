@@ -26,7 +26,7 @@ func NewInvitationController(invitationUseCase usecases.InvitationUseCase) *Invi
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/invitations/send [post]
+// @Router       /classroom/{class_id}/invitation/send [post]
 func (ic *InvitationController) SendEmailInvitationController(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -69,7 +69,7 @@ func (ic *InvitationController) SendEmailInvitationController(ctx *gin.Context) 
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/invitations [get]
+// @Router       /classroom/{class_id}/invitation [get]
 func (ic *InvitationController) GetAllInvitationsByClassIDController(ctx *gin.Context) {
 	classID, err := strconv.Atoi(ctx.Param("class_id"))
 	if err != nil {
@@ -95,7 +95,7 @@ func (ic *InvitationController) GetAllInvitationsByClassIDController(ctx *gin.Co
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /invitations/me [get]
+// @Router       /invitation/me [get]
 func (ic *InvitationController) GetInvitationMeController(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -127,7 +127,7 @@ func (ic *InvitationController) GetInvitationMeController(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /invitations/{invitation_id}/accept [post]
+// @Router       /invitation/{invitation_id}/accept [post]
 func (ic *InvitationController) AcceptInvitation(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -155,8 +155,7 @@ func (ic *InvitationController) AcceptInvitation(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"message": "Invitation accepted successfully"})
 }
 
-//	@Summary      Decline Invitation
-//
+// @Summary      Decline Invitation
 // @Description  Decline an invitation to join a class
 // @Tags         invitations
 // @Accept       json
@@ -166,7 +165,7 @@ func (ic *InvitationController) AcceptInvitation(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /invitations/{invitation_id}/decline [post]
+// @Router       /invitation/{invitation_id}/decline [post]
 func (ic *InvitationController) DeclineInvitation(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {

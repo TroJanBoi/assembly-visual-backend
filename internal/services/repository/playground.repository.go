@@ -54,7 +54,6 @@ func (r *playgroundRepository) Create(ctx context.Context, userID int, playgroun
 	newPlayground := model.Playground{
 		AssignmentID: int(playground.AssignmentID),
 		UserID:       int(userID),
-		AttemptNO:    playground.AttemptNO,
 		Item:         datatypes.JSON(item),
 		Status:       playground.Status,
 	}
@@ -63,16 +62,23 @@ func (r *playgroundRepository) Create(ctx context.Context, userID int, playgroun
 		return nil, fmt.Errorf("failed to create playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	// var parseItems types.PlaygroundData
+	// if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
+	// 	return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	// }
+	var parseItems map[string]interface{}
+	if len(newPlayground.Item) > 0 {
+		if err := json.Unmarshal(newPlayground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
 		ID:           int(newPlayground.ID),
 		AssignmentID: newPlayground.AssignmentID,
 		UserID:       newPlayground.UserID,
-		AttemptNO:    newPlayground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -97,16 +103,19 @@ func (r *playgroundRepository) GetByPlaygroundID(ctx context.Context, userID int
 		return nil, fmt.Errorf("failed to find playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(playground.Item) > 0 {
+		if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
 		ID:           int(playground.ID),
 		AssignmentID: playground.AssignmentID,
 		UserID:       playground.UserID,
-		AttemptNO:    playground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -131,16 +140,19 @@ func (r *playgroundRepository) GetPlaygroundByMe(ctx context.Context, userID int
 		return nil, fmt.Errorf("failed to find playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(playground.Item) > 0 {
+		if err := json.Unmarshal(playground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
 		ID:           int(playground.ID),
 		AssignmentID: playground.AssignmentID,
 		UserID:       playground.UserID,
-		AttemptNO:    playground.AttemptNO,
 		Item:         parseItems,
 		Status:       playground.Status,
 	}
@@ -165,7 +177,6 @@ func (r *playgroundRepository) UpdatePlaygroundByMe(ctx context.Context, userID 
 	}
 
 	item, _ := json.Marshal(playground.Item)
-	existingPlayground.AttemptNO = playground.AttemptNO + 1
 	existingPlayground.Item = datatypes.JSON(item)
 	existingPlayground.Status = playground.Status
 
@@ -173,16 +184,19 @@ func (r *playgroundRepository) UpdatePlaygroundByMe(ctx context.Context, userID 
 		return nil, fmt.Errorf("failed to update playground: %w", err)
 	}
 
-	var parseItems types.PlaygroundData
-	if err := json.Unmarshal(existingPlayground.Item, &parseItems); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+	var parseItems map[string]interface{}
+	if len(existingPlayground.Item) > 0 {
+		if err := json.Unmarshal(existingPlayground.Item, &parseItems); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal playground item: %w", err)
+		}
+	} else {
+		parseItems = map[string]interface{}{}
 	}
 
 	playgroundResponse := &types.PlaygroundResponse{
 		ID:           int(existingPlayground.ID),
 		AssignmentID: existingPlayground.AssignmentID,
 		UserID:       existingPlayground.UserID,
-		AttemptNO:    existingPlayground.AttemptNO,
 		Item:         parseItems,
 		Status:       existingPlayground.Status,
 	}

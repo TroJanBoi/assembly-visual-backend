@@ -49,6 +49,8 @@ func GetGoogleOAuthConfig() *oauth2.Config {
 			"profile",
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/classroom.coursework.students",
+			"https://www.googleapis.com/auth/classroom.courses.readonly",
 		},
 		Endpoint: google.Endpoint,
 	}
@@ -114,8 +116,8 @@ func (c *Config) CreateClientDatabase() (*gorm.DB, *sql.DB, error) {
 	if err != nil {
 		log.Panicf("Error getting sql.DB from gorm.DB: %v", err)
 	}
-	sqlDB.SetConnMaxIdleTime(10)
-	sqlDB.SetConnMaxLifetime(10)
+	sqlDB.SetConnMaxIdleTime(50)
+	sqlDB.SetConnMaxLifetime(50)
 	sqlDB.SetMaxOpenConns(100)
 
 	err = sqlDB.Ping()

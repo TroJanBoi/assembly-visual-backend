@@ -10,7 +10,7 @@ import (
 type TestSuitesUseCases interface {
 	// Define methods related to TestCase use cases here
 	GetAllTestSuiteByAssignmentIDUsecase(ctx context.Context, classID int, assignmentID int) (*[]types.TestSuiteResponse, error)
-	AddTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) error
+	AddTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) (int, error)
 	UpdateTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testSuite types.TestSuiteRequest) error
 	DeleteTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int) error
 	GetTestSuiteByIDUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int) (*types.TestSuiteResponse, error)
@@ -33,12 +33,12 @@ func (uc *testSuitesUsecase) GetAllTestSuiteByAssignmentIDUsecase(ctx context.Co
 	return resp, nil
 }
 
-func (uc *testSuitesUsecase) AddTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) error {
-	err := uc.testCaseRepo.AddTestSuite(ctx, owner, classID, assignmentID, testSuite)
+func (uc *testSuitesUsecase) AddTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) (int, error) {
+	id, err := uc.testCaseRepo.AddTestSuite(ctx, owner, classID, assignmentID, testSuite)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 
 func (uc *testSuitesUsecase) UpdateTestSuiteUsecase(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testSuite types.TestSuiteRequest) error {

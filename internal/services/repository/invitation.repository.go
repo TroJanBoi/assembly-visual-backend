@@ -31,8 +31,8 @@ func (r *invitationRepository) SendEmailInvitation(ctx context.Context, email st
 		return errors.New("user with the provided email does not exist")
 	}
 
-	var class model.Class
-	if err := r.db.WithContext(ctx).Where("id = ? AND owner = ?", classID, owner).First(&class).Error; err != nil {
+	var class model.Classroom
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", classID, owner).First(&class).Error; err != nil {
 		return errors.New("class not found or you are not the owner")
 	}
 
@@ -41,15 +41,15 @@ func (r *invitationRepository) SendEmailInvitation(ctx context.Context, email st
 		return errors.New("user is already a member of the class")
 	}
 
-	if class.Owner == int(user.ID) {
+	if class.OwnerId == int(user.ID) {
 		return errors.New("cannot invite the class owner")
 	}
 
 	invitation := model.Invitation{
-		InvitationEmail: email,
-		ClassID:         int(classID),
-		UserID:          int(user.ID),
-		Status:          "pending",
+		InvitedEmail:  email,
+		ClassID:       int(classID),
+		InvitedUserID: int(user.ID),
+		Status:        "pending",
 	}
 
 	if err := r.db.WithContext(ctx).Create(&invitation).Error; err != nil {
@@ -70,9 +70,11 @@ func (r *invitationRepository) GetAllInvitationsByClassID(ctx context.Context, c
 		invitationResponses = append(invitationResponses, types.InvitationResponse{
 			ID:              int(invitation.ID),
 			ClassID:         invitation.ClassID,
-			UserID:          invitation.UserID,
-			InvitationEmail: invitation.InvitationEmail,
+			UserID:          invitation.InvitedUserID,
+			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
+			Token:           invitation.Token,
+			Expired:         invitation.Expired,
 		})
 	}
 
@@ -86,7 +88,7 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 	}
 
 	var invitations []model.Invitation
-	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&invitations).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("invited_user_id = ?", userID).Find(&invitations).Error; err != nil {
 		return nil, err
 	}
 
@@ -95,9 +97,11 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 		invitationResponses = append(invitationResponses, types.InvitationResponse{
 			ID:              int(invitation.ID),
 			ClassID:         invitation.ClassID,
-			UserID:          invitation.UserID,
-			InvitationEmail: invitation.InvitationEmail,
+			UserID:          invitation.InvitedUserID,
+			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
+			Token:           invitation.Token,
+			Expired:         invitation.Expired,
 		})
 	}
 
@@ -107,7 +111,7 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 func (r *invitationRepository) UpdateInvitationStatus(ctx context.Context, invitationID int, userID int, status string) error {
 
 	var invitation model.Invitation
-	if err := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", invitationID, userID).First(&invitation).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND invited_user_id = ?", invitationID, userID).First(&invitation).Error; err != nil {
 		return errors.New("invitation not found for this user")
 	}
 
@@ -124,7 +128,7 @@ func (r *invitationRepository) UpdateInvitationStatus(ctx context.Context, invit
 		return errors.New("invitation has expired")
 	}
 
-	if invitation.UserID != userID {
+	if invitation.InvitedUserID != userID {
 		return errors.New("you are not recipient of this invitation")
 	}
 

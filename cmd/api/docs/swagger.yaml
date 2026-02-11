@@ -1,40 +1,11 @@
 definitions:
-  types.AllowedInstructions:
-    properties:
-      arithmetic:
-        additionalProperties:
-          type: integer
-        description: ADD, SUB, INC, DEC, MUL, DIV
-        type: object
-      comparison_and_conditional:
-        additionalProperties:
-          type: integer
-        description: CMP, JMP, JC, JNZ, JZ, JNC
-        type: object
-      data_movement:
-        additionalProperties:
-          type: integer
-        description: LOAD, STORE, MOV
-        type: object
-      system:
-        additionalProperties:
-          type: integer
-        description: LABEL, NOP, HLT
-        type: object
-    type: object
-  types.AssignmentCondition:
-    properties:
-      allowed_instructions:
-        $ref: '#/definitions/types.AllowedInstructions'
-      execution_constraints:
-        $ref: '#/definitions/types.ExecutionConstraints'
-    type: object
   types.AssignmentResponse:
     properties:
       class_id:
         type: integer
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
         type: string
       due_date:
@@ -47,24 +18,9 @@ definitions:
       max_attempt:
         type: integer
       settings:
-        $ref: '#/definitions/types.AssignmentSettings'
+        additionalProperties: true
+        type: object
       title:
-        type: string
-    type: object
-  types.AssignmentSettings:
-    properties:
-      fe_behavior:
-        $ref: '#/definitions/types.FEBehavior'
-      grade_policy:
-        $ref: '#/definitions/types.GradePolicy'
-      test_case_policy:
-        $ref: '#/definitions/types.TestCasePolicy'
-    type: object
-  types.CatResponse:
-    properties:
-      id:
-        type: integer
-      name:
         type: string
     type: object
   types.ChangePasswordRequest:
@@ -76,22 +32,13 @@ definitions:
     type: object
   types.ClassMeResponse:
     properties:
+      banner_id:
+        type: integer
+      code:
+        type: string
       description:
         type: string
-      fav_score:
-        type: integer
-      id:
-        type: integer
-      owner:
-        type: integer
-      topic:
-        type: string
-    type: object
-  types.ClassResponse:
-    properties:
-      description:
-        type: string
-      fav_score:
+      favorite:
         type: integer
       google_course_id:
         type: string
@@ -101,8 +48,41 @@ definitions:
         type: string
       id:
         type: integer
-      owner:
+      member_amount:
         type: integer
+      owner_id:
+        type: integer
+      owner_name:
+        type: string
+      status:
+        type: integer
+      topic:
+        type: string
+    type: object
+  types.ClassResponse:
+    properties:
+      banner_id:
+        type: integer
+      code:
+        type: string
+      description:
+        type: string
+      favorite:
+        type: integer
+      google_course_id:
+        type: string
+      google_course_link:
+        type: string
+      google_synced_at:
+        type: string
+      id:
+        type: integer
+      member_amount:
+        type: integer
+      owner_id:
+        type: integer
+      owner_name:
+        type: string
       status:
         type: integer
       topic:
@@ -111,8 +91,11 @@ definitions:
   types.CreateAssignmentRequest:
     properties:
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
+        type: string
+      due_date:
         type: string
       grade:
         description: total grade of the assignment
@@ -120,15 +103,19 @@ definitions:
       max_attempt:
         type: integer
       settings:
-        $ref: '#/definitions/types.AssignmentSettings'
+        additionalProperties: true
+        type: object
       title:
         type: string
     required:
-    - description
     - title
     type: object
   types.CreateClassRequest:
     properties:
+      banner_id:
+        type: integer
+      code:
+        type: string
       description:
         type: string
       google_course_id:
@@ -144,6 +131,32 @@ definitions:
     - description
     - topic
     type: object
+  types.CreateSubmissionRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      duration_ms:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
+        type: string
+    type: object
   types.CreateUserRequest:
     properties:
       email:
@@ -152,15 +165,14 @@ definitions:
         type: string
       password:
         type: string
-      tel:
-        type: string
     required:
     - email
     type: object
   types.EditAssignmentRequest:
     properties:
       condition:
-        $ref: '#/definitions/types.AssignmentCondition'
+        additionalProperties: true
+        type: object
       description:
         type: string
       grade:
@@ -168,8 +180,12 @@ definitions:
         type: integer
       max_attempt:
         type: integer
-      settings:
-        $ref: '#/definitions/types.AssignmentSettings'
+      setting:
+        additionalProperties: true
+        description: |-
+          Setting     AssignmentSettings  `json:"settings"`
+          Condition   AssignmentCondition `json:"condition"`
+        type: object
       title:
         type: string
     type: object
@@ -179,40 +195,8 @@ definitions:
         type: string
       picture_path:
         type: string
-      tel:
-        type: string
       username:
         type: string
-    type: object
-  types.ExecutionConstraints:
-    properties:
-      initial_state:
-        $ref: '#/definitions/types.InitialState'
-      memory_node:
-        type: integer
-      register_count:
-        type: integer
-    type: object
-  types.FEBehavior:
-    properties:
-      allow_resubmit_after_due:
-        type: boolean
-      lock_after_submit:
-        type: boolean
-    type: object
-  types.GradePolicy:
-    properties:
-      mode:
-        type: string
-      weight:
-        $ref: '#/definitions/types.WeightPolicy'
-    type: object
-  types.InitialState:
-    properties:
-      memory:
-        items:
-          $ref: '#/definitions/types.Memory'
-        type: array
     type: object
   types.LoginRequest:
     properties:
@@ -230,56 +214,64 @@ definitions:
         type: string
       id:
         type: integer
+      join_at:
+        type: string
       name:
         type: string
       picture_path:
         type: string
+      role:
+        type: string
     type: object
-  types.Memory:
+  types.NewRoleRequest:
     properties:
-      address:
+      class_id:
         type: integer
-      value:
+      new_role:
+        type: string
+      user_id:
         type: integer
+    required:
+    - class_id
+    - new_role
+    - user_id
     type: object
-  types.OperationResponse:
+  types.NotificationRequest:
     properties:
+      data:
+        additionalProperties: true
+        type: object
       message:
         type: string
-      status_code:
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
         type: integer
-      value:
-        type: number
+    required:
+    - message
+    - title
+    - type
+    - user_id
     type: object
-  types.PlaygroundData:
+  types.NotificationResponse:
     properties:
-      items:
-        items:
-          $ref: '#/definitions/types.PlaygroundItem'
-        type: array
-      meta_data:
-        $ref: '#/definitions/types.PlaygroundMetaData'
-      ui:
-        $ref: '#/definitions/types.PlaygroundUI'
-    type: object
-  types.PlaygroundItem:
-    properties:
+      data:
+        additionalProperties: true
+        type: object
       id:
         type: integer
-      instruction:
+      is_read:
+        type: boolean
+      message:
         type: string
-      label:
+      title:
         type: string
-      next:
+      type:
+        type: string
+      user_id:
         type: integer
-      next_false:
-        type: integer
-      next_true:
-        type: integer
-      operands:
-        items:
-          $ref: '#/definitions/types.PlaygroundOperands'
-        type: array
     type: object
   types.PlaygroundMeRequest:
     properties:
@@ -288,58 +280,32 @@ definitions:
     required:
     - assignment_id
     type: object
-  types.PlaygroundMetaData:
-    properties:
-      author_id:
-        type: integer
-      program_name:
-        type: string
-      timestamp:
-        type: string
-    type: object
-  types.PlaygroundOperands:
-    properties:
-      type:
-        type: string
-      value:
-        type: string
-    type: object
-  types.PlaygroundPosition:
-    properties:
-      x:
-        type: integer
-      "y":
-        type: integer
-    type: object
   types.PlaygroundRequest:
     properties:
       assignment_id:
         type: integer
-      attempt_no:
-        type: integer
       item:
-        $ref: '#/definitions/types.PlaygroundData'
+        additionalProperties: true
+        type: object
       status:
         description: e.g., "in_progress", "completed", "failed"
         type: string
     required:
     - assignment_id
-    - attempt_no
     - item
     - status
     type: object
-  types.PlaygroundUI:
+  types.RemoveMemberRequest:
     properties:
-      pan:
-        $ref: '#/definitions/types.PlaygroundPosition'
-      position:
-        additionalProperties:
-          $ref: '#/definitions/types.PlaygroundPosition'
-        type: object
-      zoom:
-        type: number
+      class_id:
+        type: integer
+      user_id:
+        type: integer
+    required:
+    - class_id
+    - user_id
     type: object
-  types.SignInRequest:
+  types.SignUpRequest:
     properties:
       email:
         type: string
@@ -347,11 +313,43 @@ definitions:
         type: string
       password:
         type: string
-      tel:
-        type: string
     required:
     - email
     - password
+    type: object
+  types.SubmissionResponse:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      created_at:
+        type: string
+      duration_ms:
+        type: integer
+      id:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   types.TestCaseAssert:
     properties:
@@ -361,6 +359,10 @@ definitions:
         type: object
       halted:
         type: boolean
+      io_output:
+        additionalProperties:
+          type: string
+        type: object
       memory:
         additionalProperties:
           type: integer
@@ -371,15 +373,21 @@ definitions:
         type: object
     required:
     - flags
-    - halted
     - memory
     - register
     type: object
   types.TestCaseInit:
     properties:
+      _meta:
+        additionalProperties: true
+        type: object
       flags:
         additionalProperties:
           type: integer
+        type: object
+      io_input:
+        additionalProperties:
+          type: string
         type: object
       memory:
         additionalProperties:
@@ -393,11 +401,6 @@ definitions:
     - flags
     - memory
     - register
-    type: object
-  types.TestCasePolicy:
-    properties:
-      visible_to_student:
-        type: boolean
     type: object
   types.TestCaseRequest:
     properties:
@@ -457,13 +460,37 @@ definitions:
       topic:
         type: string
     type: object
+  types.UpdateSubmissionRequest:
+    properties:
+      assignment_id:
+        type: integer
+      attempt_no:
+        type: integer
+      client_result:
+        additionalProperties: true
+        type: object
+      duration_ms:
+        type: integer
+      is_verified:
+        type: boolean
+      item_snapshot:
+        additionalProperties: true
+        type: object
+      playground_id:
+        type: integer
+      score:
+        type: number
+      server_result:
+        additionalProperties: true
+        type: object
+      status:
+        type: string
+    type: object
   types.UpdateUserRequest:
     properties:
       name:
         type: string
       password:
-        type: string
-      tel:
         type: string
     type: object
   types.UserResponse:
@@ -474,19 +501,10 @@ definitions:
         type: integer
       name:
         type: string
-      password:
+      password_hash:
         type: string
       picture_path:
         type: string
-      tel:
-        type: string
-    type: object
-  types.WeightPolicy:
-    properties:
-      number_of_node_used:
-        type: number
-      test_case:
-        type: number
     type: object
 info:
   contact: {}
@@ -548,7 +566,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/types.SignInRequest'
+          $ref: '#/definitions/types.SignUpRequest'
       produces:
       - application/json
       responses:
@@ -573,36 +591,11 @@ paths:
       summary: Register new user
       tags:
       - auth
-  /cats:
+  /classroom:
     get:
       consumes:
       - application/json
-      description: Retrieve all cat information from the system
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/types.CatResponse'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all cats
-      tags:
-      - cats
-  /classes:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve all classes
+      description: Retrieve all classrooms
       produces:
       - application/json
       responses:
@@ -618,8 +611,9 @@ paths:
             additionalProperties:
               type: string
             type: object
+      summary: Get all classrooms
       tags:
-      - classes
+      - classrooms
     post:
       consumes:
       - application/json
@@ -660,13 +654,16 @@ paths:
             type: object
       security:
       - BearerAuth: []
+      summary: Create a new class
       tags:
-      - classes
-  /classes/{class_id}:
+      - classrooms
+  /classroom/{class_id}:
     delete:
       consumes:
       - application/json
-      description: Delete a class
+      description: |-
+        Delete a class
+        Delete a classroom
       parameters:
       - description: Class ID
         in: path
@@ -703,7 +700,7 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - classes
+      - classrooms
     get:
       consumes:
       - application/json
@@ -733,8 +730,9 @@ paths:
             additionalProperties:
               type: string
             type: object
+      summary: Get class by ID
       tags:
-      - classes
+      - classrooms
     put:
       consumes:
       - application/json
@@ -780,9 +778,10 @@ paths:
             type: object
       security:
       - BearerAuth: []
+      summary: Update an existing class
       tags:
-      - classes
-  /classes/{class_id}/assignments:
+      - classrooms
+  /classroom/{class_id}/assignment:
     get:
       consumes:
       - application/json
@@ -857,7 +856,7 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
-  /classes/{class_id}/assignments/{assignment_id}:
+  /classroom/{class_id}/assignment/{assignment_id}:
     delete:
       consumes:
       - application/json
@@ -980,7 +979,7 @@ paths:
       - BearerAuth: []
       tags:
       - assignments
-  /classes/{class_id}/assignments/{assignment_id}/test-suites:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite:
     get:
       consumes:
       - application/json
@@ -1067,7 +1066,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-suites
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}:
     delete:
       consumes:
       - application/json
@@ -1207,7 +1206,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-suites
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case:
     get:
       consumes:
       - application/json
@@ -1304,7 +1303,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-cases
-  /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id}/test-cases/{test_id}:
+  /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id}/test-case/{test_id}:
     delete:
       consumes:
       - application/json
@@ -1459,7 +1458,7 @@ paths:
       - BearerAuth: []
       tags:
       - test-cases
-  /classes/{class_id}/invitations:
+  /classroom/{class_id}/invitation:
     get:
       consumes:
       - application/json
@@ -1497,7 +1496,7 @@ paths:
       summary: Get All Invitations by Class ID
       tags:
       - invitations
-  /classes/{class_id}/invitations/send:
+  /classroom/{class_id}/invitation/send:
     post:
       consumes:
       - application/json
@@ -1539,11 +1538,11 @@ paths:
       summary: Send Email Invitation
       tags:
       - invitations
-  /classes/{class_id}/join:
+  /classroom/{class_id}/join:
     post:
       consumes:
       - application/json
-      description: Join a class
+      description: Join a classroom
       parameters:
       - description: Class ID
         in: path
@@ -1579,9 +1578,54 @@ paths:
             type: object
       security:
       - BearerAuth: []
+      summary: Join a classroom
       tags:
-      - classes
-  /classes/{class_id}/members:
+      - classrooms
+  /classroom/{class_id}/member/permission:
+    put:
+      consumes:
+      - application/json
+      description: Change permission of a member in a class
+      parameters:
+      - description: New role info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.NewRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change permission of a member in a class
+      tags:
+      - classrooms
+  /classroom/{class_id}/members:
     get:
       consumes:
       - application/json
@@ -1615,13 +1659,58 @@ paths:
             type: object
       security:
       - BearerAuth: []
+      summary: Get all members of a class by class ID
       tags:
-      - classes
-  /classes/public:
+      - classrooms
+  /classroom/member:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a member from a class
+      parameters:
+      - description: Remove member info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.RemoveMemberRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove a member from a class
+      tags:
+      - classrooms
+  /classroom/public:
     get:
       consumes:
       - application/json
-      description: Retrieve all public classes
+      description: Retrieve all public classrooms
       produces:
       - application/json
       responses:
@@ -1637,9 +1726,119 @@ paths:
             additionalProperties:
               type: string
             type: object
+      summary: Get all public classrooms
       tags:
-      - classes
-  /invitations/{invitation_id}/accept:
+      - classrooms
+  /google/classroom/courses:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Google Classroom courses for the authenticated
+        user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List Google Classroom Courses
+      tags:
+      - google-service
+  /google/classroom/courses/{course_id}/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm the connection to a Google Classroom course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Confirm Google Classroom Connection
+      tags:
+      - google-service
+  /google/classroom/courses/{course_id}/courseWork:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of Google Classroom course work for a specific
+        course
+      parameters:
+      - description: Course ID
+        in: path
+        name: course_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assigment Google Classroom CourseWork
+      tags:
+      - google-service
+  /invitation/{invitation_id}/accept:
     post:
       consumes:
       - application/json
@@ -1676,7 +1875,7 @@ paths:
       summary: Accept Invitation
       tags:
       - invitations
-  /invitations/{invitation_id}/decline:
+  /invitation/{invitation_id}/decline:
     post:
       consumes:
       - application/json
@@ -1713,7 +1912,7 @@ paths:
       summary: Decline Invitation
       tags:
       - invitations
-  /invitations/me:
+  /invitation/me:
     get:
       consumes:
       - application/json
@@ -1745,6 +1944,153 @@ paths:
       summary: Get My Invitations
       tags:
       - invitations
+  /notifications:
+    get:
+      description: Retrieve all notifications for a specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.NotificationResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Notifications by User ID
+      tags:
+      - notifications
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification for a user
+      parameters:
+      - description: Notification Request
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/types.NotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create Notification
+      tags:
+      - notifications
+  /notifications/{notification_id}:
+    delete:
+      description: Delete a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Notification
+      tags:
+      - notifications
+  /notifications/{notification_id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the read status of a notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: integer
+      - description: Notification Status
+        in: body
+        name: status
+        required: true
+        schema:
+          properties:
+            is_read:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update Notification Status
+      tags:
+      - notifications
   /oauth/google/login:
     get:
       description: Initiate Google OAuth2 login
@@ -1773,149 +2119,7 @@ paths:
             type: object
       tags:
       - oauth
-  /operations/add:
-    post:
-      consumes:
-      - application/json
-      description: Add a list of numbers and return the result
-      parameters:
-      - description: List of numbers to add
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Add numbers
-      tags:
-      - operations
-  /operations/div:
-    post:
-      consumes:
-      - application/json
-      description: Divide a list of numbers and return the result
-      parameters:
-      - description: List of numbers to divide
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-      security:
-      - BearerAuth: []
-      summary: Divide numbers
-      tags:
-      - operations
-  /operations/mul:
-    post:
-      consumes:
-      - application/json
-      description: Multiply a list of numbers and return the result
-      parameters:
-      - description: List of numbers to multiply
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-      security:
-      - BearerAuth: []
-      summary: Multiply numbers
-      tags:
-      - operations
-  /operations/sub:
-    post:
-      consumes:
-      - application/json
-      description: Subtract a list of numbers and return the result
-      parameters:
-      - description: List of numbers to subtract
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            type: number
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/types.OperationResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Subtract numbers
-      tags:
-      - operations
-  /playgrounds:
+  /playground:
     post:
       consumes:
       - application/json
@@ -1951,7 +2155,7 @@ paths:
       - BearerAuth: []
       tags:
       - playgrounds
-  /playgrounds/{id}:
+  /playground/{id}:
     get:
       consumes:
       - application/json
@@ -1986,43 +2190,7 @@ paths:
       - BearerAuth: []
       tags:
       - playgrounds
-  /playgrounds/{playground_id}/execute:
-    post:
-      consumes:
-      - application/json
-      description: Execute the code in a playground
-      parameters:
-      - description: Playground ID
-        in: path
-        name: playground_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Execute Playground
-      tags:
-      - executions
-  /playgrounds/me:
+  /playground/me:
     delete:
       consumes:
       - application/json
@@ -2450,44 +2618,29 @@ paths:
       summary: Delete user profile
       tags:
       - profile
-  /systems/hlt:
-    get:
-      consumes:
-      - application/json
-      description: Check if system is halted
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - systems
-  /systems/labels:
+  /submission:
     post:
       consumes:
       - application/json
-      description: Retrieve system labels
+      description: Create a new submission for an assignment
       parameters:
-      - description: Label Filter
-        in: query
-        name: label
+      - description: Submission Data
+        in: body
+        name: submission
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/types.CreateSubmissionRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
           schema:
             additionalProperties:
               type: string
@@ -2498,18 +2651,71 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new submission
       tags:
-      - systems
-  /systems/nop:
+      - Submission
+  /submission/{submission_id}:
     get:
+      description: Retrieve a submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get submission by ID
+      tags:
+      - Submission
+    put:
       consumes:
       - application/json
-      description: Perform NOP operation
+      description: Update an existing submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      - description: Updated Submission Data
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateSubmissionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
           schema:
             additionalProperties:
               type: string
@@ -2520,9 +2726,79 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
+      summary: Update an existing submission
       tags:
-      - systems
-  /users:
+      - Submission
+  /submission/assignment/{assignment_id}:
+    get:
+      description: Retrieve a submission for a specific assignment by assignment ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all submission by assignment ID
+      tags:
+      - Submission
+  /submission/assignment/{assignment_id}/user:
+    get:
+      description: Retrieve all submissions for a specific assignment by assignment
+        ID and user ID
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.SubmissionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all submission by assignment ID and user ID
+      tags:
+      - Submission
+  /user:
     get:
       consumes:
       - application/json
@@ -2584,7 +2860,7 @@ paths:
       summary: Create new user
       tags:
       - users
-  /users/{id}:
+  /user/{id}:
     delete:
       consumes:
       - application/json
@@ -2663,7 +2939,7 @@ paths:
       summary: Update user
       tags:
       - users
-  /users/me/classes:
+  /user/me/classroom:
     get:
       consumes:
       - application/json
@@ -2686,6 +2962,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Get my classes
+      tags:
+      - users
+  /user/owner/classroom:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve classes owned by the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.ClassMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get owner classes
       tags:
       - users
 securityDefinitions:

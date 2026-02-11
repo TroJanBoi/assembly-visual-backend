@@ -32,3 +32,9 @@ main
 # OS X generated file
 .DS_Store
 
+
+# Project 
+/internal/services/controller/.old_controller
+/internal/services/repository/.old_repository
+/internal/services/usecases/.old_usecase
+/internal/services/types/.old_types

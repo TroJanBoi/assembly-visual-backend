@@ -10,7 +10,7 @@ import (
 
 type TestSuiteRepository interface {
 	GetAllTestSuiteByAssignmentID(ctx context.Context, classID int, assignmentID int) (*[]types.TestSuiteResponse, error)
-	AddTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) error
+	AddTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) (int, error)
 	UpdateTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testSuite types.TestSuiteRequest) error
 	DeleteTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int) error
 	GetTestSuiteByID(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int) (*types.TestSuiteResponse, error)
@@ -25,7 +25,7 @@ func NewTestSuiteRepository(db *gorm.DB) TestSuiteRepository {
 }
 
 func (r *testSuiteRepository) GetAllTestSuiteByAssignmentID(ctx context.Context, classID int, assignmentID int) (*[]types.TestSuiteResponse, error) {
-	var classes model.Class
+	var classes model.Classroom
 	if err := r.db.WithContext(ctx).Where("id = ?", classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
@@ -33,7 +33,7 @@ func (r *testSuiteRepository) GetAllTestSuiteByAssignmentID(ctx context.Context,
 		return nil, err
 	}
 
-	var testSuites []model.TestSuites
+	var testSuites []model.TestSuite
 	if err := r.db.WithContext(ctx).Where("assignment_id = ?", assignmentID).Find(&testSuites).Error; err != nil {
 		return nil, err
 	}
@@ -48,40 +48,40 @@ func (r *testSuiteRepository) GetAllTestSuiteByAssignmentID(ctx context.Context,
 	return &testSuiteResponses, nil
 }
 
-func (r *testSuiteRepository) AddTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) error {
+func (r *testSuiteRepository) AddTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuite types.TestSuiteRequest) (id int, err error) {
 	var usr model.User
 	if err := r.db.WithContext(ctx).Where("id = ?", owner).First(&usr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
 	var assignment model.Assignment
 	if err := r.db.WithContext(ctx).Where("id = ? AND class_id = ?", assignmentID, classID).First(&assignment).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return gorm.ErrRecordNotFound
+			return 0, gorm.ErrRecordNotFound
 		}
-		return err
+		return 0, err
 	}
 
-	var newTestSuite model.TestSuites
+	var newTestSuite model.TestSuite
 	newTestSuite.Name = testSuite.Name
 	newTestSuite.AssignmentID = assignmentID
 
 	if err := r.db.WithContext(ctx).Create(&newTestSuite).Error; err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return int(newTestSuite.ID), nil
 }
 
 func (r *testSuiteRepository) UpdateTestSuite(ctx context.Context, owner int, classID int, assignmentID int, testSuiteID int, testSuite types.TestSuiteRequest) error {
@@ -93,8 +93,8 @@ func (r *testSuiteRepository) UpdateTestSuite(ctx context.Context, owner int, cl
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -109,7 +109,7 @@ func (r *testSuiteRepository) UpdateTestSuite(ctx context.Context, owner int, cl
 		return err
 	}
 
-	var existingTestSuite model.TestSuites
+	var existingTestSuite model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&existingTestSuite).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
@@ -137,8 +137,8 @@ func (r *testSuiteRepository) DeleteTestSuite(ctx context.Context, owner int, cl
 		return err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
 		}
@@ -153,7 +153,7 @@ func (r *testSuiteRepository) DeleteTestSuite(ctx context.Context, owner int, cl
 		return err
 	}
 
-	var existingTestSuite model.TestSuites
+	var existingTestSuite model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&existingTestSuite).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return gorm.ErrRecordNotFound
@@ -188,8 +188,8 @@ func (r *testSuiteRepository) GetTestSuiteByID(ctx context.Context, owner int, c
 		return nil, err
 	}
 
-	var classes model.Class
-	if err := r.db.WithContext(ctx).Where("owner = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
+	var classes model.Classroom
+	if err := r.db.WithContext(ctx).Where("owner_id = ? AND id = ?", owner, classID).First(&classes).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound
 		}
@@ -204,7 +204,7 @@ func (r *testSuiteRepository) GetTestSuiteByID(ctx context.Context, owner int, c
 		return nil, err
 	}
 
-	var testSuite model.TestSuites
+	var testSuite model.TestSuite
 	if err := r.db.WithContext(ctx).Where("id = ? AND assignment_id = ?", testSuiteID, assignmentID).First(&testSuite).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, gorm.ErrRecordNotFound

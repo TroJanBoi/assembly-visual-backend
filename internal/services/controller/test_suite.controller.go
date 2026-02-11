@@ -30,7 +30,7 @@ func NewTestSuiteController(testCaseUseCase usecases.TestSuitesUseCases) *TestSu
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id}/test-suites [get]
+// @Router       /classroom/{class_id}/assignment/{assignment_id}/test-suite [get]
 func (c *TestSuiteController) GetAllTestSuiteByAssignmentID(ctx *gin.Context) {
 	classIDStr := ctx.Param("class_id")
 	assignmentIDStr := ctx.Param("assignment_id")
@@ -68,7 +68,7 @@ func (c *TestSuiteController) GetAllTestSuiteByAssignmentID(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id}/test-suites [post]
+// @Router       /classroom/{class_id}/assignment/{assignment_id}/test-suite [post]
 func (c *TestSuiteController) AddTestSuite(ctx *gin.Context) {
 	ownerIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -102,13 +102,16 @@ func (c *TestSuiteController) AddTestSuite(ctx *gin.Context) {
 		return
 	}
 
-	err = c.testCaseUseCase.AddTestSuiteUsecase(ctx, ownerID, classID, assignmentID, testSuiteRequest)
+	id, err := c.testCaseUseCase.AddTestSuiteUsecase(ctx, ownerID, classID, assignmentID, testSuiteRequest)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Test suite added successfully"})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Test suite added successfully",
+		"id":      id,
+	})
 }
 
 // UpdateTestSuite handles the request to update an existing test suite
@@ -124,7 +127,7 @@ func (c *TestSuiteController) AddTestSuite(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id} [put]
+// @Router       /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id} [put]
 func (c *TestSuiteController) UpdateTestSuite(ctx *gin.Context) {
 	ownerIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -186,7 +189,7 @@ func (c *TestSuiteController) UpdateTestSuite(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id} [delete]
+// @Router       /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id} [delete]
 func (c *TestSuiteController) DeleteTestSuite(ctx *gin.Context) {
 	ownerIDVal, exists := ctx.Get("user_id")
 	if !exists {
@@ -242,7 +245,7 @@ func (c *TestSuiteController) DeleteTestSuite(ctx *gin.Context) {
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Security     BearerAuth
-// @Router       /classes/{class_id}/assignments/{assignment_id}/test-suites/{test_suite_id} [get]
+// @Router       /classroom/{class_id}/assignment/{assignment_id}/test-suite/{test_suite_id} [get]
 func (c *TestSuiteController) GetTestSuiteByID(ctx *gin.Context) {
 	ownerIDVal, exists := ctx.Get("user_id")
 	if !exists {

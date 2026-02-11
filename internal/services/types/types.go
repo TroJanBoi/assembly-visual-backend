@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type CatResponse struct {
 	ID   int    `json:"id"`
@@ -18,22 +20,19 @@ type CreateUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type UserResponse struct {
 	ID           int    `json:"id"`
 	Email        string `json:"email"`
-	Password     string `json:"password"`
+	PasswordHash string `json:"password_hash"`
 	Name         string `json:"name"`
-	Tel          string `json:"tel"`
-	Picture_path string `json:"picture_path"`
+	PicturePath  string `json:"picture_path"`
 }
 
 type UpdateUserRequest struct {
 	Password string `json:"password"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type OperationResponse struct {
@@ -42,16 +41,14 @@ type OperationResponse struct {
 	Message    string  `json:"message"`
 }
 
-// DeleteUserRequest represents the request body for deleting a user
 type DeleteUserRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
-type SignInRequest struct {
+type SignUpRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 	Name     string `json:"name"`
-	Tel      string `json:"tel"`
 }
 
 type LoginRequest struct {
@@ -64,10 +61,9 @@ type LoginResponse struct {
 }
 
 type EditProfileRequest struct {
-	Username     string `json:"username"`
-	Name         string `json:"name"`
-	Tel          string `json:"tel"`
-	Picture_path string `json:"picture_path"`
+	Username    string `json:"username"`
+	Name        string `json:"name"`
+	PicturePath string `json:"picture_path"`
 }
 
 type ChangePasswordRequest struct {
@@ -76,14 +72,18 @@ type ChangePasswordRequest struct {
 
 type ClassResponse struct {
 	ID               int    `json:"id"`
+	OwnerID          int    `json:"owner_id"`
+	OwnerName        string `json:"owner_name"`
+	MemberAmount     int64  `json:"member_amount"`
+	Code             string `json:"code"`
 	Topic            string `json:"topic"`
 	Description      string `json:"description"`
+	Status           int    `json:"status"`
+	Favorite         int    `json:"favorite"`
+	BannerID         int    `json:"banner_id"`
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	GoogleSyncedAt   string `json:"google_synced_at"`
-	FavScore         int64  `json:"fav_score"`
-	Owner            int    `json:"owner"`
-	Status           int    `json:"status"`
 }
 
 type CreateClassRequest struct {
@@ -91,6 +91,8 @@ type CreateClassRequest struct {
 	Description      string `json:"description" binding:"required"`
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
+	BannerID         int    `json:"banner_id"`
+	Code             string `json:"code"`
 	Status           int    `json:"status"` // public or private
 }
 
@@ -103,15 +105,15 @@ type UpdateClassRequest struct {
 }
 
 type AssignmentResponse struct {
-	ID          int                 `json:"id"`
-	ClassID     int                 `json:"class_id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	DueDate     string              `json:"due_date"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Settings    AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	ID          int                    `json:"id"`
+	ClassID     int                    `json:"class_id"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	DueDate     string                 `json:"due_date"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Settings    map[string]interface{} `json:"settings"`
+	Condition   map[string]interface{} `json:"condition"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
 }
 
 type AllowedInstructions struct {
@@ -142,12 +144,13 @@ type AssignmentCondition struct {
 }
 
 type CreateAssignmentRequest struct {
-	Title       string              `json:"title" binding:"required"`
-	Description string              `json:"description" binding:"required"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Settings    AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	Title       string                 `json:"title" binding:"required"`
+	Description string                 `json:"description"`
+	DueDate     time.Time              `json:"due_date"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Settings    map[string]interface{} `json:"settings"`
+	Condition   map[string]interface{} `json:"condition"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
 }
 
 type GradePolicy struct {
@@ -169,43 +172,57 @@ type FEBehavior struct {
 	AllowResubmitAfterDue bool `json:"allow_resubmit_after_due"`
 }
 
-type AssignmentSettings struct {
-	GradePolicy    GradePolicy    `json:"grade_policy"`
-	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
-	FEBehavior     FEBehavior     `json:"fe_behavior"`
-}
+// type AssignmentSettings struct {
+// 	GradePolicy    GradePolicy    `json:"grade_policy"`
+// 	TestCasePolicy TestCasePolicy `json:"test_case_policy"`
+// 	FEBehavior     FEBehavior     `json:"fe_behavior"`
+// }
 
 type EditAssignmentRequest struct {
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	MaxAttempt  int                 `json:"max_attempt"`
-	Grade       int                 `json:"grade"` // total grade of the assignment
-	Setting     AssignmentSettings  `json:"settings"`
-	Condition   AssignmentCondition `json:"condition"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	MaxAttempt  int    `json:"max_attempt"`
+	Grade       int    `json:"grade"` // total grade of the assignment
+	// Setting     AssignmentSettings  `json:"settings"`
+	// Condition   AssignmentCondition `json:"condition"`
+	Setting   map[string]interface{} `json:"setting"`
+	Condition map[string]interface{} `json:"condition"`
 }
 
 type MemberResponse struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	Picture_path string `json:"picture_path"`
+	ID          int       `json:"id"`
+	Name        string    `json:"name"`
+	Email       string    `json:"email"`
+	PicturePath string    `json:"picture_path"`
+	Role        string    `json:"role"`
+	JoinAt      time.Time `json:"join_at"`
 }
 
 type ClassMeResponse struct {
-	ID          int    `json:"id"`
-	Topic       string `json:"topic"`
-	Description string `json:"description"`
-	FavScore    int64  `json:"fav_score"`
-	Owner       int    `json:"owner"`
+	ID               int    `json:"id"`
+	OwnerID          int    `json:"owner_id"`
+	OwnerName        string `json:"owner_name"`
+	MemberAmount     int64  `json:"member_amount"`
+	Code             string `json:"code"`
+	Topic            string `json:"topic"`
+	Description      string `json:"description"`
+	Status           int    `json:"status"`
+	Favorite         int    `json:"favorite"`
+	BannerID         int    `json:"banner_id"`
+	GoogleCourseID   string `json:"google_course_id"`
+	GoogleCourseLink string `json:"google_course_link"`
+	GoogleSyncedAt   string `json:"google_synced_at"`
 }
 
 type InvitationResponse struct {
-	ID               int    `json:"id"`
-	ClassID          int    `json:"class_id"`
-	UserID           int    `json:"user_id"`
-	InvitationEmail  string `json:"invitation_email"`
-	GoogleInviteCode string `json:"google_invite_code"`
-	Status           string `json:"status"`
+	ID               int       `json:"id"`
+	ClassID          int       `json:"class_id"`
+	UserID           int       `json:"user_id"`
+	InvitationEmail  string    `json:"invitation_email"`
+	GoogleInviteCode string    `json:"google_invite_code"`
+	Status           string    `json:"status"`
+	Token            string    `json:"token"`
+	Expired          time.Time `json:"expired"`
 }
 
 type UploadAvatarRequest struct {
@@ -237,29 +254,31 @@ type TestCaseResponse struct {
 }
 
 type TestCaseInit struct {
-	Memory   map[string]int `json:"memory" binding:"required"`
-	Register map[string]int `json:"register" binding:"required"`
-	Flags    map[string]int `json:"flags" binding:"required"`
+	Memory   map[string]int         `json:"memory" binding:"required"`
+	Register map[string]int         `json:"register" binding:"required"`
+	Flags    map[string]int         `json:"flags" binding:"required"`
+	IOInput  map[string]string      `json:"io_input,omitempty"`
+	Meta     map[string]interface{} `json:"_meta,omitempty"`
 }
 
 type TestCaseAssert struct {
-	Memory   map[string]int `json:"memory" binding:"required"`
-	Register map[string]int `json:"register" binding:"required"`
-	Flags    map[string]int `json:"flags" binding:"required"`
-	Halted   bool           `json:"halted" binding:"required"`
+	Memory   map[string]int    `json:"memory" binding:"required"`
+	Register map[string]int    `json:"register" binding:"required"`
+	Flags    map[string]int    `json:"flags" binding:"required"`
+	Halted   bool              `json:"halted"`
+	IOOutput map[string]string `json:"io_output,omitempty"`
 }
 
 type PlaygroundRequest struct {
-	AssignmentID int            `json:"assignment_id" binding:"required"`
-	AttemptNO    int            `json:"attempt_no" binding:"required"`
-	Item         PlaygroundData `json:"item" binding:"required"`
-	Status       string         `json:"status" binding:"required"` // e.g., "in_progress", "completed", "failed"
+	AssignmentID int                    `json:"assignment_id" binding:"required"`
+	Item         map[string]interface{} `json:"item" binding:"required"`
+	Status       string                 `json:"status" binding:"required"` // e.g., "in_progress", "completed", "failed"
 }
 
 type PlaygroundData struct {
-	Items    []PlaygroundItem   `json:"items"`
-	MetaData PlaygroundMetaData `json:"meta_data"`
-	UI       PlaygroundUI       `json:"ui"`
+	Items    map[string]interface{} `json:"items"`
+	MetaData map[string]interface{} `json:"meta_data"`
+	UI       map[string]interface{} `json:"ui"`
 }
 
 type PlaygroundItem struct {
@@ -295,24 +314,15 @@ type PlaygroundUI struct {
 }
 
 type PlaygroundResponse struct {
-	ID           int            `json:"id"`
-	AssignmentID int            `json:"assignment_id"`
-	UserID       int            `json:"user_id"`
-	AttemptNO    int            `json:"attempt_no"`
-	Item         PlaygroundData `json:"item"`
-	Status       string         `json:"status"` // e.g., "in_progress", "completed", "failed"
+	ID           int                    `json:"id"`
+	AssignmentID int                    `json:"assignment_id"`
+	UserID       int                    `json:"user_id"`
+	Item         map[string]interface{} `json:"item"`
+	Status       string                 `json:"status"` // e.g., "in_progress", "completed", "failed"
 }
 
 type PlaygroundMeRequest struct {
 	AssignmentID int `json:"assignment_id" binding:"required"`
-}
-
-type ExecutionState struct {
-	Registers    map[string]int    `json:"registers"`
-	Flags        map[string]int    `json:"flags"`
-	MemorySparse map[string]int    `json:"memory_sparse"`
-	Halted       bool              `json:"halted"`
-	Error        *ErrorStateDetail `json:"error"`
 }
 
 type ErrorStateDetail struct {
@@ -330,4 +340,100 @@ type ExecutionStepLog struct {
 	MemoryDelta map[string]int `json:"memory_delta"`
 	Stdout      []string       `json:"stdout"`
 	Timestamp   time.Time      `json:"timestamp"`
+}
+
+type CourseData struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	AlternateLink  string `json:"alternateLink"`
+	EnrollmentCode string `json:"enrollmentCode"`
+}
+
+type CourseWorkData struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	DueDate     struct {
+		Year  int `json:"year"`
+		Month int `json:"month"`
+		Day   int `json:"day"`
+	} `json:"dueDate"`
+	AlternateLink string `json:"alternateLink"`
+	MaxPoints     int    `json:"maxPoints"`
+}
+
+type CourseWorkListResponse struct {
+	CourseWork []CourseWorkData `json:"courseWork"`
+}
+
+type NewRoleRequest struct {
+	ClassID int    `json:"class_id" binding:"required"`
+	UserID  int    `json:"user_id" binding:"required"`
+	NewRole string `json:"new_role" binding:"required"`
+}
+
+type RemoveMemberRequest struct {
+	ClassID int `json:"class_id" binding:"required"`
+	UserID  int `json:"user_id" binding:"required"`
+}
+
+type CreateSubmissionRequest struct {
+	AssignmentID  int                    `json:"assignment_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+}
+
+type UpdateSubmissionRequest struct {
+	AssignmentID  int                    `json:"assignment_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+}
+
+type SubmissionResponse struct {
+	ID            int                    `json:"id"`
+	AssignmentID  int                    `json:"assignment_id"`
+	UserID        int                    `json:"user_id"`
+	PlaygroundID  int                    `json:"playground_id"`
+	AttemptNumber int                    `json:"attempt_no"`
+	ItemSnapshot  map[string]interface{} `json:"item_snapshot"`
+	ClientResult  map[string]interface{} `json:"client_result"`
+	ServerResult  map[string]interface{} `json:"server_result"`
+	Score         float64                `json:"score"`
+	Status        string                 `json:"status"`
+	IsVerified    bool                   `json:"is_verified"`
+	DurationMS    int                    `json:"duration_ms"`
+	CreatedAt     string                 `json:"created_at"`
+	UpdatedAt     string                 `json:"updated_at"`
+}
+
+type NotificationRequest struct {
+	UserID  int                    `json:"user_id" binding:"required"`
+	Type    string                 `json:"type" binding:"required"`
+	Title   string                 `json:"title" binding:"required"`
+	Message string                 `json:"message" binding:"required"`
+	Data    map[string]interface{} `json:"data"`
+}
+
+type NotificationResponse struct {
+	ID      int                    `json:"id"`
+	UserID  int                    `json:"user_id"`
+	Type    string                 `json:"type"`
+	Title   string                 `json:"title"`
+	Message string                 `json:"message"`
+	Data    map[string]interface{} `json:"data"`
+	IsRead  bool                   `json:"is_read"`
 }

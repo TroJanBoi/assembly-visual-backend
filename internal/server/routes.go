@@ -38,10 +38,6 @@ func (s *Server) Router() (http.Handler, func()) {
 
 	docs.SwaggerInfo.BasePath = "/api/v2"
 
-	catRepository := repository.NewCatRepository(s.db)
-	catUseCase := usecases.NewCatUseCase(catRepository)
-	catController := controller.NewCatController(catUseCase)
-
 	oauthRepository := repository.NewOAuthRepository()
 	oauthUseCase := usecases.NewOAuthUseCase(oauthRepository)
 	oauthController := controller.NewOAuthController(oauthUseCase)
@@ -49,10 +45,6 @@ func (s *Server) Router() (http.Handler, func()) {
 	userRepository := repository.NewUserRepository(s.db)
 	userUseCase := usecases.NewUserUseCase(userRepository)
 	userController := controller.NewUserController(userUseCase)
-
-	operationRepository := repository.NewOperationRepository(s.db)
-	operationUsecase := usecases.NewOperationUsecase(operationRepository)
-	operationController := controller.NewOperationController(operationUsecase)
 
 	authRepository := repository.NewAuthRepository(s.db)
 	authUseCase := usecases.NewAuthUseCase(authRepository)
@@ -95,32 +87,28 @@ func (s *Server) Router() (http.Handler, func()) {
 	testCaseUseCase := usecases.NewTestCaseUseCases(testCaseRepository)
 	testCaseController := controller.NewTestCaseController(testCaseUseCase)
 
-	systemsRepository := repository.NewSystemsRepository(s.db)
-	systemsUseCase := usecases.NewSystemsUseCase(systemsRepository)
-	systemsController := controller.NewSystemsController(systemsUseCase)
-
 	playgroundRepository := repository.NewPlaygroundRepository(s.db)
 	playgroundUseCase := usecases.NewPlaygroundUseCases(playgroundRepository)
 	playgroundController := controller.NewPlaygroundController(playgroundUseCase)
 
-	executionRepository := repository.NewExecutionRepository(s.db)
-	executionUseCase := usecases.NewExecutionUseCases(executionRepository)
-	executionController := controller.NewExecutionController(executionUseCase)
+	googleServiceRepository := repository.NewGoogleServiceRepository(s.db)
+	googleServiceUsecase := usecases.NewGoogleServiceUsecase(googleServiceRepository, oauthRepository)
+	googleServiceController := controller.NewGoogleServiceController(googleServiceUsecase)
+
+	submissionRepository := repository.NewSubmissionRepository(s.db)
+	submissionUsecase := usecases.NewSubmissionUseCase(submissionRepository)
+	submissionController := controller.NewSubmissionController(submissionUsecase)
+
+	notificationRepository := repository.NewNotificationRepository(s.db)
+	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository)
+	notificationController := controller.NewNotificationController(notificationUsecase)
 
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
-		catGroup := api.Group("/cats").Use(security.Middleware())
-		{
-			catController.CatRegisterRoutes(catGroup)
-		}
-		userGroup := api.Group("/users").Use(security.Middleware())
+		userGroup := api.Group("/user").Use(security.Middleware())
 		{
 			userController.UserRoutes(userGroup)
-		}
-		operationGroup := api.Group("/operations").Use(security.Middleware())
-		{
-			operationController.OperationRegisterRoutes(operationGroup)
 		}
 		authGroup := api.Group("/auth")
 		{
@@ -130,51 +118,54 @@ func (s *Server) Router() (http.Handler, func()) {
 		{
 			profileController.ProfileRoutes(profileGroup)
 		}
-		classGroup := api.Group("/classes").Use(security.Middleware()).(*gin.RouterGroup)
+		classGroup := api.Group("/classroom").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			classController.ClassRoutes(classGroup)
-			assignmentGroup := classGroup.Group("/:class_id/assignments").Use(security.Middleware()).(*gin.RouterGroup)
+			assignmentGroup := classGroup.Group("/:class_id/assignment").Use(security.Middleware()).(*gin.RouterGroup)
 			{
 				assignmentControllerInClass.AssignmentRoutes(assignmentGroup)
 				// Register TestSuite routes within the assignment group
-				testSuiteGroup := assignmentGroup.Group("/:assignment_id/test-suites").Use(security.Middleware()).(*gin.RouterGroup)
+				testSuiteGroup := assignmentGroup.Group("/:assignment_id/test-suite").Use(security.Middleware()).(*gin.RouterGroup)
 				{
 					testSuiteController.TestSuiteRoutes(testSuiteGroup)
-					testCaseGroup := testSuiteGroup.Group("/:test_suite_id/test-cases").Use(security.Middleware()).(*gin.RouterGroup)
+					testCaseGroup := testSuiteGroup.Group("/:test_suite_id/test-case").Use(security.Middleware()).(*gin.RouterGroup)
 					{
 						testCaseController.TestCaseRoutes(testCaseGroup)
 					}
 				}
 			}
-			invitationGroup := classGroup.Group("/:class_id/invitations").Use(security.Middleware()).(*gin.RouterGroup)
+			invitationGroup := classGroup.Group("/:class_id/invitation").Use(security.Middleware()).(*gin.RouterGroup)
 			{
 				invitationController.InvitaionRoutes(invitationGroup)
 			}
 		}
-		invitationMeGroup := api.Group("/invitations").Use(security.Middleware()).(*gin.RouterGroup)
+		invitationMeGroup := api.Group("/invitation").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			invitationMeController.InvitationMeRoutes(invitationMeGroup)
 		}
-		classNotLoginGroup := api.Group("/classes")
+		classNotLoginGroup := api.Group("/classroom")
 		{
 			classNotLoginController.ClassNotLoginRoutes(classNotLoginGroup)
 		}
-		assignmentNotLoginGroup := api.Group("/classes/:class_id/assignments")
+		assignmentNotLoginGroup := api.Group("/classroom/:class_id/assignment")
 		{
 			assignmentControllerNotLogin.AssignmentNotLoginRoutes(assignmentNotLoginGroup)
 		}
-
-		systemsGroup := api.Group("/systems")
-		{
-			systemsController.SystemsRoutes(systemsGroup)
-		}
-		playgroundGroup := api.Group("/playgrounds").Use(security.Middleware()).(*gin.RouterGroup)
+		playgroundGroup := api.Group("/playground").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			playgroundController.PlaygroundRoutes(playgroundGroup)
-			executionGroup := playgroundGroup.Group("/:playground_id").Use(security.Middleware()).(*gin.RouterGroup)
-			{
-				executionController.ExecutionRoutes(executionGroup)
-			}
+		}
+		googleServiceGroup := api.Group("/google").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			googleServiceController.GoogleServiceRegisterRoutes(googleServiceGroup)
+		}
+		submissionGroup := api.Group("/submission").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			submissionController.SubmissionRoutes(submissionGroup)
+		}
+		notificationGroup := api.Group("/notifications").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			notificationController.NotificationRoutes(notificationGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
