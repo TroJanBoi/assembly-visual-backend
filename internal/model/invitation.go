@@ -13,8 +13,8 @@ type Invitation struct {
 	InvitedUserID      int       `gorm:"not null"`
 	GoogleInvitationID string    `gorm:"null;"`
 	Status             string    `gorm:"not null;default:'pending'"` // e.g., "pending", "accepted", "declined"
-	token              string    `gorm:"null;"`
-	expired            time.Time `gorm:"null"`
+	Token              string    `gorm:"null;"`
+	Expired            time.Time `gorm:"null"`
 	Classroom          Classroom `gorm:"foreignKey:ClassID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	User               User      `gorm:"foreignKey:InvitedUserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

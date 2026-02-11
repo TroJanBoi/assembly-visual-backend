@@ -73,6 +73,8 @@ func (r *invitationRepository) GetAllInvitationsByClassID(ctx context.Context, c
 			UserID:          invitation.InvitedUserID,
 			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
+			Token:           invitation.Token,
+			Expired:         invitation.Expired,
 		})
 	}
 
@@ -86,7 +88,7 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 	}
 
 	var invitations []model.Invitation
-	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&invitations).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("invited_user_id = ?", userID).Find(&invitations).Error; err != nil {
 		return nil, err
 	}
 
@@ -98,6 +100,8 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 			UserID:          invitation.InvitedUserID,
 			InvitationEmail: invitation.InvitedEmail,
 			Status:          invitation.Status,
+			Token:           invitation.Token,
+			Expired:         invitation.Expired,
 		})
 	}
 
@@ -107,7 +111,7 @@ func (r *invitationRepository) GetInvitationMe(ctx context.Context, userID int) 
 func (r *invitationRepository) UpdateInvitationStatus(ctx context.Context, invitationID int, userID int, status string) error {
 
 	var invitation model.Invitation
-	if err := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", invitationID, userID).First(&invitation).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND invited_user_id = ?", invitationID, userID).First(&invitation).Error; err != nil {
 		return errors.New("invitation not found for this user")
 	}
 

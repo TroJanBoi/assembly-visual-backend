@@ -215,12 +215,14 @@ type ClassMeResponse struct {
 }
 
 type InvitationResponse struct {
-	ID               int    `json:"id"`
-	ClassID          int    `json:"class_id"`
-	UserID           int    `json:"user_id"`
-	InvitationEmail  string `json:"invitation_email"`
-	GoogleInviteCode string `json:"google_invite_code"`
-	Status           string `json:"status"`
+	ID               int       `json:"id"`
+	ClassID          int       `json:"class_id"`
+	UserID           int       `json:"user_id"`
+	InvitationEmail  string    `json:"invitation_email"`
+	GoogleInviteCode string    `json:"google_invite_code"`
+	Status           string    `json:"status"`
+	Token            string    `json:"token"`
+	Expired          time.Time `json:"expired"`
 }
 
 type UploadAvatarRequest struct {
@@ -427,11 +429,11 @@ type NotificationRequest struct {
 }
 
 type NotificationResponse struct {
-	ID        int                    `json:"id"`
-	UserID    int                    `json:"user_id"`
-	Type      string                 `json:"type"`
-	Title     string                 `json:"title"`
-	Message   string                 `json:"message"`
-	Data      map[string]interface{} `json:"data"`
-	IsRead    bool                   `json:"is_read"`
+	ID      int                    `json:"id"`
+	UserID  int                    `json:"user_id"`
+	Type    string                 `json:"type"`
+	Title   string                 `json:"title"`
+	Message string                 `json:"message"`
+	Data    map[string]interface{} `json:"data"`
+	IsRead  bool                   `json:"is_read"`
 }

@@ -155,8 +155,7 @@ func (ic *InvitationController) AcceptInvitation(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"message": "Invitation accepted successfully"})
 }
 
-//	@Summary      Decline Invitation
-//
+// @Summary      Decline Invitation
 // @Description  Decline an invitation to join a class
 // @Tags         invitations
 // @Accept       json
