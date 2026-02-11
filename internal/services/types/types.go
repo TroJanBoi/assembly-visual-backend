@@ -179,14 +179,13 @@ type FEBehavior struct {
 // }
 
 type EditAssignmentRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	MaxAttempt  int    `json:"max_attempt"`
-	Grade       int    `json:"grade"` // total grade of the assignment
-	// Setting     AssignmentSettings  `json:"settings"`
-	// Condition   AssignmentCondition `json:"condition"`
-	Setting   map[string]interface{} `json:"setting"`
-	Condition map[string]interface{} `json:"condition"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
+	Setting     map[string]interface{} `json:"setting"`
+	Condition   map[string]interface{} `json:"condition"`
+	DueDate     time.Time              `json:"due_date"`
 }
 
 type MemberResponse struct {
