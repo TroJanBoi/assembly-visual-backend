@@ -99,6 +99,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	submissionUsecase := usecases.NewSubmissionUseCase(submissionRepository)
 	submissionController := controller.NewSubmissionController(submissionUsecase)
 
+	notificationRepository := repository.NewNotificationRepository(s.db)
+	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository)
+	notificationController := controller.NewNotificationController(notificationUsecase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -158,6 +162,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		submissionGroup := api.Group("/submission").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			submissionController.SubmissionRoutes(submissionGroup)
+		}
+		notificationGroup := api.Group("/notifications").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			notificationController.NotificationRoutes(notificationGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {

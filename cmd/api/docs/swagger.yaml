@@ -32,10 +32,14 @@ definitions:
     type: object
   types.ClassMeResponse:
     properties:
+      banner_id:
+        type: integer
       code:
         type: string
       description:
         type: string
+      favorite:
+        type: integer
       google_course_id:
         type: string
       google_course_link:
@@ -44,8 +48,12 @@ definitions:
         type: string
       id:
         type: integer
+      member_amount:
+        type: integer
       owner_id:
         type: integer
+      owner_name:
+        type: string
       status:
         type: integer
       topic:
@@ -106,6 +114,8 @@ definitions:
     properties:
       banner_id:
         type: integer
+      code:
+        type: string
       description:
         type: string
       google_course_id:
@@ -225,6 +235,43 @@ definitions:
     - class_id
     - new_role
     - user_id
+    type: object
+  types.NotificationRequest:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - message
+    - title
+    - type
+    - user_id
+    type: object
+  types.NotificationResponse:
+    properties:
+      data:
+        additionalProperties: true
+        type: object
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      message:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: integer
     type: object
   types.PlaygroundMeRequest:
     properties:
@@ -1897,6 +1944,153 @@ paths:
       summary: Get My Invitations
       tags:
       - invitations
+  /notifications:
+    get:
+      description: Retrieve all notifications for a specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.NotificationResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Notifications by User ID
+      tags:
+      - notifications
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification for a user
+      parameters:
+      - description: Notification Request
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/types.NotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create Notification
+      tags:
+      - notifications
+  /notifications/{notification_id}:
+    delete:
+      description: Delete a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete Notification
+      tags:
+      - notifications
+  /notifications/{notification_id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the read status of a notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: integer
+      - description: Notification Status
+        in: body
+        name: status
+        required: true
+        schema:
+          properties:
+            is_read:
+              type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update Notification Status
+      tags:
+      - notifications
   /oauth/google/login:
     get:
       description: Initiate Google OAuth2 login

@@ -417,3 +417,21 @@ type SubmissionResponse struct {
 	CreatedAt     string                 `json:"created_at"`
 	UpdatedAt     string                 `json:"updated_at"`
 }
+
+type NotificationRequest struct {
+	UserID  int                    `json:"user_id" binding:"required"`
+	Type    string                 `json:"type" binding:"required"`
+	Title   string                 `json:"title" binding:"required"`
+	Message string                 `json:"message" binding:"required"`
+	Data    map[string]interface{} `json:"data"`
+}
+
+type NotificationResponse struct {
+	ID        int                    `json:"id"`
+	UserID    int                    `json:"user_id"`
+	Type      string                 `json:"type"`
+	Title     string                 `json:"title"`
+	Message   string                 `json:"message"`
+	Data      map[string]interface{} `json:"data"`
+	IsRead    bool                   `json:"is_read"`
+}
