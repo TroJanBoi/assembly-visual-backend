@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/usecases"
@@ -318,6 +319,42 @@ func (c *ClassController) RemoveMemberInClass(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Member removed from class successfully"})
 }
 
+// @Summary      Get recent classes by many IDs
+// @Description  Get recent classes by many IDs (GET: ?class_id=1&class_id=2, POST: {"class_id":[1,2]})
+// @Tags         classrooms
+// @Accept       json
+// @Produce      json
+// @Param        class_id  query  []int  false  "List of Class IDs (GET)"
+// @Success      200   {array}   types.ClassResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /classroom/recent [get]
+func (c *ClassController) GetClassRecentManyIDs(ctx *gin.Context) {
+	idsQuery := ctx.QueryArray("class_id")
+	var ids []int
+
+	for _, idStr := range idsQuery {
+
+		parts := strings.Split(idStr, ",")
+
+		for _, p := range parts {
+			id, err := strconv.Atoi(strings.TrimSpace(p))
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid class ID in query"})
+				return
+			}
+			ids = append(ids, id)
+		}
+	}
+	classes, err := c.classUseCase.GetClassRecentManyIDsUseCases(ctx, ids)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, classes)
+}
+
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.POST("/", c.ClassCreateClass)
 	r.PUT("/:class_id", c.ClassUpdateClass)
@@ -333,4 +370,6 @@ func (c *ClassController) ClassNotLoginRoutes(rg *gin.RouterGroup) {
 	rg.GET("/", c.ClassGetAllClasses)
 	rg.GET("/:class_id", c.ClassGetClassByID)
 	rg.GET("/public", c.GetAllClassPublic)
+	rg.GET("/recent", c.GetClassRecentManyIDs)
+	rg.POST("/recent", c.GetClassRecentManyIDs)
 }

@@ -23,6 +23,7 @@ type ClassRepository interface {
 	GetAllClassPublic(ctx context.Context) (*[]types.ClassResponse, error)
 	ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error
 	RemoveMemberInClass(ctx context.Context, classID, userID int) error
+	GetClassRecentManyIDs(ctx context.Context, limit []int) (*[]types.ClassResponse, error)
 }
 
 type classRepository struct {
@@ -349,4 +350,42 @@ func (r *classRepository) RemoveMemberInClass(ctx context.Context, classID, user
 	}
 
 	return nil
+}
+
+func (r *classRepository) GetClassRecentManyIDs(ctx context.Context, limit []int) (*[]types.ClassResponse, error) {
+	var classes []model.Classroom
+	if err := r.db.WithContext(ctx).Where("id IN ?", limit).Find(&classes).Error; err != nil {
+		return nil, err
+	}
+
+	classResponses := make([]types.ClassResponse, 0, len(classes))
+
+	for _, class := range classes {
+		var owner model.User
+		if err := r.db.WithContext(ctx).Where("id = ?", class.OwnerId).First(&owner).Error; err != nil {
+			return nil, err
+		}
+
+		var memberCount int64
+		if err := r.db.WithContext(ctx).Model(&model.Member{}).Where("class_id = ?", class.ID).Count(&memberCount).Error; err != nil {
+			return nil, err
+		}
+		classResponses = append(classResponses, types.ClassResponse{
+			ID:               int(class.ID),
+			Topic:            class.Topic,
+			Description:      class.Description,
+			Code:             class.Code,
+			GoogleCourseID:   class.GoogleCourseID,
+			GoogleCourseLink: class.GoogleCourseLink,
+			GoogleSyncedAt:   class.GoogleSyncedAt,
+			OwnerID:          int(class.OwnerId),
+			OwnerName:        owner.Name,
+			MemberAmount:     memberCount,
+			Status:           class.Status,
+			Favorite:         class.Favorite,
+			BannerID:         class.BannerID,
+		})
+	}
+
+	return &classResponses, nil
 }

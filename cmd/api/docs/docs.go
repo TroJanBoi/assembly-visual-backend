@@ -341,6 +341,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/classroom/recent": {
+            "get": {
+                "description": "Get recent classes by many IDs (GET: ?class_id=1\u0026class_id=2, POST: {\"class_id\":[1,2]})",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "classrooms"
+                ],
+                "summary": "Get recent classes by many IDs",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "List of Class IDs (GET)",
+                        "name": "class_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ClassResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/classroom/{class_id}": {
             "get": {
                 "description": "Retrieve a class by ID",

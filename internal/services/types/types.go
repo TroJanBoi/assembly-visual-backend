@@ -437,3 +437,7 @@ type NotificationResponse struct {
 	Data    map[string]interface{} `json:"data"`
 	IsRead  bool                   `json:"is_read"`
 }
+
+type RecentRequest struct {
+	Limit []int `json:"limit" binding:"required"`
+}
