@@ -240,26 +240,26 @@ func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.Ta
 		return nil, fmt.Errorf("failed to retrieve assignments: %w", err)
 	}
 
-	assignmentIDList := make([]int, len(assignments))
-	for i, assignment := range assignments {
-		assignmentIDList[i] = int(assignment.ID)
+	var submissions []model.Submission
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&submissions).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve submissions: %w", err)
 	}
 
-	var playgrounds []model.Playground
-	if err := r.db.WithContext(ctx).Where("assignment_id IN ? AND user_id = ? AND status = ?", assignmentIDList, userID, "in_progress").Find(&playgrounds).Error; err != nil {
-		return nil, fmt.Errorf("failed to retrieve playground records: %w", err)
-	}
-
-	var playgorundLst []int
-	for _, pg := range playgrounds {
-		playgorundLst = append(playgorundLst, int(pg.AssignmentID))
-	}
-
+	var status string
 	var taskResp []types.TaskMeResponse
-	for _, pg := range playgorundLst {
-		var assignment model.Assignment
-		if err := r.db.WithContext(ctx).Where("id = ?", pg).First(&assignment).Error; err != nil {
-			return nil, fmt.Errorf("failed to retrieve assignment: %w", err)
+	for _, assignment := range assignments {
+
+		var countSubmissionByAssignmentID int64
+		if err := r.db.WithContext(ctx).Model(&model.Submission{}).Where("user_id = ? AND assignment_id = ?", userID, assignment.ID).Count(&countSubmissionByAssignmentID).Error; err != nil {
+			return nil, fmt.Errorf("failed to count submissions: %w", err)
+		}
+
+		if time.Now().After(assignment.DueDate) {
+			status = "overdue"
+		} else if countSubmissionByAssignmentID > 0 {
+			status = "completed"
+		} else {
+			status = "in_progress"
 		}
 
 		taskResp = append(taskResp, types.TaskMeResponse{
@@ -269,9 +269,31 @@ func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.Ta
 			AssignmentTitle: assignment.Title,
 			Description:     assignment.Description,
 			MaxAttempt:      assignment.MaxAttempt,
-			PlaygroundID:    pg,
 			DueDate:         assignment.DueDate.Format((time.RFC3339)),
+			Status:          status,
 		})
 	}
 	return &taskResp, nil
+
+	// var status string
+	// var taskResp []types.TaskMeResponse
+	// for _, assignment := range assignments {
+	// 	if time.Now().After(assignment.DueDate) {
+	// 		status = "overdue"
+	// 	} else if
+	// 	} else {
+	// 		status = "in_progress"
+	// 	}
+	// 	taskResp = append(taskResp, types.TaskMeResponse{
+	// 		ClassID:         int(assignment.ClassID),
+	// 		Favorite:        int(assignment.Classroom.Favorite),
+	// 		AssignmentID:    int(assignment.ID),
+	// 		AssignmentTitle: assignment.Title,
+	// 		Description:     assignment.Description,
+	// 		MaxAttempt:      assignment.MaxAttempt,
+	// 		DueDate:         assignment.DueDate.Format((time.RFC3339)),
+	// 		Status:          status,
+	// 	})
+	// }
+	// return &taskResp, nil
 }

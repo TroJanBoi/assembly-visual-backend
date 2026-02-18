@@ -442,14 +442,12 @@ type RecentRequest struct {
 
 type TaskMeResponse struct {
 	ClassID         int    `json:"class_id"`
-	ClassTopic      string `json:"class_topic"`
 	BannerID        int    `json:"banner_id"`
 	Favorite        int    `json:"favorite"`
 	AssignmentID    int    `json:"assignment_id"`
 	AssignmentTitle string `json:"assignment_title"`
 	Description     string `json:"description"`
 	MaxAttempt      int    `json:"max_attempt"`
-	PlaygroundID    int    `json:"playground_id"`
 
 	DueDate string `json:"due_date"`
 	Status  string `json:"status"` // e.g., "not_started", "in_progress", "completed", "overdue"
