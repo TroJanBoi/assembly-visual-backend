@@ -70,7 +70,7 @@ func (r *submissionRepository) CreateSubmission(ctx context.Context, userId int,
 
 func (r *submissionRepository) UpdateSubmission(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error {
 	var submission model.Submission
-	err := r.db.WithContext(ctx).Where("id = ?", submissionID, userID).First(&submission).Error
+	err := r.db.WithContext(ctx).Where("id = ?", submissionID).First(&submission).Error
 	if err != nil {
 		return err
 	}

@@ -3751,6 +3751,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/me/task": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve tasks of the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get my tasks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.TaskMeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/owner/classroom": {
             "get": {
                 "security": [
@@ -4063,9 +4103,6 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "due_date": {
-                    "type": "string"
-                },
                 "grade": {
                     "description": "total grade of the assignment",
                     "type": "integer"
@@ -4178,6 +4215,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "due_date": {
+                    "type": "string"
+                },
                 "grade": {
                     "description": "total grade of the assignment",
                     "type": "integer"
@@ -4186,7 +4226,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "setting": {
-                    "description": "Setting     AssignmentSettings  ` + "`" + `json:\"settings\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
                     "type": "object",
                     "additionalProperties": true
                 },
@@ -4432,6 +4471,42 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "types.TaskMeResponse": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                },
+                "assignment_title": {
+                    "type": "string"
+                },
+                "banner_id": {
+                    "type": "integer"
+                },
+                "class_id": {
+                    "type": "integer"
+                },
+                "class_topic": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "favorite": {
+                    "type": "integer"
+                },
+                "max_attempt": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "e.g., \"not_started\", \"in_progress\", \"completed\", \"overdue\"",
+                    "type": "string"
                 }
             }
         },

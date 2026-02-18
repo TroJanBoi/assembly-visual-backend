@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -20,6 +21,7 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, userID int) error
 	GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 	GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
+	GetMeTask(ctx context.Context, userID int) (*[]types.TaskMeResponse, error)
 }
 
 type userRepository struct {
@@ -208,4 +210,68 @@ func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]type
 		})
 	}
 	return &classResp, nil
+}
+
+func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.TaskMeResponse, error) {
+	var member []model.Member // check member
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&member).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve member records: %w", err)
+	}
+
+	var classIDs []int
+	for _, m := range member {
+		classIDs = append(classIDs, int(m.ClassID))
+	}
+
+	var classes []model.Classroom // select classes where user is member
+	if err := r.db.WithContext(ctx).Where("id IN ?", classIDs).Find(&classes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
+	}
+
+	// get class id list for select tasks
+	var classIDList []int
+	for _, class := range classes {
+		classIDList = append(classIDList, int(class.ID))
+	}
+
+	// select tasks where class id in classIDList
+	var assignments []model.Assignment
+	if err := r.db.WithContext(ctx).Where("class_id IN ?", classIDList).Find(&assignments).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve assignments: %w", err)
+	}
+
+	assignmentIDList := make([]int, len(assignments))
+	for i, assignment := range assignments {
+		assignmentIDList[i] = int(assignment.ID)
+	}
+
+	var playgrounds []model.Playground
+	if err := r.db.WithContext(ctx).Where("assignment_id IN ? AND user_id = ? AND status = ?", assignmentIDList, userID, "in_progress").Find(&playgrounds).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve playground records: %w", err)
+	}
+
+	var playgorundLst []int
+	for _, pg := range playgrounds {
+		playgorundLst = append(playgorundLst, int(pg.AssignmentID))
+	}
+
+	var taskResp []types.TaskMeResponse
+	for _, pg := range playgorundLst {
+		var assignment model.Assignment
+		if err := r.db.WithContext(ctx).Where("id = ?", pg).First(&assignment).Error; err != nil {
+			return nil, fmt.Errorf("failed to retrieve assignment: %w", err)
+		}
+
+		taskResp = append(taskResp, types.TaskMeResponse{
+			ClassID:         int(assignment.ClassID),
+			Favorite:        int(assignment.Classroom.Favorite),
+			AssignmentID:    int(assignment.ID),
+			AssignmentTitle: assignment.Title,
+			Description:     assignment.Description,
+			MaxAttempt:      assignment.MaxAttempt,
+			PlaygroundID:    pg,
+			DueDate:         assignment.DueDate.Format((time.RFC3339)),
+		})
+	}
+	return &taskResp, nil
 }

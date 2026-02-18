@@ -95,8 +95,6 @@ definitions:
         type: object
       description:
         type: string
-      due_date:
-        type: string
       grade:
         description: total grade of the assignment
         type: integer
@@ -175,6 +173,8 @@ definitions:
         type: object
       description:
         type: string
+      due_date:
+        type: string
       grade:
         description: total grade of the assignment
         type: integer
@@ -182,9 +182,6 @@ definitions:
         type: integer
       setting:
         additionalProperties: true
-        description: |-
-          Setting     AssignmentSettings  `json:"settings"`
-          Condition   AssignmentCondition `json:"condition"`
         type: object
       title:
         type: string
@@ -350,6 +347,30 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  types.TaskMeResponse:
+    properties:
+      assignment_id:
+        type: integer
+      assignment_title:
+        type: string
+      banner_id:
+        type: integer
+      class_id:
+        type: integer
+      class_topic:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      favorite:
+        type: integer
+      max_attempt:
+        type: integer
+      status:
+        description: e.g., "not_started", "in_progress", "completed", "overdue"
+        type: string
     type: object
   types.TestCaseAssert:
     properties:
@@ -3000,6 +3021,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Get my classes
+      tags:
+      - users
+  /user/me/task:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve tasks of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TaskMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my tasks
       tags:
       - users
   /user/owner/classroom:
