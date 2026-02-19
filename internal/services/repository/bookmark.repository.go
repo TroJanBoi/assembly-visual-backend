@@ -81,7 +81,6 @@ func (r *bookmarkRepository) GetBookmarksByUserID(ctx context.Context, userID in
 			OwnerName:        owner.Name,
 			MemberAmount:     memberCount,
 			Status:           class.Status,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}

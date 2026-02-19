@@ -165,7 +165,6 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			Favorite:         int(class.Favorite),
 			BannerID:         int(class.BannerID),
 			MemberAmount:     countMember,
 		})
@@ -204,7 +203,6 @@ func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]type
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			Favorite:         int(class.Favorite),
 			BannerID:         int(class.BannerID),
 			MemberAmount:     countMember,
 		})
@@ -264,7 +262,6 @@ func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.Ta
 
 		taskResp = append(taskResp, types.TaskMeResponse{
 			ClassID:         int(assignment.ClassID),
-			Favorite:        int(assignment.Classroom.Favorite),
 			AssignmentID:    int(assignment.ID),
 			AssignmentTitle: assignment.Title,
 			Description:     assignment.Description,
@@ -274,26 +271,4 @@ func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.Ta
 		})
 	}
 	return &taskResp, nil
-
-	// var status string
-	// var taskResp []types.TaskMeResponse
-	// for _, assignment := range assignments {
-	// 	if time.Now().After(assignment.DueDate) {
-	// 		status = "overdue"
-	// 	} else if
-	// 	} else {
-	// 		status = "in_progress"
-	// 	}
-	// 	taskResp = append(taskResp, types.TaskMeResponse{
-	// 		ClassID:         int(assignment.ClassID),
-	// 		Favorite:        int(assignment.Classroom.Favorite),
-	// 		AssignmentID:    int(assignment.ID),
-	// 		AssignmentTitle: assignment.Title,
-	// 		Description:     assignment.Description,
-	// 		MaxAttempt:      assignment.MaxAttempt,
-	// 		DueDate:         assignment.DueDate.Format((time.RFC3339)),
-	// 		Status:          status,
-	// 	})
-	// }
-	// return &taskResp, nil
 }

@@ -81,7 +81,6 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 			OwnerName:        owner.Name,
 			Status:           class.Status,
 			MemberAmount:     memberCount,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
@@ -201,7 +200,6 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		OwnerName:        owner.Name,
 		MemberAmount:     memberCount,
 		Status:           class.Status,
-		Favorite:         class.Favorite,
 		BannerID:         class.BannerID,
 	}
 
@@ -308,7 +306,6 @@ func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.Class
 			OwnerName:        owner.Name,
 			MemberAmount:     memberCount,
 			Status:           class.Status,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
@@ -382,7 +379,6 @@ func (r *classRepository) GetClassRecentManyIDs(ctx context.Context, limit []int
 			OwnerName:        owner.Name,
 			MemberAmount:     memberCount,
 			Status:           class.Status,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
