@@ -23,6 +23,13 @@ definitions:
       title:
         type: string
     type: object
+  types.BookMarkRequest:
+    properties:
+      class_id:
+        type: integer
+    required:
+    - class_id
+    type: object
   types.ChangePasswordRequest:
     properties:
       new_password:
@@ -358,8 +365,6 @@ definitions:
         type: integer
       class_id:
         type: integer
-      class_topic:
-        type: string
       description:
         type: string
       due_date:
@@ -612,6 +617,110 @@ paths:
       summary: Register new user
       tags:
       - auth
+  /bookmark:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a bookmark for a class
+      parameters:
+      - description: Bookmark data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.BookMarkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a bookmark
+      tags:
+      - bookmark
+    get:
+      consumes:
+      - application/json
+      description: Get all bookmarks for a user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get bookmarks by user ID
+      tags:
+      - bookmark
+    post:
+      consumes:
+      - application/json
+      description: Create a bookmark for a class
+      parameters:
+      - description: Bookmark data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.BookMarkRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a bookmark
+      tags:
+      - bookmark
   /classroom:
     get:
       consumes:

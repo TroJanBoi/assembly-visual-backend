@@ -452,3 +452,23 @@ type TaskMeResponse struct {
 	DueDate string `json:"due_date"`
 	Status  string `json:"status"` // e.g., "not_started", "in_progress", "completed", "overdue"
 }
+
+type TaskMeDetailResponse struct {
+	ClassID         int                  `json:"class_id"`
+	BannerID        int                  `json:"banner_id"`
+	Favorite        int                  `json:"favorite"`
+	AssignmentID    int                  `json:"assignment_id"`
+	AssignmentTitle string               `json:"assignment_title"`
+	Description     string               `json:"description"`
+	MaxAttempt      int                  `json:"max_attempt"`
+	DueDate         string               `json:"due_date"`
+	Status          string               `json:"status"` // e.g., "not_started", "in_progress", "completed", "overdue"
+	Submissions     []SubmissionResponse `json:"submissions"`
+	Playground      *PlaygroundResponse  `json:"playground,omitempty"`
+	Assignment      *AssignmentResponse  `json:"assignment,omitempty"`
+	Class           *ClassMeResponse     `json:"class,omitempty"`
+}
+
+type BookMarkRequest struct {
+	ClassID int `json:"class_id" binding:"required"`
+}

@@ -103,6 +103,10 @@ func (s *Server) Router() (http.Handler, func()) {
 	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository)
 	notificationController := controller.NewNotificationController(notificationUsecase)
 
+	bookmarkRepository := repository.NewBookmarkRepository(s.db)
+	bookmarkUseCase := usecases.NewBookmarkUseCase(bookmarkRepository)
+	bookmarkController := controller.NewBookmarkController(bookmarkUseCase)
+
 	api := r.Group("/api/v2")
 	{
 		oauthController.OAuthRegisterRoutes(api)
@@ -166,6 +170,10 @@ func (s *Server) Router() (http.Handler, func()) {
 		notificationGroup := api.Group("/notifications").Use(security.Middleware()).(*gin.RouterGroup)
 		{
 			notificationController.NotificationRoutes(notificationGroup)
+		}
+		bookmarkGroup := api.Group("/bookmark").Use(security.Middleware()).(*gin.RouterGroup)
+		{
+			bookmarkController.BookmarkRoutes(bookmarkGroup)
 		}
 	}
 	if config.ENV == "dev" || config.ENV == "uat" {
