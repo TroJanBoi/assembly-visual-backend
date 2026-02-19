@@ -138,12 +138,18 @@ func (r *invitationRepository) UpdateInvitationStatus(ctx context.Context, invit
 		return err
 	}
 
-	if status == "accepted" {
+	switch status {
+	case "accepted":
 		newMember := model.Member{
 			UserID:  userID,
 			ClassID: invitation.ClassID,
+			Role:    "member",
 		}
 		if err := r.db.WithContext(ctx).Create(&newMember).Error; err != nil {
+			return err
+		}
+	case "declined":
+		if err := r.db.WithContext(ctx).Delete(&invitation).Error; err != nil {
 			return err
 		}
 	}
