@@ -1792,6 +1792,49 @@ paths:
       summary: Get all members of a class by class ID
       tags:
       - classrooms
+  /classroom/join-with-code/{code}:
+    post:
+      consumes:
+      - application/json
+      description: Join a class using a unique code
+      parameters:
+      - description: Class Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Join a class with code
+      tags:
+      - classrooms
   /classroom/member:
     delete:
       consumes:
