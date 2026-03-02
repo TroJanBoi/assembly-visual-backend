@@ -102,6 +102,7 @@ type UpdateClassRequest struct {
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	Status           int    `json:"status"` // public or private
+	BannerID         int    `json:"banner_id"`
 }
 
 type AssignmentResponse struct {

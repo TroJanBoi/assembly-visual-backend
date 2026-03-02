@@ -4963,6 +4963,9 @@ const docTemplate = `{
         "types.UpdateClassRequest": {
             "type": "object",
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
