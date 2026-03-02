@@ -3843,6 +3843,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/submission/{submission_id}/grade": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the grade for a specific submission by submission ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submission"
+                ],
+                "summary": "Update grade for a submission",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "submission_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Grade Data",
+                        "name": "grade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGradeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "security": [
@@ -4407,6 +4474,9 @@ const docTemplate = `{
                 "duration_ms": {
                     "type": "integer"
                 },
+                "feed_back": {
+                    "type": "string"
+                },
                 "is_verified": {
                     "type": "boolean"
                 },
@@ -4911,6 +4981,24 @@ const docTemplate = `{
                 }
             }
         },
+        "types.UpdateGradeRequest": {
+            "type": "object",
+            "required": [
+                "is_verified",
+                "score"
+            ],
+            "properties": {
+                "feed_back": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "score": {
+                    "type": "number"
+                }
+            }
+        },
         "types.UpdateSubmissionRequest": {
             "type": "object",
             "properties": {
@@ -4926,6 +5014,9 @@ const docTemplate = `{
                 },
                 "duration_ms": {
                     "type": "integer"
+                },
+                "feed_back": {
+                    "type": "string"
                 },
                 "is_verified": {
                     "type": "boolean"

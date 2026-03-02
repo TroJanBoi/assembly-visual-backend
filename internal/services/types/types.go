@@ -386,6 +386,7 @@ type CreateSubmissionRequest struct {
 	Status        string                 `json:"status"`
 	IsVerified    bool                   `json:"is_verified"`
 	DurationMS    int                    `json:"duration_ms"`
+	FeedBack      string                 `json:"feed_back"`
 }
 
 type UpdateSubmissionRequest struct {
@@ -398,6 +399,7 @@ type UpdateSubmissionRequest struct {
 	Score         float64                `json:"score"`
 	Status        string                 `json:"status"`
 	IsVerified    bool                   `json:"is_verified"`
+	FeedBack      string                 `json:"feed_back"`
 	DurationMS    int                    `json:"duration_ms"`
 }
 
@@ -471,4 +473,14 @@ type TaskMeDetailResponse struct {
 
 type BookMarkRequest struct {
 	ClassID int `json:"class_id" binding:"required"`
+}
+
+type UpdateGradeRequest struct {
+	Score      float64 `json:"score" binding:"required"`
+	IsVerified bool    `json:"is_verified" binding:"required"`
+	FeedBack   string  `json:"feed_back"`
+}
+
+type BadRequestError struct {
+	Message string `json:"message"`
 }

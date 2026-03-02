@@ -147,6 +147,8 @@ definitions:
         type: object
       duration_ms:
         type: integer
+      feed_back:
+        type: string
       is_verified:
         type: boolean
       item_snapshot:
@@ -486,6 +488,18 @@ definitions:
       topic:
         type: string
     type: object
+  types.UpdateGradeRequest:
+    properties:
+      feed_back:
+        type: string
+      is_verified:
+        type: boolean
+      score:
+        type: number
+    required:
+    - is_verified
+    - score
+    type: object
   types.UpdateSubmissionRequest:
     properties:
       assignment_id:
@@ -497,6 +511,8 @@ definitions:
         type: object
       duration_ms:
         type: integer
+      feed_back:
+        type: string
       is_verified:
         type: boolean
       item_snapshot:
@@ -2940,6 +2956,49 @@ paths:
       security:
       - BearerAuth: []
       summary: Update an existing submission
+      tags:
+      - Submission
+  /submission/{submission_id}/grade:
+    put:
+      consumes:
+      - application/json
+      description: Update the grade for a specific submission by submission ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      - description: Updated Grade Data
+        in: body
+        name: grade
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateGradeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update grade for a submission
       tags:
       - Submission
   /submission/assignment/{assignment_id}:
