@@ -1,0 +1,78 @@
+# version: "3.9"
+
+services:
+  # 1. Database
+  postgres:
+    image: postgres:15
+    container_name: assembly_perf_postgres
+    restart: always
+    env_file: .env
+    environment:
+      TZ: ${POSTGRES_TIMEZONE:-Asia/Bangkok}
+      PGTZ: ${POSTGRES_TIMEZONE:-Asia/Bangkok}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata_perf:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d  
+    networks:
+      - assembly-perf-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+  # 2. Backend API
+  backend:
+    build: 
+      context: .
+      # Make sure you have a Dockerfile in the backend folder for this to work
+      dockerfile: Dockerfile
+    container_name: assembly_perf_backend
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_HOST=postgres
+      - ENV=production
+    ports:
+      - "${PORT:-9090}:${PORT:-9090}"
+    depends_on:
+      - postgres
+    networks:
+      - assembly-perf-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1G
+
+  # 3. Frontend Web App
+  frontend:
+    build: 
+      context: ../assembly-visual-frontend/app
+      # Make sure you have a Dockerfile in the frontend folder for this to work
+      dockerfile: Dockerfile
+    container_name: assembly_perf_frontend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:${PORT:-9090} # Called from client browser
+      - INTERNAL_API_URL=http://backend:${PORT:-9090}      # Called from Next.js server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - assembly-perf-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+volumes:
+  pgdata_perf:
+
+networks:
+  assembly-perf-net:
+    driver: bridge
