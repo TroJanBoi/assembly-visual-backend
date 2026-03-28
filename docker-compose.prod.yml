@@ -27,7 +27,6 @@ services:
     environment:
       - ENV=production
       - POSTGRES_HOST=postgres
-      # Other variables (DB passwords, secrets) are pulled from .env.prod natively
     ports:
       - "9090:9090"
     networks:
@@ -42,10 +41,10 @@ services:
       dockerfile: Dockerfile
     container_name: assembly_prod_frontend
     restart: always
-    env_file: ../assembly-visual-frontend/app/.env.local # Uses local env for testing, or create a prod one
+    env_file: ../assembly-visual-frontend/app/.env.local 
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost/api  # Nginx will route this to backend on port 80
-      - INTERNAL_API_URL=http://backend:9090      # Server-side calls direct to backend container
+      - NEXT_PUBLIC_API_URL=/api 
+      - INTERNAL_API_URL=http://backend:9090
     networks:
       - assembly-prod-net
     depends_on:
