@@ -24,6 +24,7 @@ tmp/
 
 # .env file
 .env
+.env.prod
 
 # Project build
 main
@@ -38,3 +39,7 @@ main
 /internal/services/repository/.old_repository
 /internal/services/usecases/.old_usecase
 /internal/services/types/.old_types
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
