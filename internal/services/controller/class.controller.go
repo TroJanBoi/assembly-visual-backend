@@ -355,6 +355,43 @@ func (c *ClassController) GetClassRecentManyIDs(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, classes)
 }
 
+// @Summary      Join a class with code
+// @Description  Join a class using a unique code
+// @Tags         classrooms
+// @Accept       json
+// @Produce      json
+// @Param        code   path      string  true  "Class Code"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      401   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Security     BearerAuth
+// @Router       /classroom/join-with-code/{code} [post]
+func (c *ClassController) JoinWithCode(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+	code := ctx.Param("code")
+	if code == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Class code is required"})
+		return
+	}
+
+	err := c.classUseCase.JoinWithCodeUseCases(ctx, userID, code)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Joined class successfully"})
+}
+
 func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.POST("/", c.ClassCreateClass)
 	r.PUT("/:class_id", c.ClassUpdateClass)
@@ -363,6 +400,7 @@ func (c *ClassController) ClassRoutes(r gin.IRoutes) {
 	r.GET("/:class_id/members", c.GetAllMembersByClassID)
 	r.PUT("/:class_id/member/permission", c.ChangePermissionMember)
 	r.DELETE("/member", c.RemoveMemberInClass)
+	r.POST("/join-with-code/:code", c.JoinWithCode)
 }
 
 func (c *ClassController) ClassNotLoginRoutes(rg *gin.RouterGroup) {

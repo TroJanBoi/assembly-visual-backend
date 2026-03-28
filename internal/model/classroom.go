@@ -8,7 +8,6 @@ type Classroom struct {
 	Topic            string `gorm:"not null"`
 	Description      string `gorm:"null"`
 	Code             string `gorm:"null"`               // code for invitation in classroom
-	Favorite         int    `gorm:"not null;default:0"` // amount of stars
 	BannerID         int    `gorm:"null"`
 	Status           int    `gorm:"not null;default:0"` // 0: public, 1: private, 2: archived
 	GoogleCourseID   string `gorm:"null;"`

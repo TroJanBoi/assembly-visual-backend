@@ -135,6 +135,169 @@ const docTemplate = `{
                 }
             }
         },
+        "/bookmark": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all bookmarks for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmark"
+                ],
+                "summary": "Get bookmarks by user ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a bookmark for a class",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmark"
+                ],
+                "summary": "Create a bookmark",
+                "parameters": [
+                    {
+                        "description": "Bookmark data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.BookMarkRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a bookmark for a class",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmark"
+                ],
+                "summary": "Delete a bookmark",
+                "parameters": [
+                    {
+                        "description": "Bookmark data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.BookMarkRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/classroom": {
             "get": {
                 "description": "Retrieve all classrooms",
@@ -200,6 +363,73 @@ const docTemplate = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/classroom/join-with-code/{code}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Join a class using a unique code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "classrooms"
+                ],
+                "summary": "Join a class with code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Class Code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -3613,6 +3843,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/submission/{submission_id}/grade": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the grade for a specific submission by submission ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Submission"
+                ],
+                "summary": "Update grade for a submission",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Submission ID",
+                        "name": "submission_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Grade Data",
+                        "name": "grade",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.UpdateGradeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "security": [
@@ -3736,6 +4033,46 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/types.ClassMeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/me/task": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve tasks of the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get my tasks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.TaskMeResponse"
                             }
                         }
                     },
@@ -3951,6 +4288,17 @@ const docTemplate = `{
                 }
             }
         },
+        "types.BookMarkRequest": {
+            "type": "object",
+            "required": [
+                "class_id"
+            ],
+            "properties": {
+                "class_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "types.ChangePasswordRequest": {
             "type": "object",
             "required": [
@@ -4063,9 +4411,6 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "due_date": {
-                    "type": "string"
-                },
                 "grade": {
                     "description": "total grade of the assignment",
                     "type": "integer"
@@ -4129,6 +4474,9 @@ const docTemplate = `{
                 "duration_ms": {
                     "type": "integer"
                 },
+                "feed_back": {
+                    "type": "string"
+                },
                 "is_verified": {
                     "type": "boolean"
                 },
@@ -4178,6 +4526,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "due_date": {
+                    "type": "string"
+                },
                 "grade": {
                     "description": "total grade of the assignment",
                     "type": "integer"
@@ -4186,7 +4537,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "setting": {
-                    "description": "Setting     AssignmentSettings  ` + "`" + `json:\"settings\"` + "`" + `\nCondition   AssignmentCondition ` + "`" + `json:\"condition\"` + "`" + `",
                     "type": "object",
                     "additionalProperties": true
                 },
@@ -4435,6 +4785,39 @@ const docTemplate = `{
                 }
             }
         },
+        "types.TaskMeResponse": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "integer"
+                },
+                "assignment_title": {
+                    "type": "string"
+                },
+                "banner_id": {
+                    "type": "integer"
+                },
+                "class_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "favorite": {
+                    "type": "integer"
+                },
+                "max_attempt": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "e.g., \"not_started\", \"in_progress\", \"completed\", \"overdue\"",
+                    "type": "string"
+                }
+            }
+        },
         "types.TestCaseAssert": {
             "type": "object",
             "required": [
@@ -4580,6 +4963,9 @@ const docTemplate = `{
         "types.UpdateClassRequest": {
             "type": "object",
             "properties": {
+                "banner_id": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -4598,6 +4984,24 @@ const docTemplate = `{
                 }
             }
         },
+        "types.UpdateGradeRequest": {
+            "type": "object",
+            "required": [
+                "is_verified",
+                "score"
+            ],
+            "properties": {
+                "feed_back": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "score": {
+                    "type": "number"
+                }
+            }
+        },
         "types.UpdateSubmissionRequest": {
             "type": "object",
             "properties": {
@@ -4613,6 +5017,9 @@ const docTemplate = `{
                 },
                 "duration_ms": {
                     "type": "integer"
+                },
+                "feed_back": {
+                    "type": "string"
                 },
                 "is_verified": {
                     "type": "boolean"

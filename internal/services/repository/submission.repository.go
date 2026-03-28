@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -16,6 +17,7 @@ type SubmissionRepository interface {
 	GetAllSubmissionByAssignmentID(ctx context.Context, ownerID, assignmentID int) (*[]types.SubmissionResponse, error)
 	GetSubmissionByID(ctx context.Context, userID, submissionID int) (*types.SubmissionResponse, error)
 	GetAllSubmissionByAssignmentIDandUserID(ctx context.Context, assignmentID, userID int) (*[]types.SubmissionResponse, error)
+	UpdateGrade(ctx context.Context, userID, submissionID int, request types.UpdateGradeRequest) error
 }
 
 type submissionRepository struct {
@@ -49,6 +51,10 @@ func (r *submissionRepository) CreateSubmission(ctx context.Context, userId int,
 	clientResult, _ := json.Marshal(request.ClientResult)
 	serverResult, _ := json.Marshal(request.ServerResult)
 
+	if request.Score > float64(assignment.Grade) {
+		request.Score = float64(assignment.Grade)
+	}
+
 	newSubmission := model.Submission{
 		AssignmentID:  int(request.AssignmentID),
 		UserID:        int(userId),
@@ -70,7 +76,13 @@ func (r *submissionRepository) CreateSubmission(ctx context.Context, userId int,
 
 func (r *submissionRepository) UpdateSubmission(ctx context.Context, userID, submissionID int, request types.UpdateSubmissionRequest) error {
 	var submission model.Submission
-	err := r.db.WithContext(ctx).Where("id = ?", submissionID, userID).First(&submission).Error
+	err := r.db.WithContext(ctx).Where("id = ?", submissionID).First(&submission).Error
+	if err != nil {
+		return err
+	}
+
+	var assignment model.Assignment
+	err = r.db.WithContext(ctx).Where("id = ?", submission.AssignmentID).First(&assignment).Error
 	if err != nil {
 		return err
 	}
@@ -86,14 +98,20 @@ func (r *submissionRepository) UpdateSubmission(ctx context.Context, userID, sub
 	clientResult, _ := json.Marshal(request.ClientResult)
 	serverResult, _ := json.Marshal(request.ServerResult)
 
+	if request.Score > float64(assignment.Grade) {
+		request.Score = float64(assignment.Grade)
+	} else {
+		submission.Score = request.Score
+	}
+
 	submission.AttemptNumber = int(request.AttemptNumber)
 	submission.ItemSnapshot = datatypes.JSON(snapshot)
 	submission.ClientResult = datatypes.JSON(clientResult)
 	submission.ServerResult = datatypes.JSON(serverResult)
-	submission.Score = request.Score
-	submission.Status = request.Status
 	submission.IsVerified = request.IsVerified
 	submission.DurationMS = request.DurationMS
+	submission.FeedBack = request.FeedBack
+	submission.UpdatedAt = time.Now()
 
 	if err := r.db.WithContext(ctx).Save(&submission).Error; err != nil {
 		return err
@@ -285,4 +303,44 @@ func (r *submissionRepository) GetAllSubmissionByAssignmentIDandUserID(ctx conte
 		})
 	}
 	return &submissionResponse, nil
+}
+
+func (r *submissionRepository) UpdateGrade(ctx context.Context, userID, submissionID int, request types.UpdateGradeRequest) error {
+	var submission model.Submission
+	err := r.db.WithContext(ctx).Where("id = ?", submissionID).First(&submission).Error
+	if err != nil {
+		return err
+	}
+
+	var assignment model.Assignment
+	err = r.db.WithContext(ctx).Where("id = ?", submission.AssignmentID).First(&assignment).Error
+	if err != nil {
+		return err
+	}
+
+	// อนุญาตให้แก้ไขได้ทุกฟิลด์ เจ้าของ submission และ owner ของ assignment และ member ที่เป็น TA เท่านั้น
+	err = r.db.WithContext(ctx).Table("classroom c").Select("c.id, c.owner_id").Joins("JOIN assignment a ON a.class_id = c.id").Joins("JOIN member m ON m.class_id = c.id").Joins("JOIN submission s ON s.assignment_id = a.id").Where("a.id = ? AND (c.owner_id = ? OR (m.user_id = ? AND m.role = ?) OR s.user_id = ?)", submission.AssignmentID, userID, userID, "ta", userID).First(&model.Classroom{}).Error
+	if err != nil {
+		return err
+	}
+
+	// ถ้า score ที่ส่งมามากกว่า grade ของ assignment ให้ตั้งเป็น grade ของ assignment แทน และ ถ้าไม่ก็ให้ตั้งเป็น score ที่ส่งมา
+	if request.Score > float64(assignment.Grade) {
+		submission.Score = float64(assignment.Grade)
+	} else {
+		submission.Score = request.Score
+	}
+	submission.FeedBack = request.FeedBack
+	submission.IsVerified = request.IsVerified
+	submission.UpdatedAt = time.Now()
+
+	submission.Status = "submitted"
+	if err := r.db.WithContext(ctx).Save(&submission).Error; err != nil {
+		submission.Status = "failed"
+		if err := r.db.WithContext(ctx).Save(&submission).Error; err != nil {
+			return err
+		}
+		return err
+	}
+	return nil
 }

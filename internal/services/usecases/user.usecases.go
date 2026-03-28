@@ -14,6 +14,7 @@ type UserUseCase interface {
 	DeleteUserUsecase(ctx context.Context, userID int) error
 	GetMeClassUsecase(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 	GetOwnerClassUsecase(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
+	GetMeTaskUsecase(ctx context.Context, userID int) (*[]types.TaskMeResponse, error)
 }
 type userUseCase struct {
 	userRepository repository.UserRepository
@@ -68,4 +69,12 @@ func (u *userUseCase) GetOwnerClassUsecase(ctx context.Context, userID int) (*[]
 		return nil, err
 	}
 	return classes, nil
+}
+
+func (u *userUseCase) GetMeTaskUsecase(ctx context.Context, userID int) (*[]types.TaskMeResponse, error) {
+	tasks, err := u.userRepository.GetMeTask(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }

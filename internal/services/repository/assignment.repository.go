@@ -41,8 +41,6 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 		return nil, gorm.ErrRecordNotFound
 	}
 
-	dueDate := time.Now().Add(7 * 24 * time.Hour).Format(time.RFC3339) // Example due date set to one week from now := 2023-10-01T15:04:05Z07:00
-
 	var assignments []model.Assignment
 	if err := r.db.WithContext(ctx).Where("class_id = ?", classID).Find(&assignments).Error; err != nil {
 		return nil, err
@@ -68,6 +66,8 @@ func (r *assignmentRepository) GetAssignmentsByClassID(ctx context.Context, clas
 		} else {
 			condition = map[string]interface{}{}
 		}
+
+		dueDate := assignment.DueDate.Format(time.RFC3339)
 
 		assignmentResponses = append(assignmentResponses, types.AssignmentResponse{
 			ID:          int(assignment.ID),
@@ -219,6 +219,10 @@ func (r *assignmentRepository) EditAssignmentByAssignmentID(ctx context.Context,
 	}
 	if assignment.Grade != 0 {
 		existingAssignment.Grade = assignment.Grade
+	}
+	// Update DueDate if provided (check for non-zero time)
+	if !assignment.DueDate.IsZero() {
+		existingAssignment.DueDate = assignment.DueDate
 	}
 
 	settingBytes, _ := json.Marshal(assignment.Setting)

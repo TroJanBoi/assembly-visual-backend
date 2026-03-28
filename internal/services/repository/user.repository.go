@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/TroJanBoi/assembly-visual-backend/internal/model"
 	"github.com/TroJanBoi/assembly-visual-backend/internal/services/types"
@@ -20,6 +21,7 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, userID int) error
 	GetMeClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
 	GetOwnerClass(ctx context.Context, userID int) (*[]types.ClassMeResponse, error)
+	GetMeTask(ctx context.Context, userID int) (*[]types.TaskMeResponse, error)
 }
 
 type userRepository struct {
@@ -163,7 +165,6 @@ func (r *userRepository) GetMeClass(ctx context.Context, userID int) (*[]types.C
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			Favorite:         int(class.Favorite),
 			BannerID:         int(class.BannerID),
 			MemberAmount:     countMember,
 		})
@@ -202,10 +203,72 @@ func (r *userRepository) GetOwnerClass(ctx context.Context, userID int) (*[]type
 			GoogleCourseID:   class.GoogleCourseID,
 			GoogleCourseLink: class.GoogleCourseLink,
 			GoogleSyncedAt:   class.GoogleSyncedAt,
-			Favorite:         int(class.Favorite),
 			BannerID:         int(class.BannerID),
 			MemberAmount:     countMember,
 		})
 	}
 	return &classResp, nil
+}
+
+func (r *userRepository) GetMeTask(ctx context.Context, userID int) (*[]types.TaskMeResponse, error) {
+	var member []model.Member // check member
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&member).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve member records: %w", err)
+	}
+
+	var classIDs []int
+	for _, m := range member {
+		classIDs = append(classIDs, int(m.ClassID))
+	}
+
+	var classes []model.Classroom // select classes where user is member
+	if err := r.db.WithContext(ctx).Where("id IN ?", classIDs).Find(&classes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve classes: %w", err)
+	}
+
+	// get class id list for select tasks
+	var classIDList []int
+	for _, class := range classes {
+		classIDList = append(classIDList, int(class.ID))
+	}
+
+	// select tasks where class id in classIDList
+	var assignments []model.Assignment
+	if err := r.db.WithContext(ctx).Where("class_id IN ?", classIDList).Find(&assignments).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve assignments: %w", err)
+	}
+
+	var submissions []model.Submission
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&submissions).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve submissions: %w", err)
+	}
+
+	var status string
+	var taskResp []types.TaskMeResponse
+	for _, assignment := range assignments {
+
+		var countSubmissionByAssignmentID int64
+		if err := r.db.WithContext(ctx).Model(&model.Submission{}).Where("user_id = ? AND assignment_id = ?", userID, assignment.ID).Count(&countSubmissionByAssignmentID).Error; err != nil {
+			return nil, fmt.Errorf("failed to count submissions: %w", err)
+		}
+
+		if time.Now().After(assignment.DueDate) {
+			status = "overdue"
+		} else if countSubmissionByAssignmentID > 0 {
+			status = "completed"
+		} else {
+			status = "in_progress"
+		}
+
+		taskResp = append(taskResp, types.TaskMeResponse{
+			ClassID:         int(assignment.ClassID),
+			AssignmentID:    int(assignment.ID),
+			AssignmentTitle: assignment.Title,
+			Description:     assignment.Description,
+			MaxAttempt:      assignment.MaxAttempt,
+			DueDate:         assignment.DueDate.Format((time.RFC3339)),
+			Status:          status,
+		})
+	}
+	return &taskResp, nil
 }

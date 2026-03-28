@@ -23,6 +23,13 @@ definitions:
       title:
         type: string
     type: object
+  types.BookMarkRequest:
+    properties:
+      class_id:
+        type: integer
+    required:
+    - class_id
+    type: object
   types.ChangePasswordRequest:
     properties:
       new_password:
@@ -95,8 +102,6 @@ definitions:
         type: object
       description:
         type: string
-      due_date:
-        type: string
       grade:
         description: total grade of the assignment
         type: integer
@@ -142,6 +147,8 @@ definitions:
         type: object
       duration_ms:
         type: integer
+      feed_back:
+        type: string
       is_verified:
         type: boolean
       item_snapshot:
@@ -175,6 +182,8 @@ definitions:
         type: object
       description:
         type: string
+      due_date:
+        type: string
       grade:
         description: total grade of the assignment
         type: integer
@@ -182,9 +191,6 @@ definitions:
         type: integer
       setting:
         additionalProperties: true
-        description: |-
-          Setting     AssignmentSettings  `json:"settings"`
-          Condition   AssignmentCondition `json:"condition"`
         type: object
       title:
         type: string
@@ -351,6 +357,28 @@ definitions:
       user_id:
         type: integer
     type: object
+  types.TaskMeResponse:
+    properties:
+      assignment_id:
+        type: integer
+      assignment_title:
+        type: string
+      banner_id:
+        type: integer
+      class_id:
+        type: integer
+      description:
+        type: string
+      due_date:
+        type: string
+      favorite:
+        type: integer
+      max_attempt:
+        type: integer
+      status:
+        description: e.g., "not_started", "in_progress", "completed", "overdue"
+        type: string
+    type: object
   types.TestCaseAssert:
     properties:
       flags:
@@ -448,6 +476,8 @@ definitions:
     type: object
   types.UpdateClassRequest:
     properties:
+      banner_id:
+        type: integer
       description:
         type: string
       google_course_id:
@@ -460,6 +490,18 @@ definitions:
       topic:
         type: string
     type: object
+  types.UpdateGradeRequest:
+    properties:
+      feed_back:
+        type: string
+      is_verified:
+        type: boolean
+      score:
+        type: number
+    required:
+    - is_verified
+    - score
+    type: object
   types.UpdateSubmissionRequest:
     properties:
       assignment_id:
@@ -471,6 +513,8 @@ definitions:
         type: object
       duration_ms:
         type: integer
+      feed_back:
+        type: string
       is_verified:
         type: boolean
       item_snapshot:
@@ -591,6 +635,110 @@ paths:
       summary: Register new user
       tags:
       - auth
+  /bookmark:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a bookmark for a class
+      parameters:
+      - description: Bookmark data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.BookMarkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a bookmark
+      tags:
+      - bookmark
+    get:
+      consumes:
+      - application/json
+      description: Get all bookmarks for a user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get bookmarks by user ID
+      tags:
+      - bookmark
+    post:
+      consumes:
+      - application/json
+      description: Create a bookmark for a class
+      parameters:
+      - description: Bookmark data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/types.BookMarkRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a bookmark
+      tags:
+      - bookmark
   /classroom:
     get:
       consumes:
@@ -1660,6 +1808,49 @@ paths:
       security:
       - BearerAuth: []
       summary: Get all members of a class by class ID
+      tags:
+      - classrooms
+  /classroom/join-with-code/{code}:
+    post:
+      consumes:
+      - application/json
+      description: Join a class using a unique code
+      parameters:
+      - description: Class Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Join a class with code
       tags:
       - classrooms
   /classroom/member:
@@ -2769,6 +2960,49 @@ paths:
       summary: Update an existing submission
       tags:
       - Submission
+  /submission/{submission_id}/grade:
+    put:
+      consumes:
+      - application/json
+      description: Update the grade for a specific submission by submission ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: submission_id
+        required: true
+        type: integer
+      - description: Updated Grade Data
+        in: body
+        name: grade
+        required: true
+        schema:
+          $ref: '#/definitions/types.UpdateGradeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update grade for a submission
+      tags:
+      - Submission
   /submission/assignment/{assignment_id}:
     get:
       description: Retrieve a submission for a specific assignment by assignment ID
@@ -3000,6 +3234,31 @@ paths:
       security:
       - BearerAuth: []
       summary: Get my classes
+      tags:
+      - users
+  /user/me/task:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve tasks of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TaskMeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my tasks
       tags:
       - users
   /user/owner/classroom:

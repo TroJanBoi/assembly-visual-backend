@@ -102,6 +102,7 @@ type UpdateClassRequest struct {
 	GoogleCourseID   string `json:"google_course_id"`
 	GoogleCourseLink string `json:"google_course_link"`
 	Status           int    `json:"status"` // public or private
+	BannerID         int    `json:"banner_id"`
 }
 
 type AssignmentResponse struct {
@@ -146,7 +147,6 @@ type AssignmentCondition struct {
 type CreateAssignmentRequest struct {
 	Title       string                 `json:"title" binding:"required"`
 	Description string                 `json:"description"`
-	DueDate     time.Time              `json:"due_date"`
 	MaxAttempt  int                    `json:"max_attempt"`
 	Settings    map[string]interface{} `json:"settings"`
 	Condition   map[string]interface{} `json:"condition"`
@@ -179,14 +179,13 @@ type FEBehavior struct {
 // }
 
 type EditAssignmentRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	MaxAttempt  int    `json:"max_attempt"`
-	Grade       int    `json:"grade"` // total grade of the assignment
-	// Setting     AssignmentSettings  `json:"settings"`
-	// Condition   AssignmentCondition `json:"condition"`
-	Setting   map[string]interface{} `json:"setting"`
-	Condition map[string]interface{} `json:"condition"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	MaxAttempt  int                    `json:"max_attempt"`
+	Grade       int                    `json:"grade"` // total grade of the assignment
+	Setting     map[string]interface{} `json:"setting"`
+	Condition   map[string]interface{} `json:"condition"`
+	DueDate     time.Time              `json:"due_date"`
 }
 
 type MemberResponse struct {
@@ -388,6 +387,7 @@ type CreateSubmissionRequest struct {
 	Status        string                 `json:"status"`
 	IsVerified    bool                   `json:"is_verified"`
 	DurationMS    int                    `json:"duration_ms"`
+	FeedBack      string                 `json:"feed_back"`
 }
 
 type UpdateSubmissionRequest struct {
@@ -400,6 +400,7 @@ type UpdateSubmissionRequest struct {
 	Score         float64                `json:"score"`
 	Status        string                 `json:"status"`
 	IsVerified    bool                   `json:"is_verified"`
+	FeedBack      string                 `json:"feed_back"`
 	DurationMS    int                    `json:"duration_ms"`
 }
 
@@ -440,4 +441,47 @@ type NotificationResponse struct {
 
 type RecentRequest struct {
 	Limit []int `json:"limit" binding:"required"`
+}
+
+type TaskMeResponse struct {
+	ClassID         int    `json:"class_id"`
+	BannerID        int    `json:"banner_id"`
+	Favorite        int    `json:"favorite"`
+	AssignmentID    int    `json:"assignment_id"`
+	AssignmentTitle string `json:"assignment_title"`
+	Description     string `json:"description"`
+	MaxAttempt      int    `json:"max_attempt"`
+
+	DueDate string `json:"due_date"`
+	Status  string `json:"status"` // e.g., "not_started", "in_progress", "completed", "overdue"
+}
+
+type TaskMeDetailResponse struct {
+	ClassID         int                  `json:"class_id"`
+	BannerID        int                  `json:"banner_id"`
+	Favorite        int                  `json:"favorite"`
+	AssignmentID    int                  `json:"assignment_id"`
+	AssignmentTitle string               `json:"assignment_title"`
+	Description     string               `json:"description"`
+	MaxAttempt      int                  `json:"max_attempt"`
+	DueDate         string               `json:"due_date"`
+	Status          string               `json:"status"` // e.g., "not_started", "in_progress", "completed", "overdue"
+	Submissions     []SubmissionResponse `json:"submissions"`
+	Playground      *PlaygroundResponse  `json:"playground,omitempty"`
+	Assignment      *AssignmentResponse  `json:"assignment,omitempty"`
+	Class           *ClassMeResponse     `json:"class,omitempty"`
+}
+
+type BookMarkRequest struct {
+	ClassID int `json:"class_id" binding:"required"`
+}
+
+type UpdateGradeRequest struct {
+	Score      float64 `json:"score" binding:"required"`
+	IsVerified bool    `json:"is_verified" binding:"required"`
+	FeedBack   string  `json:"feed_back"`
+}
+
+type BadRequestError struct {
+	Message string `json:"message"`
 }

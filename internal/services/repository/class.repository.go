@@ -24,6 +24,7 @@ type ClassRepository interface {
 	ChangePermissionMember(ctx context.Context, userID, classID int, newRole string) error
 	RemoveMemberInClass(ctx context.Context, classID, userID int) error
 	GetClassRecentManyIDs(ctx context.Context, limit []int) (*[]types.ClassResponse, error)
+	JoinWithCode(ctx context.Context, userID int, code string) error
 }
 
 type classRepository struct {
@@ -81,7 +82,6 @@ func (r *classRepository) GetAllClasses(ctx context.Context) (*[]types.ClassResp
 			OwnerName:        owner.Name,
 			Status:           class.Status,
 			MemberAmount:     memberCount,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
@@ -201,7 +201,6 @@ func (r *classRepository) GetClassByID(ctx context.Context, classID int) (*types
 		OwnerName:        owner.Name,
 		MemberAmount:     memberCount,
 		Status:           class.Status,
-		Favorite:         class.Favorite,
 		BannerID:         class.BannerID,
 	}
 
@@ -308,7 +307,6 @@ func (r *classRepository) GetAllClassPublic(ctx context.Context) (*[]types.Class
 			OwnerName:        owner.Name,
 			MemberAmount:     memberCount,
 			Status:           class.Status,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
@@ -382,10 +380,42 @@ func (r *classRepository) GetClassRecentManyIDs(ctx context.Context, limit []int
 			OwnerName:        owner.Name,
 			MemberAmount:     memberCount,
 			Status:           class.Status,
-			Favorite:         class.Favorite,
 			BannerID:         class.BannerID,
 		})
 	}
 
 	return &classResponses, nil
+}
+
+func (r *classRepository) JoinWithCode(ctx context.Context, userID int, code string) error {
+	var class model.Classroom
+	if err := r.db.WithContext(ctx).Where("code = ?", code).First(&class).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return gorm.ErrRecordNotFound
+		}
+		return err
+	}
+
+	// Check if the user is the owner of the class
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", class.ID, userID).First(&class).Error; err == nil {
+		return errors.New("owner cannot join their own class as member")
+	}
+
+	// Check if the user is already a member of the class
+	var member model.Member
+	if err := r.db.WithContext(ctx).Where("user_id = ? AND class_id = ?", userID, class.ID).First(&member).Error; err == nil {
+		return errors.New("user already joined the class")
+	}
+
+	var newMember model.Member
+	newMember.UserID = userID
+	newMember.ClassID = int(class.ID)
+	newMember.JoinAt = time.Now()
+	newMember.Role = "member"
+
+	if err := r.db.WithContext(ctx).Create(&newMember).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -222,10 +222,58 @@ func (c *SubmissionController) GetAllSubmissionByAssignmentIDandUserID(ctx *gin.
 	ctx.JSON(http.StatusOK, submissionResponse)
 }
 
+// @Summary Update grade for a submission
+// @Description Update the grade for a specific submission by submission ID
+// @Tags Submission
+// @Accept json
+// @Produce json
+// @Param submission_id path int true "Submission ID"
+// @Param grade body types.UpdateGradeRequest true "Updated Grade Data"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Security     BearerAuth
+// @Router /submission/{submission_id}/grade [put]
+func (c *SubmissionController) UpdateGrade(ctx *gin.Context) {
+	userIDVal, exist := ctx.Get("user_id")
+	if !exist {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID, ok := userIDVal.(int)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	submissionIDStr := ctx.Param("submission_id")
+	submissionID, err := strconv.Atoi(submissionIDStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid submission ID"})
+		return
+	}
+
+	var req types.UpdateGradeRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = c.submissionUseCase.UpdateGradeUseCase(ctx.Request.Context(), userID, submissionID, req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "grade updated successfully"})
+}
+
 func (c *SubmissionController) SubmissionRoutes(r gin.IRoutes) {
 	r.POST("/", c.CreateSubmission)
 	r.PUT("/:submission_id", c.UpdateSubmission)
 	r.GET("/assignment/:assignment_id", c.GetAllSubmissionByAssignmentID)
 	r.GET("/:submission_id", c.GetSubmissionByID)
 	r.GET("/assignment/:assignment_id/user", c.GetAllSubmissionByAssignmentIDandUserID)
+	r.PUT("/:submission_id/grade", c.UpdateGrade)
 }
