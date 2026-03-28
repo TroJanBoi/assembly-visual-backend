@@ -18,7 +18,6 @@ RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /app
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
 
 EXPOSE 9090
 
